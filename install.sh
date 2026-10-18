@@ -3,12 +3,13 @@
 # Kaiju OS Bootstrap Installer — install.sh
 # Implements: the installer spec v1.0 (first draft 2026-09-17)
 #
-# STATUS: run end to end on clean VMs on the MINIMAL path (Docker
-# pre-installed, model pull skipped, FASHSD skipped) on Ubuntu 24.04,
-# Debian 13 and Ubuntu 22.04 LTS; the bugs those runs found are fixed.
-# The FULL path (Docker install, model pull, FASHSD Phase 5) is not yet
-# timed or verified end to end, so treat Phase 5 as less exercised than
-# the other phases.
+# STATUS: run end to end. The minimal path (Docker pre-installed, model
+# pull skipped, FASHSD skipped) ran on clean VMs on Ubuntu 24.04, Debian
+# 13 and Ubuntu 22.04 LTS; the bugs those runs found are fixed. The FULL
+# path (Docker install, Tier 3 model pull, FASHSD Phase 5) ran once on
+# Ubuntu 24.04: 11m33s, no errors, and the installed watchdog timer ran
+# unattended afterward. The full path on Debian 13 and Ubuntu 22.04 has
+# not been run.
 #
 # Resolved design decisions this script follows (the installer spec's
 # open questions, all resolved 2026-09-13):
