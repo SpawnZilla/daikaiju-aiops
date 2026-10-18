@@ -67,7 +67,8 @@ and the agent layer outside the reference deployment.
 
 The Daikaiju AIOps execution agent runs on Claude Code. Claude Code is not bundled
 and is not needed for Kaiju GAIS. The installer prints a note if it is not on your
-`PATH`; install it yourself when you want the execution agent.
+`PATH`; install it yourself when you want the execution agent. Check Anthropic's
+current terms before using it with non-Anthropic models.
 
 ## Layout
 
