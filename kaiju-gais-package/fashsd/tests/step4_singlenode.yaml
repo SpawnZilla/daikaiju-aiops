@@ -1,0 +1,12 @@
+# step4_singlenode.yaml — wol_trigger.sh should no-op cleanly in this mode
+
+topology:
+  mode: single-node
+
+services: []
+drives: []
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

@@ -1,0 +1,21 @@
+# step19_compose.yml -- disposable owner+dependent stack for run_tests.sh Step 19
+# (Round 6, verified live 2026-09-25). Usage:
+#   mkdir -p /tmp/kaiju-orch-networkgroup-test
+#   cp step19_compose.yml /tmp/kaiju-orch-networkgroup-test/docker-compose.yml
+#   cd /tmp/kaiju-orch-networkgroup-test && docker compose up -d
+services:
+  kaiju-test-orch-owner:
+    image: nginx:alpine
+    container_name: kaiju-test-orch-owner
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+  kaiju-test-orch-dep:
+    image: curlimages/curl
+    container_name: kaiju-test-orch-dep
+    network_mode: "service:kaiju-test-orch-owner"
+    entrypoint: ["sleep", "infinity"]
+    depends_on:
+      - kaiju-test-orch-owner

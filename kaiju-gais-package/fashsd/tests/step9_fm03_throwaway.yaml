@@ -1,0 +1,42 @@
+# step9_fm03_throwaway.yaml — for testing fm03_gluetun_unhealthy.sh
+# ONLY against a disposable compose stack, never real Kaidosho arr/gluetun.
+#
+# fm03 needs a real HEALTHCHECK-bearing "owner" container plus at least
+# one "dependent" that shares its network namespace and can curl out.
+# A minimal disposable stack: a container with a HEALTHCHECK directive
+# as the owner, and a second container using `network_mode: service:owner`
+# as the dependent/verify_via target.
+#
+# Setup required BEFORE running (see run_tests.sh Step 9):
+#   1. mkdir -p /tmp/kaiju-fm03-test && cd /tmp/kaiju-fm03-test
+#   2. Write a docker-compose.yml with two services:
+#      - "kaiju-test-owner": any image with a HEALTHCHECK (e.g. a
+#        curlimages/curl image looping `curl localhost` with a
+#        HEALTHCHECK CMD) — this stands in for gluetun
+#      - "kaiju-test-dep": network_mode: "service:kaiju-test-owner",
+#        any image with curl installed (e.g. curlimages/curl, keep it
+#        alive with `sleep infinity`) — this stands in for qbittorrent
+#   3. docker compose up -d, confirm both are up and owner reports
+#      healthy: docker inspect --format='{{.State.Health.Status}}' kaiju-test-owner
+#   4. Set KAIJU_FM03_VERIFY_URL to something the dependent can
+#      genuinely reach (defaults to https://nyaa.si, any reachable
+#      URL is fine for this test)
+#   5. THEN run fm03_gluetun_unhealthy.sh against this config
+
+topology:
+  mode: single-node
+
+services: []
+
+network_groups:
+  - owner: "kaiju-test-owner"
+    dependents: ["kaiju-test-dep"]
+    compose_dir: "/tmp/kaiju-fm03-test"
+    verify_via: "kaiju-test-dep"
+
+drives: []
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

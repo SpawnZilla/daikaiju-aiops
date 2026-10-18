@@ -1,0 +1,34 @@
+# step8_fm05_throwaway.yaml — for testing fm05_drive_not_mounted.sh
+# ONLY against a disposable loopback-mounted file, never a real drive.
+#
+# fm05_drive_not_mounted.sh's fix command is `sudo mount "/mnt/$drive_name"`
+# — it relies on an /etc/fstab entry to know what to mount, it does not
+# take a device path directly. Safe disposable testing means creating a
+# throwaway loopback image + a TEMPORARY fstab entry, not touching any
+# real drive or any real existing fstab entry.
+#
+# Setup required BEFORE running the test (see run_tests.sh Step 8 /
+# TESTING.md for the full sequence, including fstab cleanup after):
+#   1. Create a small loopback image + filesystem
+#   2. Add a TEMPORARY /etc/fstab entry for it, mount point /mnt/kaiju-test-drive
+#   3. Mount it once to confirm it works, then unmount (simulate the
+#      FM-05 trigger condition: configured but not currently mounted)
+#   4. THEN run fm05_drive_not_mounted.sh against this config
+#   5. Cleanup: unmount, remove the fstab entry, delete the image file
+
+topology:
+  mode: single-node
+
+services: []
+
+drives:
+  - name: "kaiju-test-drive"
+    mount_point: "/mnt/kaiju-test-drive"
+    device: "/dev/loop-kaiju-test"
+    smart_check: false
+
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

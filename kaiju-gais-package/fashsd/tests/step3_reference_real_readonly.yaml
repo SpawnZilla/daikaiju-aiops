@@ -1,0 +1,98 @@
+# step3_reference_real_readonly.yaml — Kaidosho's actual 10 FM-09 services, translated
+# to the Kaiju OS schema, for a REAL side-by-side comparison against
+# Kaidosho's original hardcoded app_curl_check.sh. READ-ONLY — this script
+# only curls health endpoints, never modifies anything, safe to run
+# against live Kaidosho infrastructure.
+#
+# Values pulled directly from Kaidosho's original hardcoded
+# app_curl_check.sh — should produce IDENTICAL PASS/FAIL output to
+# that original script when run.
+#
+# NOTE: compose_dir values below are BEST-GUESS mappings inferred from
+# FM-01's ALLOWED_DIRS list + the reference deployment service index, NOT independently
+# verified against real docker-compose.yml locations. This is fine for
+# THIS test (app_curl_check.sh never reads compose_dir), but do NOT
+# reuse this file for testing fm01_container_exited.sh — use
+# step6_throwaway_container.yaml for that instead, which sidesteps the
+# need for accurate compose_dir entirely by using a disposable container.
+
+topology:
+  mode: two-node-wol
+  watcher_node:
+    name: "pi-node"
+    ip: "192.0.2.21"
+  target_node:
+    name: "Dokaisho"
+    ip: "192.0.2.45"
+    mac: "02:00:00:00:00:01"
+
+services:
+  - name: "open-webui"
+    container: "open-webui"
+    compose_dir: "/mnt/hola3/compose/openwebui"   # best-guess, unverified
+    health_url: "http://192.0.2.21:3000/health"
+    expected_code: "200"
+    timeout_seconds: 15
+  - name: "gitea"
+    container: "gitea"
+    compose_dir: "/mnt/hola3/compose/gitea"        # best-guess, unverified
+    health_url: "http://192.0.2.21:3002/api/healthz"
+    expected_code: "200"
+    timeout_seconds: 10
+  - name: "immich"
+    container: "immich-server"
+    compose_dir: "/mnt/hola3/compose/immich"       # best-guess, unverified
+    health_url: "http://192.0.2.21:2283/api/server/ping"
+    expected_code: "200"
+    timeout_seconds: 15
+  - name: "vaultwarden"
+    container: "vaultwarden"
+    compose_dir: "/mnt/hola3/compose/vaultwarden"  # best-guess, unverified
+    health_url: "http://192.0.2.21:8090/api/config"
+    expected_code: "200"
+    timeout_seconds: 10
+  - name: "searxng"
+    container: "searxng"
+    compose_dir: "/mnt/hola3/compose/searxng"      # best-guess, unverified
+    health_url: "http://192.0.2.21:8085/healthz"
+    expected_code: "200"
+    timeout_seconds: 10
+  - name: "jellyfin"
+    container: "jellyfin"
+    compose_dir: "/mnt/hola2/compose/jellyfin"     # best-guess, unverified
+    health_url: "http://192.0.2.21:8096/health"
+    expected_code: "200"
+    timeout_seconds: 10
+  - name: "nextcloud"
+    container: "nextcloud"
+    compose_dir: "/mnt/hola3/compose/nextcloud"    # best-guess, unverified
+    health_url: "http://192.0.2.21:9090/status.php"
+    expected_code: "200"
+    timeout_seconds: 15
+  - name: "uptime-kuma"
+    container: "uptime-kuma"
+    compose_dir: "/mnt/hola3/compose/monitoring"   # best-guess, unverified
+    health_url: "http://192.0.2.21:3001"
+    expected_code: "302"
+    timeout_seconds: 10
+  - name: "prowlarr"
+    container: "prowlarr"
+    compose_dir: "/mnt/hola2/compose/arr"          # best-guess, unverified
+    health_url: "http://192.0.2.21:9696"
+    expected_code: "302"
+    timeout_seconds: 10
+  - name: "dozzle"
+    container: "dozzle"
+    compose_dir: "/mnt/hola3/compose/monitoring"   # best-guess, unverified
+    health_url: "http://192.0.2.21:8888"
+    expected_code: "200"
+    timeout_seconds: 10
+
+drives: []
+
+alerting:
+  ntfy_topic: "kaiju-alerts"
+  ntfy_self_hosted_url: "http://192.0.2.45:8201"
+
+watchdog:
+  interval_minutes: 30

@@ -1,0 +1,34 @@
+# step10_fm06_throwaway.yaml — for testing fm06_ghost_mount.sh
+# ONLY against a disposable loopback-mounted file, same pattern as
+# step8_fm05_throwaway.yaml — never a real drive.
+#
+# Setup required BEFORE running (see run_tests.sh Step 10):
+#   1. Create a small loopback image + filesystem (same as step 8)
+#   2. Inside it, create the subdirectories listed under
+#      expected_subdirs below (mkdir kaiju-subdir-a kaiju-subdir-b)
+#   3. Add a TEMPORARY /etc/fstab entry, mount point
+#      /mnt/kaiju-test-ghost-drive
+#   4. Mount once to confirm the subdirs are visible, then leave it
+#      mounted (fm06 force-unmounts as part of its own fix — you do
+#      NOT need to pre-unmount like step 8 does)
+#   5. THEN run fm06_ghost_mount.sh against this config
+#   6. Cleanup: same as step 8 (unmount, remove fstab entry, delete
+#      the image file)
+
+topology:
+  mode: single-node
+
+services: []
+
+drives:
+  - name: "kaiju-test-ghost-drive"
+    mount_point: "/mnt/kaiju-test-ghost-drive"
+    device: "/dev/loop-kaiju-test-ghost"
+    smart_check: false
+    expected_subdirs: ["kaiju-subdir-a", "kaiju-subdir-b"]
+
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

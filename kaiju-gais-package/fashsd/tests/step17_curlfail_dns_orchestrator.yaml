@@ -1,0 +1,18 @@
+topology:
+  mode: single-node
+services:
+  - name: kaiju-test-orch-dns
+    container: kaiju-test-orch-dns
+    compose_dir: /tmp/kaiju-orch-dns-test
+    health_url: "http://localhost:8194/nonexistent-path"
+    expected_code: "200"
+    timeout_seconds: 5
+    dns_check_url: "https://1.1.1.1"
+network_groups: []
+drives: []
+watchdog:
+  interval_minutes: 60
+  clock_drift_threshold_ms: 2000
+alerting:
+  ntfy_topic: "kaiju-alerts"
+  ntfy_self_hosted_url: "http://192.0.2.45:8201"

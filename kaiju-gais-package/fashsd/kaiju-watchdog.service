@@ -1,0 +1,11 @@
+[Unit]
+Description=Kaiju OS FASHSD Watchdog
+After=network.target docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/kaiju-os/watchdog/pi5_watchdog.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target

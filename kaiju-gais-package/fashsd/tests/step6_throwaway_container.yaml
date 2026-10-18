@@ -1,0 +1,28 @@
+# step6_throwaway_container.yaml — for testing fm01_container_exited.sh
+# ONLY against a disposable container, never a real Kaidosho service.
+#
+# Setup required BEFORE running the test (see run_tests.sh Step 6 /
+# TESTING.md for the full sequence):
+#   1. mkdir -p /tmp/kaiju-fm01-test && cd /tmp/kaiju-fm01-test
+#   2. Write a minimal docker-compose.yml there (see TESTING.md)
+#   3. docker compose up -d   (starts the throwaway container)
+#   4. docker stop kaiju-test-nginx   (simulate the FM-01 trigger condition)
+#   5. THEN run fm01_container_exited.sh against this config
+
+topology:
+  mode: single-node
+
+services:
+  - name: "kaiju-test-nginx"
+    container: "kaiju-test-nginx"
+    compose_dir: "/tmp/kaiju-fm01-test"
+    health_url: "http://localhost:8199"
+    expected_code: "200"
+    timeout_seconds: 10
+
+drives: []
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

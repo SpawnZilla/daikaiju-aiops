@@ -1,0 +1,29 @@
+# step11_fm07_throwaway.yaml — for testing fm07_dns_failure.sh
+# ONLY against a disposable compose stack, never real Kaidosho prowlarr.
+#
+# Setup required BEFORE running (see run_tests.sh Step 11):
+#   1. mkdir -p /tmp/kaiju-fm07-test && cd /tmp/kaiju-fm07-test
+#   2. Write a docker-compose.yml with one service, "kaiju-test-dns",
+#      any image with curl installed (e.g. curlimages/curl, keep it
+#      alive with `sleep infinity`)
+#   3. docker compose up -d, confirm it's running
+#   4. THEN run: fm07_dns_failure.sh kaiju-test-dns
+
+topology:
+  mode: single-node
+
+services:
+  - name: "kaiju-test-dns"
+    container: "kaiju-test-dns"
+    compose_dir: "/tmp/kaiju-fm07-test"
+    health_url: "http://localhost:8197"
+    expected_code: "200"
+    timeout_seconds: 10
+    dns_check_url: "https://nyaa.si"
+
+drives: []
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

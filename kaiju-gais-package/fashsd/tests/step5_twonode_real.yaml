@@ -1,0 +1,22 @@
+# step5_twonode_real.yaml — Kaidosho's real Dokaisho MAC, for comparing
+# generalized wol_trigger.sh against Kaidosho's original wol_trigger.sh.
+# Safe to run: a WoL packet to a MAC you own is harmless even if the
+# target machine is already awake — it's a no-op in that case.
+
+topology:
+  mode: two-node-wol
+  watcher_node:
+    name: "pi-node"
+    ip: "192.0.2.21"
+  target_node:
+    name: "Dokaisho"
+    ip: "192.0.2.45"
+    mac: "02:00:00:00:00:01"
+
+services: []
+drives: []
+alerting:
+  ntfy_topic: "kaiju-alerts"
+  ntfy_self_hosted_url: "http://192.0.2.45:8201"
+watchdog:
+  interval_minutes: 30

@@ -1,0 +1,46 @@
+# step1_isolated.yaml — Test the config lib alone, no real infra involved
+# Purpose: verify fashsd_config_lib.sh's functions return exactly what's
+# in this file. Nothing here is real — pure structural test.
+
+topology:
+  mode: two-node-wol
+  watcher_node:
+    name: "test-watcher"
+    ip: "192.0.2.99"
+  target_node:
+    name: "test-target"
+    ip: "192.0.2.98"
+    mac: "00:11:22:33:44:55"
+
+services:
+  - name: "fake-service-a"
+    container: "fake-a"
+    compose_dir: "/tmp/fake/a"
+    health_url: "http://localhost:9001/health"
+    expected_code: "200"
+    timeout_seconds: 5
+  - name: "fake-service-b"
+    container: "fake-b"
+    compose_dir: "/tmp/fake/b"
+    health_url: "http://localhost:9002/health"
+    expected_code: "200"
+    timeout_seconds: 5
+  - name: "fake-service-c"
+    container: "fake-c"
+    compose_dir: "/tmp/fake/c"
+    health_url: "http://localhost:9003/health"
+    expected_code: "302"
+    timeout_seconds: 5
+
+drives:
+  - name: "fake-drive-1"
+    mount_point: "/mnt/fake1"
+    device: "/dev/fakea"
+    smart_check: true
+
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+
+watchdog:
+  interval_minutes: 60

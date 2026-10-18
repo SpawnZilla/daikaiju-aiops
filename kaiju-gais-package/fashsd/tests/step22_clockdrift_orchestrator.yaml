@@ -1,0 +1,17 @@
+topology:
+  mode: single-node
+services:
+  - name: kaiju-test-orch-clockdrift
+    container: kaiju-test-orch-clockdrift
+    compose_dir: /tmp/kaiju-orch-clockdrift-test
+    health_url: "http://localhost:8192"
+    expected_code: "200"
+    timeout_seconds: 5
+network_groups: []
+drives: []
+watchdog:
+  interval_minutes: 60
+  clock_drift_threshold_ms: 1
+alerting:
+  ntfy_topic: "kaiju-alerts"
+  ntfy_self_hosted_url: "http://192.0.2.45:8201"

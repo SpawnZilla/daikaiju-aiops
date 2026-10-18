@@ -1,0 +1,33 @@
+# step12_fm04_throwaway.yaml — for testing fm04_clock_drift.sh
+# ONLY against disposable containers listed here — this script loops
+# over EVERY entry in services[] and restarts it, so whatever is
+# listed below is the entire blast radius. Never point KAIJU_CONFIG
+# at Kaidosho's real production config when running this script.
+#
+# fm04 also does a real, system-wide `timedatectl set-ntp false/true`
+# toggle regardless of this config — that part is not scoped by
+# services[] and affects the host directly (brief, harmless resync).
+#
+# Setup required BEFORE running (see run_tests.sh Step 12):
+#   1. Bring up 1 disposable container (e.g. same pattern as step 11)
+#   2. Confirm KAIJU_CONFIG points at THIS file, listing only that
+#      container below
+#   3. bash fm04_clock_drift.sh   (takes no arguments)
+
+topology:
+  mode: single-node
+
+services:
+  - name: "kaiju-test-drift"
+    container: "kaiju-test-drift"
+    compose_dir: "/tmp/kaiju-fm04-test"
+    health_url: "http://localhost:8196"
+    expected_code: "200"
+    timeout_seconds: 10
+
+drives: []
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

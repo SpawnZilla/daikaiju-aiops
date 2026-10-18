@@ -1,0 +1,39 @@
+# step2_harmless.yaml — Test app_curl_check.sh against safe, predictable
+# external URLs before pointing it at anything real. httpbin.org's
+# /status/<code> endpoints return exactly the code requested — perfect
+# for verifying the PASS/FAIL logic works correctly in both directions.
+
+topology:
+  mode: single-node
+
+services:
+  - name: "httpbin-200"
+    container: "n/a"
+    compose_dir: "/tmp/n-a"
+    health_url: "https://httpbin.org/status/200"
+    expected_code: "200"
+    timeout_seconds: 10
+  - name: "httpbin-302"
+    container: "n/a"
+    compose_dir: "/tmp/n-a"
+    health_url: "https://httpbin.org/status/302"
+    expected_code: "302"
+    timeout_seconds: 10
+  - name: "httpbin-expect-mismatch"
+    container: "n/a"
+    compose_dir: "/tmp/n-a"
+    health_url: "https://httpbin.org/status/404"
+    expected_code: "200"
+    timeout_seconds: 10
+    # ^ deliberately WRONG expected code (real response is 404, we
+    # claim we expect 200) — this entry should show up as FAIL.
+    # If it shows PASS instead, the comparison logic is broken.
+
+drives: []
+
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+
+watchdog:
+  interval_minutes: 60

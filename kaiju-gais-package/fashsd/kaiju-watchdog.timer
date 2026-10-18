@@ -1,0 +1,10 @@
+[Unit]
+Description=Kaiju OS FASHSD Watchdog Timer
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=kaiju-watchdog.service
+
+[Install]
+WantedBy=timers.target

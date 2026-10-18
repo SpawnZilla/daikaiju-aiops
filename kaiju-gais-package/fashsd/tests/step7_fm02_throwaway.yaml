@@ -1,0 +1,38 @@
+# step7_fm02_throwaway.yaml — for testing fm02_daemon_down.sh
+# ONLY against a disposable compose stack, never real Kaidosho services.
+#
+# ⚠️  IMPORTANT — read before running: fm02_daemon_down.sh's
+# "sudo systemctl start docker" line restarts the ENTIRE Docker daemon
+# on whatever host it runs on. This is NOT scoped to the compose_dir(s)
+# listed below — a daemon restart affects every container on the host,
+# regardless of what's in this config. Choosing throwaway compose dirs
+# reduces risk for the compose-loop portion, but does not eliminate the
+# full-host impact of the daemon restart itself. Only run this when a
+# brief restart of everything on the host is acceptable — during
+# planned maintenance, on a disposable VM, or deliberately on Dokaisho
+# when nothing time-sensitive is running.
+#
+# Setup required BEFORE running the test (see run_tests.sh Step 7 /
+# TESTING.md for the full sequence):
+#   1. mkdir -p /tmp/kaiju-fm02-test && cd /tmp/kaiju-fm02-test
+#   2. Write a minimal docker-compose.yml there (see TESTING.md)
+#   3. docker compose up -d   (starts the throwaway container)
+#   4. THEN run fm02_daemon_down.sh against this config
+
+topology:
+  mode: single-node
+
+services:
+  - name: "kaiju-test-nginx"
+    container: "kaiju-test-nginx"
+    compose_dir: "/tmp/kaiju-fm02-test"
+    health_url: "http://localhost:8198"
+    expected_code: "200"
+    timeout_seconds: 10
+
+drives: []
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

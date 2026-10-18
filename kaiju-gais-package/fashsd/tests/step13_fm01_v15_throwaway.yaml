@@ -1,0 +1,40 @@
+# step13_fm01_v15_throwaway.yaml — for testing fm01_container_exited.sh's
+# schema v1.5 `service:` field ONLY against
+# disposable containers, never a real Kaidosho service.
+#
+# Two services[] entries, matching run_tests.sh Step 13's two cases:
+#   - kaiju-test-v15-server: container name (Compose-auto-generated,
+#     no container_name: override) genuinely differs from its Compose
+#     service name -- exercises the new `service:` field, Scanopy-shaped.
+#   - kaiju-test-v15-fallback: container name == service name (explicit
+#     container_name: override, no `service:` field set) -- companion
+#     regression check that the pre-v1.5 fallback path is unchanged.
+#
+# Setup required BEFORE running the test (see run_tests.sh Step 13 /
+# TESTING.md Round 4 for the full sequence) -- both disposable compose
+# projects must be up, then stopped, before invoking fm01_container_exited.sh.
+
+topology:
+  mode: single-node
+
+services:
+  - name: "kaiju-test-v15-server"
+    container: "kaijufm01v15-server-1"
+    service: "server"
+    compose_dir: "/tmp/kaiju-fm01-v15-test"
+    health_url: "http://localhost:8197"
+    expected_code: "200"
+    timeout_seconds: 10
+  - name: "kaiju-test-v15-fallback"
+    container: "kaiju-test-v15-fallback"
+    compose_dir: "/tmp/kaiju-fm01-v15-fallback"
+    health_url: "http://localhost:8196"
+    expected_code: "200"
+    timeout_seconds: 10
+
+drives: []
+alerting:
+  ntfy_topic: "kaiju-test"
+  ntfy_self_hosted_url: ""
+watchdog:
+  interval_minutes: 60

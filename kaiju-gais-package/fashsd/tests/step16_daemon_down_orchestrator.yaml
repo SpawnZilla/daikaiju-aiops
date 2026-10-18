@@ -1,0 +1,11 @@
+topology:
+  mode: single-node
+services: []
+network_groups: []
+drives: []
+watchdog:
+  interval_minutes: 60
+  clock_drift_threshold_ms: 2000
+alerting:
+  ntfy_topic: "kaiju-alerts"
+  ntfy_self_hosted_url: "http://192.0.2.45:8201"

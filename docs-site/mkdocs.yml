@@ -1,0 +1,14 @@
+site_name: Kaidosho
+site_description: Autonomous, self-healing agentic infrastructure operations
+theme:
+  name: readthedocs
+
+markdown_extensions:
+  - admonition
+
+nav:
+  - Home: index.md
+  - Daikaiju AIOps: daikaiju-aiops.md
+  - Kaiju GAIS: kaiju-gais.md
+  - Kaiju OS: kaiju-os.md
+  - Status & Roadmap: status.md
