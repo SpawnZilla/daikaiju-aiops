@@ -56,9 +56,9 @@ Notes:
   - Apple Silicon (Metal): Ollama supports this natively too, but is
     completely outside Kaidosho's own experience — mark UNVERIFIED, no
     installer support assumed for v1 (the bootstrap installer targets
-    Debian/Ubuntu Linux only per the installer spec's locked
-    decision, so macOS is out of scope for v1 regardless of Ollama's
-    own Metal support).
+    Linux only — Debian/Ubuntu, Arch Linux and Fedora tested — so
+    macOS is out of scope for v1 regardless of Ollama's own Metal
+    support).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 WATCHER/SERVICES NODE — MINIMUM SPECS

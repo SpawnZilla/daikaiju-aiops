@@ -13,16 +13,16 @@ keeps that same standard for anyone reading from the outside.
   daily use.
 - The installer for the packaged bundle (Kaiju OS) — built, tested
   across multiple clean-environment rounds, closed.
+- Distro portability to Arch Linux and Fedora 44 Cloud Base, alongside Debian/Ubuntu: minimal path tested on both; real model pull verified on Fedora only. RHEL/CentOS, Fedora Workstation/Server and non-systemd distros remain untested/out of scope.
 - The orchestration/guardrail automation layer — built, and has
   reached fully autonomous operation at least once in testing. Its
   trust state resets to a more supervised mode automatically any time
-  a mistake is detected, by design. It is currently at its first
-  graduated stage (re-qualified 2026-10-02) and has not yet returned
-  to full autonomy.
+  a mistake is detected, by design. It returned to fully autonomous
+  operation on 2026-10-10 after three supervised qualifying rounds,
+  and its live state was last verified on 2026-10-18.
 
 ## Designed but not yet built
 
-- Portability to Linux distributions outside the Debian/Ubuntu family.
 - A fuller clean-environment timing test of the "deployable by someone
   else in a reasonable amount of time" claim.
 

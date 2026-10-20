@@ -6,10 +6,12 @@
 # STATUS: run end to end. The minimal path (Docker pre-installed, model
 # pull skipped, FASHSD skipped) ran on clean VMs on Ubuntu 24.04, Debian
 # 13 and Ubuntu 22.04 LTS; the bugs those runs found are fixed. The FULL
-# path (Docker install, Tier 3 model pull, FASHSD Phase 5) ran once on
-# Ubuntu 24.04: 11m33s, no errors, and the installed watchdog timer ran
-# unattended afterward. The full path on Debian 13 and Ubuntu 22.04 has
-# not been run.
+# path (Docker install, Tier 3 model pull, FASHSD Phase 5) on Ubuntu
+# 24.04 was reported at 11m33s with no errors; its log was not kept, so
+# that is unverified. The model-pull step had a startup race on Ubuntu,
+# Arch and Fedora (fixed with wait_for_ollama_api); the fix was verified
+# with a real pull on Fedora only. Arch and Fedora 44 Cloud Base ran the
+# minimal path clean.
 #
 # Resolved design decisions this script follows (the installer spec's
 # open questions, all resolved 2026-09-13):
@@ -91,6 +93,73 @@ confirm() {
     esac
 }
 
+# wait_for_ollama_api -- the Ollama install step (curl|sh) returns as
+# soon as its own download/extract/service-enable finishes, but on a
+# fresh install this routinely takes 20-30s of real wall time (the
+# binary download+extraction itself, confirmed via journalctl on
+# Fedora and Arch test VMs, KAI-097) before ollama.service actually
+# starts listening -- so the very next command, 'ollama pull', loses
+# that race deterministically. Poll the real API instead of trusting
+# the upstream installer's own "available" message (observed on Arch
+# to print even when the daemon was not yet reachable).
+wait_for_ollama_api() {
+    local timeout=30 waited=0
+    echo "Waiting for the Ollama API to come up (up to ${timeout}s)..."
+    while [ "$waited" -lt "$timeout" ]; do
+        if curl -s -m 2 http://127.0.0.1:11434/api/version >/dev/null 2>&1; then
+            echo "Ollama API is up (after ${waited}s)."
+            return 0
+        fi
+        sleep 2
+        waited=$((waited + 2))
+    done
+    echo "Ollama API did not come up within ${timeout}s; continuing anyway (pull may fail)."
+    return 1
+}
+
+# --- Package manager abstraction (KAI-097 distro portability) --
+# apt (Debian/Ubuntu) behaves as before; pacman (Arch) and dnf (Fedora)
+# were added and ran the minimal path clean on Arch and Fedora 44 Cloud
+# Base. See Distro_Portability_Design.md. ---
+detect_pkg_manager() {
+    if command -v apt-get >/dev/null 2>&1; then
+        PKG_MANAGER="apt"
+    elif command -v pacman >/dev/null 2>&1; then
+        PKG_MANAGER="pacman"
+    elif command -v dnf >/dev/null 2>&1; then
+        PKG_MANAGER="dnf"
+    else
+        PKG_MANAGER=""
+    fi
+}
+
+# kaiju_install_pkg <generic-name> -- installs <generic-name> via the
+# package manager PKG_MANAGER was set to, translating the name through
+# the per-distro map below where a distro calls it something else.
+kaiju_install_pkg() {
+    local generic="$1" pkg="$1"
+    case "$PKG_MANAGER" in
+        apt)
+            sudo apt-get update -y && sudo apt-get install -y "$pkg"
+            ;;
+        pacman)
+            case "$generic" in
+                pipx) pkg="python-pipx" ;;
+            esac
+            sudo pacman -Sy --noconfirm "$pkg"
+            ;;
+        dnf)
+            # Fedora round (KAI-097): names verified against a real
+            # Fedora 44 Cloud box, see RESULTS_fedora.md.
+            sudo dnf install -y "$pkg"
+            ;;
+        *)
+            echo "FATAL: no supported package manager (apt/pacman/dnf) found -- cannot install $generic." >&2
+            return 1
+            ;;
+    esac
+}
+
 # ============================================================
 # PHASE 0 — PRE-FLIGHT CHECKS
 # ============================================================
@@ -106,12 +175,16 @@ phase_0() {
     . /etc/os-release
     case "${ID_LIKE:-$ID}" in
         *debian*|*ubuntu*) ;;
+        *arch*) ;;
+        *fedora*) ;;
         *)
-            echo "Kaiju OS v1 currently supports Debian/Ubuntu only." >&2
+            echo "Kaiju OS v1 currently supports Debian/Ubuntu, Arch and Fedora." >&2
             echo "Other distros are a known future gap — see Distro_Portability_Design.md." >&2
             exit 1
             ;;
     esac
+    detect_pkg_manager
+    [ -n "$PKG_MANAGER" ] || { echo "FATAL: no supported package manager (apt/pacman/dnf) found." >&2; exit 1; }
     echo "Distro check: OK ($PRETTY_NAME)"
 
     # Step 2: sudo check (per INSTALL PATH RULE spirit — never silently
@@ -217,6 +290,7 @@ phase_1() {
     # Step 3: pull models (warn about size first, per Model_Selection_Guide.md's note)
     echo "About to pull: $exec_model and $chat_model (if different) — these can be several GB each."
     if confirm "Proceed with model pull(s) now?" Y; then
+        wait_for_ollama_api
         ollama pull "$exec_model"
         if [ "$exec_model" != "$chat_model" ]; then
             ollama pull "$chat_model"
@@ -303,11 +377,11 @@ phase_1() {
             # change within this same shell process yet.
             export PATH="$HOME/.local/bin:$PATH"
         else
-            echo "pipx not found -- installing it via apt (real, visible install," >&2
+            echo "pipx not found -- installing it via $PKG_MANAGER (real, visible install," >&2
             echo "not silent). This is the correct path on Ubuntu 24.04+, where" >&2
             echo "PEP 668 blocks 'pip install --user' directly (" >&2
             echo "'externally-managed-environment')." >&2
-            sudo apt-get update -y && sudo apt-get install -y pipx
+            kaiju_install_pkg pipx
             pipx ensurepath >/dev/null 2>&1 || true
             export PATH="$HOME/.local/bin:$PATH"
             if command -v pipx >/dev/null 2>&1; then
@@ -430,6 +504,15 @@ EOF
     echo "Vault structure written to $vault_path"
 
     if [ ! -d "$vault_path/.git" ]; then
+        # fix (KAI-097, Arch round): git was assumed present -- true on
+        # the Debian/Ubuntu cloud images this was tested on, but Arch's
+        # cloud image ships without it, and this block had no check,
+        # so git init/add/commit all silently failed ("command not
+        # found") while Phase 3 still printed "Layer 4 complete."
+        if ! command -v git >/dev/null 2>&1; then
+            echo "git not found -- installing it via $PKG_MANAGER." >&2
+            kaiju_install_pkg git
+        fi
         git -C "$vault_path" init -q
         echo "git init'd the vault."
         read -r -p "Set up a git remote for backup/sync now? (URL, or leave blank to skip): " remote_url
@@ -617,7 +700,7 @@ phase_5() {
 
     if ! command -v yq >/dev/null 2>&1; then
         echo "Installing yq (required by FASHSD scripts)..."
-        sudo apt-get update -y && sudo apt-get install -y yq
+        kaiju_install_pkg yq
     fi
 
     # Systemd timer + service (interval read back from the config just written)

@@ -16,9 +16,10 @@ and what is not.
 
 ## Quick start
 
-Requirements: Ubuntu or Debian, a normal user with `sudo`, and Docker with the
-Compose plugin already installed. Tier 3 needs about 40 GB of free disk for the
-models; the model pull can be skipped.
+Requirements: Ubuntu, Debian, Arch Linux or Fedora, a normal user with `sudo`,
+and Docker with the Compose plugin already installed (you install Docker
+yourself — the installer never does). Tier 3 needs about 40 GB of free disk
+for the models; the model pull can be skipped.
 
 ```bash
 git clone https://github.com/SpawnZilla/daikaiju-aiops.git
@@ -36,32 +37,37 @@ sets up the FASHSD watchdog from a short list of your services and drives.
 
 ## Measured install time
 
-One clean-VM run on Ubuntu 24.04 (CPU-only VM, 493 Mbps connection):
-
-| Step | Time |
-|---|---|
-| Docker install | 19 s |
-| `install.sh` end to end (Tier 3, both models pulled, FASHSD enabled) | 11 min 33 s |
-| Whole deploy from a bare VM | about 12 min |
-
-About 8 minutes of that was Ollama and the two models (35 GB). The rest includes about
-two minutes of typing answers. On a slower connection the model download dominates:
-at 100 Mbps, 35 GB alone takes about 47 minutes. Debian 13 and Ubuntu 22.04 were
-tested on the minimal path only (no model pull, no FASHSD).
+One clean-VM run on Ubuntu 24.04 (CPU-only VM, 493 Mbps connection),
+`install.sh` end to end (Tier 3, both models pulled, FASHSD enabled):
+11 min 33 s; whole deploy from a bare VM about 12 min. This run's own
+log was not kept, so treat the figure as reported, not independently
+re-verified. About 8 minutes of that was Ollama and the two models
+(35 GB); on a slower connection the model download dominates -- at
+100 Mbps, 35 GB alone takes about 47 minutes.
 
 ## What is verified
 
-- The installer ran clean on Ubuntu 24.04, Debian 13 and Ubuntu 22.04 (minimal path)
-  and on Ubuntu 24.04 (full path above).
-- The FASHSD watchdog scripts (container exited, daemon down, network-namespace
-  owner, clock drift, drive not mounted, ghost mount, DNS failure) were each tested
-  against disposable infrastructure; results are in
-  `kaiju-gais-package/fashsd/tests/TESTING.md`.
-- In the full-path run the installed watchdog timer ran unattended every hour and
-  every check passed.
+- Minimal path (no model pull, no FASHSD) ran clean on Ubuntu 24.04,
+  Debian 13, Ubuntu 22.04, Arch Linux (cloud image) and Fedora 44
+  Cloud Base (SELinux enforcing, no denials seen).
+- Real model pull (after the startup-race fix below): verified on
+  Fedora 44 Cloud Base only. Not verified on Arch, Debian 13 or
+  Ubuntu in the fixed form.
+- Startup race in the model-pull step: the installer ran `ollama pull`
+  before the daemon was listening. Reproduced on Ubuntu 24.04, Arch and
+  Fedora 44 (on Ubuntu one of the two models was silently missing).
+  Fixed with a bounded wait (up to 30 s) before the first pull.
+- The FASHSD watchdog scripts (container exited, daemon down,
+  network-namespace owner, clock drift, drive not mounted, ghost mount,
+  DNS failure) were each tested against disposable infrastructure;
+  results are in `kaiju-gais-package/fashsd/tests/TESTING.md`.
+- In the one reported full-path run the installed watchdog timer ran
+  unattended every hour and every check passed (same caveat as the
+  timing above).
 
-Not verified: non-Debian distributions, the full path on Debian or Ubuntu 22.04,
-and the agent layer outside the reference deployment.
+Not verified: RHEL/CentOS and Fedora Workstation/Server, non-systemd
+distros (out of scope for v1), the full path on Debian 13, Ubuntu 22.04
+and Arch, and the agent layer outside the reference deployment.
 
 ## Claude Code
 
