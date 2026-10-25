@@ -1,8 +1,9 @@
 # Kaidosho Daikaiju AIOps
 
-Daikaiju AIOps is a governed multi-agent operations setup for a homelab or small
-infrastructure: a planning agent, a reasoning agent and an execution agent, each
-held to written guardrails, with a self-healing watchdog underneath.
+Daikaiju AIOps is a governed multi-agent operations harness for a homelab or small
+infrastructure: the layer you work through with a planning agent, a reasoning agent
+and an execution agent, each held to written guardrails, with a self-healing
+watchdog underneath.
 
 This repository holds the part that can be installed by someone else today:
 

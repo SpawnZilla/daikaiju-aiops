@@ -4,7 +4,8 @@ Autonomous, self-healing agentic infrastructure operations — built
 from the ground up as a real, running system, not a demo.
 
 Kaidosho is the umbrella brand. **Daikaiju AIOps** is the product
-underneath it — the actual running system these docs describe.
+underneath it — the actual running system these docs describe, and the
+agent harness you work through to operate it.
 
 ## The short version
 
