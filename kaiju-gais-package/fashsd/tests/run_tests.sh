@@ -3,7 +3,7 @@
 # ⚠️  MUST PRIORITY — this script IS the untested-scripts test suite.
 # Run this before removing the MUST PRIORITY warnings anywhere else.
 # ============================================================
-# run_tests.sh — Kaiju OS FASHSD test runner
+# run_tests.sh — Kaiju Spine FASHSD test runner
 #
 # Run from this directory (kaiju-gais-package/fashsd/tests/):
 #   chmod +x run_tests.sh
@@ -38,7 +38,7 @@ FASHSD_DIR="$(dirname "$SCRIPT_DIR")"
 PASS=0
 FAIL=0
 
-# Scripts are not deployed to /opt/kaiju-os/watchdog/ yet — point them
+# Scripts are not deployed to /opt/kaiju-spine/watchdog/ yet — point them
 # at this test location instead, and use a /tmp log dir since
 # /var/log/kaiju-watchdog requires root and doesn't exist pre-deploy.
 export KAIJU_LIB_DIR="$FASHSD_DIR"
@@ -294,14 +294,14 @@ print_step14() {
     if [[ $RUN_STEP14 =~ ^[Yy]$ ]]; then
         export KAIJU_CONFIG="$SCRIPT_DIR/step14_watchdog_notify.yaml"
         STEP14_OUTPUT=$(bash "$FASHSD_DIR/watchdog_notify.sh" \
-            "[Kaiju OS package test]" \
+            "[Kaiju Spine package test]" \
             "Round 5 watchdog_notify.sh test -- ignore, not a real alert." \
             "default" 2>&1)
         STEP14_EXIT=$?
         echo "  Output: $STEP14_OUTPUT"
         [ "$STEP14_EXIT" = "0" ] && pass "watchdog_notify.sh exited 0 (check your phone for the real notification)" || fail "exit code $STEP14_EXIT -- check KAIJU_NTFY_USER/PASS and network reachability"
         LOGLINE=$(tail -1 "$KAIJU_LOG_DIR/watchdog.log" 2>/dev/null)
-        echo "$LOGLINE" | grep -q "Kaiju OS package test" && pass "log line format matches the established convention" || fail "log line missing or malformed: '$LOGLINE'"
+        echo "$LOGLINE" | grep -q "Kaiju Spine package test" && pass "log line format matches the established convention" || fail "log line missing or malformed: '$LOGLINE'"
     else
         echo "  Skipped (re-run this script and answer 'y' when ready)."
     fi
@@ -599,7 +599,7 @@ case "${1:-}" in
 esac
 
 echo "═══════════════════════════════════════════════════════"
-echo "KAIJU OS FASHSD TEST SUITE — $(date '+%Y-%m-%d %H:%M:%S')"
+echo "KAIJU SPINE FASHSD TEST SUITE — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "═══════════════════════════════════════════════════════"
 
 if ! command -v yq >/dev/null 2>&1; then

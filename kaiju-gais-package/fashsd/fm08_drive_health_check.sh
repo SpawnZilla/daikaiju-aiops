@@ -3,14 +3,14 @@
 # NOT YET LIVE-TESTED against real pi-node infrastructure —
 # logic-tested only (Mokaima's sandbox, mocked smartctl). Written
 # 2026-09-14 to close the gap flagged in this package's own
-# README.md ("Remaining Kaiju OS package work"). Re-run through
+# README.md ("Remaining Kaiju Spine package work"). Re-run through
 # tests/run_tests.sh (or a manual live invocation) before trusting
 # this in production, per this project's standing verification
 # discipline.
 # ============================================================
-# fm08_drive_health_check.sh — Kaiju OS config-driven SMART/drive
+# fm08_drive_health_check.sh — Kaiju Spine config-driven SMART/drive
 # health check.
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # No Kaidosho original to generalize from -- this is new, following the
 # same config-driven loop pattern app_curl_check.sh already
@@ -38,7 +38,7 @@
 # remediation the way FM-01/02/05/etc. do -- there's nothing this
 # script itself could safely automate for a real failing disk.
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

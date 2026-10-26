@@ -2,7 +2,7 @@
 # ============================================================
 # TESTED 2026-09-08 (Round 3) — see kaiju-gais-package/fashsd/tests/TESTING.md
 # ============================================================
-# fm07_dns_failure.sh — Kaiju OS config-driven DNS/outbound-
+# fm07_dns_failure.sh — Kaiju Spine config-driven DNS/outbound-
 # connectivity recovery.
 #
 # Generalized from Kaidosho's FM-07 (Prowlarr-only): restart a
@@ -10,7 +10,7 @@
 # check (not just container health), same as the original's
 # `docker exec prowlarr curl ... nyaa.si` pattern.
 #
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # Generalization notes (Mokaima, 2026-09-06):
 #   - Takes a service name as an argument (new — the original was
@@ -26,7 +26,7 @@
 #   - Original fix logic (restart, sleep 15, curl from inside the
 #     container) preserved exactly — only call-site values changed.
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

@@ -18,18 +18,18 @@
 # tests/run_tests.sh and a real Omada/Watchtower check before trusting
 # this in production.
 # ============================================================
-# app_curl_check.sh — Kaiju OS config-driven app-level health check
+# app_curl_check.sh — Kaiju Spine config-driven app-level health check
 # Generalized from Kaidosho's (FM-09) app_curl_check.sh.
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # ORIGINAL Kaidosho SCRIPT: 10 hardcoded check_service() call sites, one per
-# Kaidosho service. This version loops over services[] from the Kaiju OS
+# Kaidosho service. This version loops over services[] from the Kaiju Spine
 # config instead. The check_service() function body below is UNCHANGED
 # from the original except for the insecure_tls addition — confirming
 # the generalization work is in the call sites, not the check logic
 # itself.
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

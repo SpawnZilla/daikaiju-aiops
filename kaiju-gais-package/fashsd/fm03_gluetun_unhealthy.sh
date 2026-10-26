@@ -2,7 +2,7 @@
 # ============================================================
 # TESTED 2026-09-08 (Round 3) — see kaiju-gais-package/fashsd/tests/TESTING.md
 # ============================================================
-# fm03_gluetun_unhealthy.sh — Kaiju OS config-driven gluetun/network-
+# fm03_gluetun_unhealthy.sh — Kaiju Spine config-driven gluetun/network-
 # namespace-owner remediation.
 #
 # Generalized from Kaidosho's FM-03 (the reference runbook REMEDIATION DECISION TREE,
@@ -10,7 +10,7 @@
 # it's healthy, THEN restart its dependents (never route this symptom
 # through the generic FM-01 single-container restart — MABS FM-13).
 #
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # CORRECTION NOTE (Mokaima, 2026-08-03): an earlier MABS-brief draft of
 # this task referenced three functions that do not exist in
@@ -27,7 +27,7 @@
 # actual verification method — the reference runbook's confirmed method is restart +
 # health check + a real curl check from the verify_via container.
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

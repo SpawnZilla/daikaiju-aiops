@@ -3,14 +3,14 @@
 # NOT YET LIVE-TESTED against real pi-node infrastructure —
 # logic-tested only (Mokaima's sandbox, mocked docker). Written
 # 2026-09-14 to close the gap flagged in this package's own
-# README.md ("Remaining Kaiju OS package work"). Re-run through
+# README.md ("Remaining Kaiju Spine package work"). Re-run through
 # tests/run_tests.sh (or a manual live invocation) before trusting
 # this in production, per this project's standing verification
 # discipline.
 # ============================================================
-# watchdog_snapshot.sh — Kaiju OS config-driven pre-remediation
+# watchdog_snapshot.sh — Kaiju Spine config-driven pre-remediation
 # snapshot utility.
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # Referenced by fm01_container_exited.sh, fm02_daemon_down.sh, and
 # fm05_drive_not_mounted.sh (all three already handle its absence
@@ -75,7 +75,7 @@ SAFE_NAME=$(printf '%s' "$NAME" | tr -c 'A-Za-z0-9_.-' '_')
 SNAPSHOT_FILE="$SNAPSHOT_DIR/${SAFE_NAME}_${TIMESTAMP}.log"
 
 {
-    echo "=== Kaiju OS watchdog snapshot ==="
+    echo "=== Kaiju Spine watchdog snapshot ==="
     echo "name: $NAME"
     echo "keep_count: $KEEP_COUNT"
     echo "compose_dir: ${COMPOSE_DIR:-<none>}"

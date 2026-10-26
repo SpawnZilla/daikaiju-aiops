@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================================
-# NOT YET TESTED — watchdog_notify.sh, Kaiju OS config-driven ntfy wrapper
-# Deploy to: /opt/kaiju-os/watchdog/
+# NOT YET TESTED — watchdog_notify.sh, Kaiju Spine config-driven ntfy wrapper
+# Deploy to: /opt/kaiju-spine/watchdog/
 # Generalized from Kaidosho's watchdog_notify.sh. CREDENTIAL HANDLING
 # CHANGED DELIBERATELY: the original hardcoded a plaintext ntfy
 # password directly in this file (a real exposure, since vault is
@@ -10,7 +10,7 @@
 # both optional (unauthenticated ntfy topics are valid).
 # ============================================================
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

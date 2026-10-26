@@ -2,7 +2,7 @@
 # ============================================================
 # TESTED 2026-09-08 (Round 3) — see kaiju-gais-package/fashsd/tests/TESTING.md
 # ============================================================
-# fm06_ghost_mount.sh — Kaiju OS config-driven ghost-mount recovery.
+# fm06_ghost_mount.sh — Kaiju Spine config-driven ghost-mount recovery.
 #
 # Generalized from Kaidosho's FM-06 (hola3-only): force-unmount a
 # drive twice (lazy unmount, matches the original's exact `umount -l`
@@ -10,7 +10,7 @@
 # preservation), remount via fstab, then verify by checking configured
 # expected_subdirs exist — not just that mountpoint(1) succeeds.
 #
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # Generalization notes (Mokaima, 2026-09-06):
 #   - Takes a drive name as an argument, same calling convention as
@@ -27,7 +27,7 @@
 #     failing — a drive with nothing configured to verify shouldn't be
 #     unable to use this fix at all.
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

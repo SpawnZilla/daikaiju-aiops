@@ -130,7 +130,7 @@ Real bugs found and fixed during this test pass (this is exactly what
 the test suite was for):
   1. yq variant mismatch (kislyuk/yq vs mikefarah/yq) — fixed with -r
      flags throughout fashsd_config_lib.sh
-  2. Hardcoded /opt/kaiju-os/watchdog/ and /var/log/kaiju-watchdog/
+  2. Hardcoded /opt/kaiju-spine/watchdog/ and /var/log/kaiju-watchdog/
      paths assumed a deployed install — added KAIJU_LIB_DIR and
      KAIJU_LOG_DIR env var overrides to all 3 executable scripts
   3. fm01_container_exited.sh's snapshot call hard-referenced a script
@@ -152,7 +152,7 @@ before testing — both had the same one bug (not yet test-suite-caught,
 caught by manual review): the snapshot call was left as a verbatim
 copy of Kaidosho's original, hardcoded to
 `/opt/pi-node/watchdog/watchdog_snapshot.sh` (a real path on Kaidosho's
-actual Pi5, but not part of the exportable Kaiju OS package). This was
+actual Pi5, but not part of the exportable Kaiju Spine package). This was
 a brief-writing gap, not an Angkai error — the brief said "preserve
 the snapshot call unchanged" without pointing at the graceful-fallback
 pattern `fm01_container_exited.sh` already established for exactly

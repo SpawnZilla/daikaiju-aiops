@@ -11,11 +11,11 @@
 # All other logic (snapshot skip, compose loop, verify/threshold) is
 # confirmed correct. See TESTING.md Round 2 results for detail.
 # ============================================================
-# fm02_daemon_down.sh — Kaiju OS config-driven Docker daemon + full-stack restart
+# fm02_daemon_down.sh — Kaiju Spine config-driven Docker daemon + full-stack restart
 # Generalized from Kaidosho's fm02_daemon_down.sh.
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

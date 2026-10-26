@@ -1,14 +1,14 @@
 #!/bin/bash
 # ============================================================
-# pi5_watchdog.sh, Kaiju OS config-driven orchestrator (every branch run live,
+# pi5_watchdog.sh, Kaiju Spine config-driven orchestrator (every branch run live,
 # Rounds 5+6 PASS 2026-09-25; see fashsd/tests/TESTING.md)
-# Deploy to: /opt/kaiju-os/watchdog/
-# Calls the 9 tested Kaiju OS FASHSD scripts (see
+# Deploy to: /opt/kaiju-spine/watchdog/
+# Calls the 9 tested Kaiju Spine FASHSD scripts (see
 # kaiju-gais-package/fashsd/README.md, tested 2026-07-23 through
 # 2026-09-08) based on symptoms detected against services.yaml.
 # ============================================================
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"
@@ -115,7 +115,7 @@ if [ "$CURL_EXIT" -ne 0 ]; then
             "$KAIJU_LIB_DIR/fm07_dns_failure.sh" "$svc"
             FIX_EXIT=$?
         else
-            _log "${svc}: curl FAIL, no dns_check_url configured — no matching fix script exists (Kaiju OS package has no FM-09 equivalent). Best-effort: dispatching fm01_container_exited.sh, then re-checking curl regardless of fm01's own result."
+            _log "${svc}: curl FAIL, no dns_check_url configured — no matching fix script exists (Kaiju Spine package has no FM-09 equivalent). Best-effort: dispatching fm01_container_exited.sh, then re-checking curl regardless of fm01's own result."
             CONTAINER=$(kaiju_service_field "$SVC_IDX" "container")
             COMPOSE_DIR=$(kaiju_service_field "$SVC_IDX" "compose_dir")
             "$KAIJU_LIB_DIR/fm01_container_exited.sh" "$CONTAINER" "$COMPOSE_DIR"

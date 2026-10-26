@@ -8,11 +8,11 @@
 # ⚠️ kaiju_clock_drift_threshold_ms ADDED 2026-09-20 (merge,
 # pi5_watchdog.sh depends on it) — also NOT YET TESTED.
 # ============================================================
-# fashsd_config_lib.sh — shared config-loading functions for Kaiju OS FASHSD
-# Part of the Kaiju OS packaged product (the FASHSD design notes)
+# fashsd_config_lib.sh — shared config-loading functions for Kaiju Spine FASHSD
+# Part of the Kaiju Spine packaged product (the FASHSD design notes)
 #
 # Source this file at the top of any FASHSD script:
-#   source /opt/kaiju-os/watchdog/fashsd_config_lib.sh
+#   source /opt/kaiju-spine/watchdog/fashsd_config_lib.sh
 #
 # Requires: yq (YAML CLI parser). Two different tools share this name:
 #   - mikefarah/yq (Go binary) — native YAML, quotes stripped by default
@@ -26,15 +26,15 @@
 # until fixed here. Bootstrap installer must document which yq it expects.
 #
 # Requires: yq (YAML CLI parser). Bootstrap installer installs this as a
-# Kaiju OS dependency during Phase 5 (FASHSD setup).
+# Kaiju Spine dependency during Phase 5 (FASHSD setup).
 
-: "${KAIJU_CONFIG:=/etc/kaiju-os/services.yaml}"
+: "${KAIJU_CONFIG:=/etc/kaiju-spine/services.yaml}"
 
 # fail loudly and immediately if the config file is missing — every
 # FASHSD script depends on it, so a silent empty-config run is worse
 # than a hard stop (Rule 14 principle applied to runtime, not just briefs)
 if [ ! -f "$KAIJU_CONFIG" ]; then
-    echo "FATAL: Kaiju OS config not found at $KAIJU_CONFIG" >&2
+    echo "FATAL: Kaiju Spine config not found at $KAIJU_CONFIG" >&2
     echo "FASHSD cannot run without a config file. Re-run the bootstrap" >&2
     echo "installer's FASHSD step, or check KAIJU_CONFIG env var." >&2
     exit 1

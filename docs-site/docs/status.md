@@ -11,7 +11,7 @@ keeps that same standard for anyone reading from the outside.
   just reviewed on paper.
 - The persistent memory/documentation layer — live, versioned, and in
   daily use.
-- The installer for the packaged bundle (Kaiju OS) — built, tested
+- The installer for the packaged bundle (Kaiju Spine) — built, tested
   across multiple clean-environment rounds, closed.
 - Distro portability to Arch Linux and Fedora 44 Cloud Base, alongside Debian/Ubuntu: minimal path tested on both; real model pull verified on Fedora only. RHEL/CentOS, Fedora Workstation/Server and non-systemd distros remain untested/out of scope.
 - The orchestration/guardrail automation layer — built, and has
@@ -28,10 +28,9 @@ keeps that same standard for anyone reading from the outside.
 
 ## Deliberately not yet started
 
-- Public release of Kaiju OS, pending Daikaiju AIOps' own readiness.
-- This documentation site's own public deployment, for the same
-  reason — it exists today as a locally buildable, previewable
-  reference, not a published site.
+- Packaging the agent adapters (planning, reasoning, execution) as part of Kaiju Spine.
+- This documentation site's own public deployment — it exists today as
+  a locally buildable, previewable reference, not a published site.
 
 ## A word on reliability claims
 

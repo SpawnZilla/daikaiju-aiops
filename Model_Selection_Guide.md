@@ -1,11 +1,11 @@
 ╔══════════════════════════════════════════════════════════════════════╗
-║  KAIJU OS — MODEL SELECTION GUIDE                                   ║
+║  KAIJU SPINE — MODEL SELECTION GUIDE                                   ║
 ║  Version: 1.0 | Created: 2026-07-22 (Daikaiju AIOps)                ║
-║  Fills: Kaiju_OS.md gap 4                                           ║
+║  Fills: Kaiju_Spine.md gap 4                                           ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
-Which local models to run for each Kaiju OS agent role, by hardware
-tier. Covers the two roles Kaiju OS's Layer 1 (Orchestration) needs a
+Which local models to run for each Kaiju Spine agent role, by hardware
+tier. Covers the two roles Kaiju Spine's Layer 1 (Orchestration) needs a
 local model for: an EXECUTION AGENT (writes/generates scripts and
 config under a planning agent's direction — Kaidosho calls this Angkai)
 and a REASONING/CONVERSATION AGENT (general Q&A, drafting, tool-calling
@@ -116,7 +116,7 @@ benchmarks.
     scale, if hardware supports it.
   Server-class options exist (GLM-5.2, Kimi K2.7-Code) but need
     256GB+ unified memory or multi-GPU server hardware — out of scope
-    for a homelab-tier Kaiju OS install. Not recommended for v1 of this
+    for a homelab-tier Kaiju Spine install. Not recommended for v1 of this
     guide; flag as a future "enthusiast+" tier if there's ever demand.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

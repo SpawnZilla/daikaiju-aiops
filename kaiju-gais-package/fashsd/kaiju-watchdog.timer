@@ -1,5 +1,5 @@
 [Unit]
-Description=Kaiju OS FASHSD Watchdog Timer
+Description=Kaiju Spine FASHSD Watchdog Timer
 
 [Timer]
 OnCalendar=hourly

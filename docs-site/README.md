@@ -27,7 +27,7 @@ live-reloading dev server.
 
 ## Content sources
 
-Adapted from `Daikaiju_AIOps.md`, `Kaiju_GAIS.md`, and `Kaiju_OS.md`
+Adapted from `Daikaiju_AIOps.md`, `Kaiju_GAIS.md`, and `Kaiju_Spine.md`
 with internal file paths, ticket
 numbers, and incident history stripped per the same "portable framing"
 standard `MABS_Standalone.md` already uses internally.

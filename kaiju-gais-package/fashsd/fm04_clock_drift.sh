@@ -3,14 +3,14 @@
 # TESTED 2026-09-08 (Round 3) — see tests/TESTING.md
 # RESTART-SCOPE DESIGN DECISION — see header note below, REVISABLE
 # ============================================================
-# fm04_clock_drift.sh — Kaiju OS config-driven clock-drift recovery.
+# fm04_clock_drift.sh — Kaiju Spine config-driven clock-drift recovery.
 #
 # Generalized from Kaidosho's FM-04: force an NTP resync, then
 # restart whichever service(s) are sensitive to clock skew (Kaidosho's
 # original only restarted Prowlarr, since that was Kaidosho's one observed
 # symptom).
 #
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # RESTART-SCOPE DECISION (Mokaima, 2026-09-06, per an open design
 # question in the project's planning notes — Gorkaige's instruction: propose one WITH REASONING,
@@ -54,7 +54,7 @@
 #     entry's own compose_dir/container (same generic loop shape as
 #     app_curl_check.sh's services[] loop).
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

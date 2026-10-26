@@ -2,16 +2,16 @@
 # ============================================================
 # ✅ TESTED 2026-07-23 — see kaiju-gais-package/fashsd/tests/TESTING.md
 # ============================================================
-# wol_trigger.sh — Kaiju OS config-driven Wake-on-LAN trigger
+# wol_trigger.sh — Kaiju Spine config-driven Wake-on-LAN trigger
 # Generalized from Kaidosho's wol_trigger.sh.
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # ORIGINAL Kaidosho SCRIPT: hardcoded MAC address, always sends a WoL packet
 # (Kaidosho is always two-node). This version reads topology.mode from config
 # first — single-node installs have nothing to wake, so this becomes a
 # clean no-op instead of erroring or sending a meaningless packet.
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

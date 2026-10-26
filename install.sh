@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================
-# Kaiju OS Bootstrap Installer — install.sh
+# Kaiju Spine Bootstrap Installer — install.sh
 # Implements: the installer spec v1.0 (first draft 2026-09-17)
 #
 # STATUS: run end to end. The minimal path (Docker pre-installed, model
@@ -25,7 +25,7 @@
 #      SCRIPT_DIR resolution below.
 #
 # Expected layout (this script assumes it is run from inside a checkout
-# of the Kaiju OS repo, not copied out on its own — matches this
+# of the Kaiju Spine repo, not copied out on its own — matches this
 # project's own real existing directory layout, not a new one invented
 # for this script):
 #   <repo-root>/install.sh                          <- this file
@@ -58,7 +58,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCS_DIR="$SCRIPT_DIR"
 FASHSD_SRC_DIR="$SCRIPT_DIR/kaiju-gais-package/fashsd"
 
-KAIJU_HOME="${KAIJU_HOME:-$HOME/.kaiju-os}"
+KAIJU_HOME="${KAIJU_HOME:-$HOME/.kaiju-spine}"
 MARKER_FILE="$KAIJU_HOME/installed.marker"
 
 # --- Answer accumulator for Phase 6's receipt file ---
@@ -178,7 +178,7 @@ phase_0() {
         *arch*) ;;
         *fedora*) ;;
         *)
-            echo "Kaiju OS v1 currently supports Debian/Ubuntu, Arch and Fedora." >&2
+            echo "Kaiju Spine v1 currently supports Debian/Ubuntu, Arch and Fedora." >&2
             echo "Other distros are a known future gap — see Distro_Portability_Design.md." >&2
             exit 1
             ;;
@@ -200,7 +200,7 @@ phase_0() {
 
     # Step 3: idempotency check
     if [ -f "$MARKER_FILE" ]; then
-        echo "Existing Kaiju OS install detected at $KAIJU_HOME."
+        echo "Existing Kaiju Spine install detected at $KAIJU_HOME."
         echo "  [R] Re-run full installer"
         echo "  [A] Add a layer only (e.g. just enable FASHSD)"
         echo "  [C] Cancel"
@@ -223,7 +223,7 @@ phase_0() {
     if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>&1; then
         echo
         echo "Docker and/or Docker Compose (v2 plugin) were not found." >&2
-        echo "Kaiju OS does not install these automatically (INSTALL PATH RULE" >&2
+        echo "Kaiju Spine does not install these automatically (INSTALL PATH RULE" >&2
         echo "spirit — this script never silently installs software you did not" >&2
         echo "explicitly ask it to)." >&2
         echo >&2
@@ -332,7 +332,7 @@ phase_1() {
         # attempted the install anyway and failed with a wall of
         # confusing "Requires-Python >=3.11" version-resolution errors
         # for every mcpo release, giving no clear guidance. Ubuntu 22.04
-        # is a real, common Kaiju OS target (the installer spec's
+        # is a real, common Kaiju Spine target (the installer spec's
         # own locked Debian/Ubuntu-family scope), not an edge case -- this
         # needed a real check, not just a clearer error after the fact.
         MCPO_PY=""
@@ -452,14 +452,14 @@ phase_2() {
     # the spec; this writes a plain reference doc any such file can
     # source content from.
     cat > "$KAIJU_HOME/install_path_rule.md" <<'EOF'
-# INSTALL PATH RULE (Kaiju OS default)
+# INSTALL PATH RULE (Kaiju Spine default)
 Nothing installs to boot, EFI, swap, root (/), or home (/home) without
 explicit approval. All AI-stack software goes to a dedicated data
 directory (this install used: see KAIJU_HOME below). Before any install
 command: (1) state where it installs, (2) state which drive/path,
 (3) get approval, (4) run a dry-run first when practical.
 
-# SESSION FORMAT RULE (Kaiju OS default)
+# SESSION FORMAT RULE (Kaiju Spine default)
 Any multi-step automated/agent-driven change uses pause points between
 phases: "PAUSE — <description>. Type GO to proceed or STOP to hold."
 EOF
@@ -493,13 +493,13 @@ session, mirroring Kaidosho's own state snapshot pattern.)
 EOF
     cat > "$vault_path/README.md" <<EOF
 # $(basename "$vault_path")
-This is your Kaiju OS memory vault. Structure:
+This is your Kaiju Spine memory vault. Structure:
   PENDING.md      — the standing task list
   state/          — running state-snapshot doc(s)
   docs/           — reference documents (naming scheme, model choices, etc.)
   briefs/         — task briefs handed to your execution agent
 
-Initialized by the Kaiju OS bootstrap installer, $(date '+%Y-%m-%d').
+Initialized by the Kaiju Spine bootstrap installer, $(date '+%Y-%m-%d').
 EOF
     echo "Vault structure written to $vault_path"
 
@@ -535,13 +535,13 @@ EOF
         # requiring them to already have one -- then commit for real
         # and report plainly if it still fails for some other reason.
         if ! git -C "$vault_path" config user.email >/dev/null 2>&1; then
-            git -C "$vault_path" config user.email "kaiju-os-installer@localhost"
-            git -C "$vault_path" config user.name "Kaiju OS Installer"
+            git -C "$vault_path" config user.email "kaiju-spine-installer@localhost"
+            git -C "$vault_path" config user.name "Kaiju Spine Installer"
             echo "No git identity was configured -- set a local-only placeholder"
-            echo "identity for this repo (kaiju-os-installer@localhost). Change it"
+            echo "identity for this repo (kaiju-spine-installer@localhost). Change it"
             echo "anytime with 'git config user.email/user.name' inside $vault_path."
         fi
-        if git -C "$vault_path" commit -q -m "Kaiju OS bootstrap: initial vault structure"; then
+        if git -C "$vault_path" commit -q -m "Kaiju Spine bootstrap: initial vault structure"; then
             echo "Initial commit created."
         else
             echo "WARNING: initial git commit failed -- vault files are staged but" >&2
@@ -624,8 +624,8 @@ phase_5() {
     fi
     ANSWERS[fashsd_enabled]="true"
 
-    local kaiju_config="/etc/kaiju-os/services.yaml"
-    sudo mkdir -p /etc/kaiju-os
+    local kaiju_config="/etc/kaiju-spine/services.yaml"
+    sudo mkdir -p /etc/kaiju-spine
     echo "Building $kaiju_config interactively. Press Ctrl+C at any point to abort Phase 5 only."
 
     # Topology
@@ -689,11 +689,11 @@ phase_5() {
     } | sudo tee -a "$kaiju_config" >/dev/null
 
     # Deploy the FASHSD scripts + shared lib
-    sudo mkdir -p /opt/kaiju-os/watchdog
+    sudo mkdir -p /opt/kaiju-spine/watchdog
     if [ -d "$FASHSD_SRC_DIR" ]; then
-        sudo cp "$FASHSD_SRC_DIR"/*.sh /opt/kaiju-os/watchdog/
-        sudo chmod +x /opt/kaiju-os/watchdog/*.sh
-        echo "FASHSD scripts deployed to /opt/kaiju-os/watchdog/"
+        sudo cp "$FASHSD_SRC_DIR"/*.sh /opt/kaiju-spine/watchdog/
+        sudo chmod +x /opt/kaiju-spine/watchdog/*.sh
+        echo "FASHSD scripts deployed to /opt/kaiju-spine/watchdog/"
     else
         echo "WARNING: fashsd/ source directory not found in this checkout — FASHSD scripts NOT deployed." >&2
     fi
@@ -708,16 +708,16 @@ phase_5() {
     interval_min=$(yq -r '.watchdog.interval_minutes' "$kaiju_config" 2>/dev/null || echo 60)
     sudo tee /etc/systemd/system/kaiju-watchdog.service >/dev/null <<EOF
 [Unit]
-Description=Kaiju OS FASHSD watchdog
+Description=Kaiju Spine FASHSD watchdog
 [Service]
 Type=oneshot
 Environment=KAIJU_CONFIG=$kaiju_config
-Environment=KAIJU_LIB_DIR=/opt/kaiju-os/watchdog
-ExecStart=/opt/kaiju-os/watchdog/app_curl_check.sh
+Environment=KAIJU_LIB_DIR=/opt/kaiju-spine/watchdog
+ExecStart=/opt/kaiju-spine/watchdog/app_curl_check.sh
 EOF
     sudo tee /etc/systemd/system/kaiju-watchdog.timer >/dev/null <<EOF
 [Unit]
-Description=Run Kaiju OS FASHSD watchdog every ${interval_min} minutes
+Description=Run Kaiju Spine FASHSD watchdog every ${interval_min} minutes
 [Timer]
 OnBootSec=2min
 OnUnitActiveSec=${interval_min}min
@@ -739,7 +739,7 @@ phase_6() {
     mkdir -p "$KAIJU_HOME"
     local receipt="$KAIJU_HOME/install-receipt-$(date '+%Y-%m-%d').yaml"
     {
-        echo "kaiju_os_install_receipt:"
+        echo "kaiju_spine_install_receipt:"
         echo "  date: \"$(date -Iseconds)\""
         echo "  hardware_tier: \"${ANSWERS[hardware_tier]}\""
         echo "  execution_model: \"${ANSWERS[exec_model]}\""
@@ -776,7 +776,7 @@ phase_7() {
     echo "  - Re-run this installer with --fashsd-only anytime to add FASHSD later."
     echo "  - Your receipt file: $KAIJU_HOME/install-receipt-$(date '+%Y-%m-%d').yaml"
     echo
-    echo "Kaiju OS bootstrap complete."
+    echo "Kaiju Spine bootstrap complete."
     exit 0
 }
 

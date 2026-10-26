@@ -1,5 +1,5 @@
 # step3_reference_real_readonly.yaml — Kaidosho's actual 10 FM-09 services, translated
-# to the Kaiju OS schema, for a REAL side-by-side comparison against
+# to the Kaiju Spine schema, for a REAL side-by-side comparison against
 # Kaidosho's original hardcoded app_curl_check.sh. READ-ONLY — this script
 # only curls health endpoints, never modifies anything, safe to run
 # against live Kaidosho infrastructure.

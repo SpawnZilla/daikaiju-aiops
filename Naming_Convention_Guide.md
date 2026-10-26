@@ -1,10 +1,10 @@
 ╔══════════════════════════════════════════════════════════════════════╗
-║  KAIJU OS — NAMING CONVENTION GUIDE                                 ║
+║  KAIJU SPINE — NAMING CONVENTION GUIDE                                 ║
 ║  Version: 1.1 | Created: 2026-07-22 | Public edition: 2026-10-18    ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
 A packaged version of the naming convention the Kaidosho reference
-deployment uses internally, so someone adopting Kaiju OS can apply a
+deployment uses internally, so someone adopting Kaiju Spine can apply a
 similarly legible scheme to their own nodes, agents, and systems — or
 understand why one is worth having even if they build their own instead.
 
@@ -12,7 +12,7 @@ understand why one is worth having even if they build their own instead.
 WHY BOTHER NAMING THINGS AT ALL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-A homelab running Kaiju OS ends up with several distinct things that
+A homelab running Kaiju Spine ends up with several distinct things that
 all need to be referred to constantly, in conversation with your
 planning agent, in scripts, in documentation: physical machines, AI
 agent roles, subsystems, drives. "The Pi5" and "the execution agent"

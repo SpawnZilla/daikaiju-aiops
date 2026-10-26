@@ -20,17 +20,17 @@
 # that doesn't set it). NOT YET run through tests/run_tests.sh with this
 # change in place — do that before trusting it live.
 # ============================================================
-# fm01_container_exited.sh — Kaiju OS config-driven FM-01 fix script
+# fm01_container_exited.sh — Kaiju Spine config-driven FM-01 fix script
 # Generalized from Kaidosho's fm01_container_exited.sh.
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 #
 # ORIGINAL Kaidosho SCRIPT: hardcoded ALLOWED_DIRS array with 14 literal Kaidosho
-# compose paths. This version derives the allowed set from the Kaiju OS
+# compose paths. This version derives the allowed set from the Kaiju Spine
 # config's services[].compose_dir field instead. Snapshot/restart/verify
 # logic is UNCHANGED from the original except for the new force-recreate
 # retry added below.
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 if [ $# -lt 2 ]; then
@@ -51,7 +51,7 @@ while IFS= read -r dir; do
 done < <(kaiju_known_compose_dirs)
 
 if [ "$VALID_DIR" = false ]; then
-    echo "Error: $COMPOSE_DIR is not a compose directory known to Kaiju OS config" >&2
+    echo "Error: $COMPOSE_DIR is not a compose directory known to Kaiju Spine config" >&2
     echo "Known directories: $(kaiju_known_compose_dirs | tr '\n' ' ')" >&2
     exit 1
 fi

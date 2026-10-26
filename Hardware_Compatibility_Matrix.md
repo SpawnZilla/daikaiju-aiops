@@ -1,10 +1,10 @@
 ╔══════════════════════════════════════════════════════════════════════╗
-║  KAIJU OS — HARDWARE COMPATIBILITY MATRIX                           ║
+║  KAIJU SPINE — HARDWARE COMPATIBILITY MATRIX                           ║
 ║  Version: 1.0 | Created: 2026-07-24 (Daikaiju AIOps)                ║
-║  Fills: Kaiju_OS.md gap 2                                           ║
+║  Fills: Kaiju_Spine.md gap 2                                           ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
-What hardware a Kaiju OS install actually needs, split by the two node
+What hardware a Kaiju Spine install actually needs, split by the two node
 roles the architecture requires (per Model_Selection_Guide.md and
 the installer spec's topology.mode setting).
 
@@ -12,7 +12,7 @@ the installer spec's topology.mode setting).
 THE TWO ROLES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Kaiju OS supports single-node (everything on one machine) or two-node
+Kaiju Spine supports single-node (everything on one machine) or two-node
 (a small always-on watcher + a larger AI/execution node) topologies.
 Hardware requirements differ sharply by role.
 
@@ -125,7 +125,7 @@ RELATIONSHIP TO OTHER DOCS
     reference this matrix's minimums, though no automated hardware
     detection against this table is built yet (OPEN QUESTION for a
     future installer pass, not blocking v1)
-  - Kaiju_OS.md gap 2 — this document resolves that gap
+  - Kaiju_Spine.md gap 2 — this document resolves that gap
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 END OF HARDWARE COMPATIBILITY MATRIX v1.0

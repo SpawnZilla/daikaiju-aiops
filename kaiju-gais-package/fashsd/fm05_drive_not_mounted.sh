@@ -6,11 +6,11 @@
 # on 2026-07-27 — Round 2 results (Step 8) confirmed PASS, doc update
 # never reached this file. No code change, banner only.
 # ============================================================
-# fm05_drive_not_mounted.sh — Kaiju OS config-driven drive remount fix
+# fm05_drive_not_mounted.sh — Kaiju Spine config-driven drive remount fix
 # Generalized from Kaidosho's fm05_drive_not_mounted.sh.
-# Deploy to: /opt/kaiju-os/watchdog/
+# Deploy to: /opt/kaiju-spine/watchdog/
 
-: "${KAIJU_LIB_DIR:=/opt/kaiju-os/watchdog}"
+: "${KAIJU_LIB_DIR:=/opt/kaiju-spine/watchdog}"
 source "$KAIJU_LIB_DIR/fashsd_config_lib.sh"
 
 : "${KAIJU_LOG_DIR:=/var/log/kaiju-watchdog}"

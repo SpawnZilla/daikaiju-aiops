@@ -20,11 +20,13 @@ anything that genuinely needs judgment.
 
 - **[Daikaiju AIOps](daikaiju-aiops.md)** is the brain — the agents
   that reason about problems and act on them.
-- **[Kaiju GAIS](kaiju-gais.md)** is the body — the self-healing,
-  memory-keeping, replicable substrate the brain runs on.
-- **[Kaiju OS](kaiju-os.md)** is the box — a later, packaged bundle of
-  both, for someone who wants the whole pattern on their own hardware
-  under their own name. **Not released yet.**
+- **[Kaiju GAIS](kaiju-gais.md)** is the heart — the self-healing,
+  memory-keeping, replicable substrate that keeps the whole system alive.
+- **[Kaiju Spine](kaiju-spine.md)** is the spine — the orchestration and
+  guardrails that carry work between the brain and the rest of the
+  system, with a check at every handoff. It is a separately
+  packaged part of Daikaiju AIOps. The installer is released; the agent
+  adapters are not packaged yet.
 
 ## Why this is different from "just automate it with a cron job"
 

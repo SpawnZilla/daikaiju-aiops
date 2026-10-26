@@ -1,4 +1,4 @@
-# Kaiju OS FASHSD Package (config-driven)
+# Kaiju Spine FASHSD Package (config-driven)
 
 ## ✅ TESTED 2026-09-08 — all 9 scripts + shared lib
 All 9 generalized scripts (`fashsd_config_lib.sh`, `app_curl_check.sh`,
@@ -98,7 +98,7 @@ calling this package copy test-suite-clean end to end.
   zero-drives and smartctl-not-installed edge cases — all pass. **NOT
   YET LIVE-TESTED** against real pi-node infrastructure.
 
-**Deployment, both new scripts:** copy to `/opt/kaiju-os/watchdog/`
+**Deployment, both new scripts:** copy to `/opt/kaiju-spine/watchdog/`
 alongside the existing FM scripts, `chmod +x`. `watchdog_snapshot.sh`
 needs no wiring — fm01/fm02/fm05 already check for it via `[ -x
 "$KAIJU_LIB_DIR/watchdog_snapshot.sh" ]` and will start using it
@@ -128,17 +128,17 @@ directory for the bar to match).
   wol_trigger.sh always ran on the Pi5, never on Dokaisho). Bootstrap
   installer's Phase 5 should install this on whichever node the user
   designates as the topology.watcher_node.
-- Config file at `/etc/kaiju-os/services.yaml` (see
+- Config file at `/etc/kaiju-spine/services.yaml` (see
   `kaiju_fashsd_config.example.yaml` in this directory for the schema).
 
 ## Environment variable overrides (for testing / non-deployed runs)
 
 All 3 executable scripts default to the real deployment paths
-(`/opt/kaiju-os/watchdog/`, `/var/log/kaiju-watchdog/`) but accept
+(`/opt/kaiju-spine/watchdog/`, `/var/log/kaiju-watchdog/`) but accept
 overrides, added 2026-07-23 while building the test suite:
 
 - `KAIJU_LIB_DIR` — where to find `fashsd_config_lib.sh` (and
-  `watchdog_snapshot.sh` if present). Default: `/opt/kaiju-os/watchdog`
+  `watchdog_snapshot.sh` if present). Default: `/opt/kaiju-spine/watchdog`
 - `KAIJU_LOG_DIR` — where to write `watchdog.log`. Default:
   `/var/log/kaiju-watchdog`. Falls back to `/tmp/kaiju-watchdog-fallback`
   automatically if the default path isn't writable (e.g. no root).
