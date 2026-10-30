@@ -14,17 +14,20 @@ keeps that same standard for anyone reading from the outside.
 - The installer for the packaged bundle (Kaiju Spine) — built, tested
   across multiple clean-environment rounds, closed.
 - Distro portability to Arch Linux and Fedora 44 Cloud Base, alongside Debian/Ubuntu: minimal path tested on both; real model pull verified on Fedora only. RHEL/CentOS, Fedora Workstation/Server and non-systemd distros remain untested/out of scope.
+- One reported clean-VM run of the full installer path on Ubuntu 24.04: 11 min 33 s
+  end to end. The run's own log was not kept, so the figure is reported, not
+  independently re-verified, and it predates the Kaiju Spine rename.
 - The orchestration/guardrail automation layer — built, and has
   reached fully autonomous operation at least once in testing. Its
   trust state resets to a more supervised mode automatically any time
   a mistake is detected, by design. It returned to fully autonomous
   operation on 2026-10-10 after three supervised qualifying rounds,
-  and its live state was last verified on 2026-10-18.
+  and its live state was last verified on 2026-10-29.
 
 ## Designed but not yet built
 
-- A fuller clean-environment timing test of the "deployable by someone
-  else in a reasonable amount of time" claim.
+- A clean-VM install test of the renamed (`kaiju-spine`) tree, and a
+  re-measured install time on it.
 
 ## Deliberately not yet started
 

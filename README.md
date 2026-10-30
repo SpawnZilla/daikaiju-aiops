@@ -9,6 +9,9 @@ This repository holds the part that can be installed by someone else today:
 
 - **Kaiju GAIS**, the substrate: a bootstrap installer, the guardrail standard (MABS),
   a version-controlled memory vault and a config-driven self-healing watchdog (FASHSD).
+- **Kaiju Spine**, the installable package: `install.sh` is the Kaiju Spine bootstrap
+  installer. It puts the memory vault in `~/.kaiju-spine`, the watchdog config in
+  `/etc/kaiju-spine/` and the watchdog scripts in `/opt/kaiju-spine/watchdog/`.
 - **docs-site/**, a local MkDocs reference site (not deployed anywhere yet).
 
 The agent orchestration layer itself (the planning, reasoning and execution agents)
@@ -42,7 +45,9 @@ One clean-VM run on Ubuntu 24.04 (CPU-only VM, 493 Mbps connection),
 `install.sh` end to end (Tier 3, both models pulled, FASHSD enabled):
 11 min 33 s; whole deploy from a bare VM about 12 min. This run's own
 log was not kept, so treat the figure as reported, not independently
-re-verified. About 8 minutes of that was Ollama and the two models
+re-verified. That run was made before the Kaiju OS to Kaiju Spine rename
+(2026-10-26); a clean-VM re-run on the renamed `kaiju-spine` paths has not been
+done yet. About 8 minutes of that was Ollama and the two models
 (35 GB); on a slower connection the model download dominates -- at
 100 Mbps, 35 GB alone takes about 47 minutes.
 
@@ -81,7 +86,7 @@ current terms before using it with non-Anthropic models.
 
 | Path | What |
 |---|---|
-| `install.sh` | Bootstrap installer (phases 0 to 7) |
+| `install.sh` | Kaiju Spine bootstrap installer (phases 0 to 7) |
 | `MABS_Standalone.md` | Portable guardrail standard for planning and execution agents |
 | `Model_Selection_Guide.md` | Model picks per hardware tier |
 | `Hardware_Compatibility_Matrix.md` | Hardware and topology compatibility notes |

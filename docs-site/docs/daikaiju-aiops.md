@@ -42,7 +42,9 @@ authorized scope or confidence.
 
 ## How it's used
 
-Today the system runs at **manual-trigger maturity**: a human hands
+By default the system runs at **manual-trigger maturity** (the orchestration
+automation has also reached fully autonomous operation in testing; see
+[Status & Roadmap](status.md)): a human hands
 off a task, Bakaidah drafts an approach, Mokaima and a human review and
 approve it, Angkai carries it out, a human reviews the result. The
 target end state removes the human from that loop entirely for routine
