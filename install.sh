@@ -5,12 +5,13 @@
 #
 # STATUS: run end to end. The minimal path (Docker pre-installed, model
 # pull skipped, FASHSD skipped) ran on clean VMs on Ubuntu 24.04, Debian
-# 13 and Ubuntu 22.04 LTS; the bugs those runs found are fixed. The FULL
+# 13 and Ubuntu 22.04 LTS (on 22.04 mcpo is skipped with a warning: it needs
+# Python 3.11+ and 22.04 ships 3.10); the bugs those runs found are fixed. The FULL
 # path (Docker install, Tier 3 model pull, FASHSD Phase 5) on Ubuntu
-# 24.04 was reported at 11m33s with no errors; its log was not kept, so
-# that is unverified. The model-pull step had a startup race on Ubuntu,
+# 24.04 was reported at 11m33s with no errors; that log was not kept. It was
+# re-run on the renamed tree on 2026-10-31 with the log kept: no errors, 395s. The model-pull step had a startup race on Ubuntu,
 # Arch and Fedora (fixed with wait_for_ollama_api); the fix was verified
-# with a real pull on Fedora only. Arch and Fedora 44 Cloud Base ran the
+# with a real pull on Fedora and Ubuntu 24.04 only. Arch and Fedora 44 Cloud Base ran the
 # minimal path clean.
 #
 # Resolved design decisions this script follows (the installer spec's

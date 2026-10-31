@@ -44,21 +44,34 @@ sets up the FASHSD watchdog from a short list of your services and drives.
 One clean-VM run on Ubuntu 24.04 (CPU-only VM, 493 Mbps connection),
 `install.sh` end to end (Tier 3, both models pulled, FASHSD enabled):
 11 min 33 s; whole deploy from a bare VM about 12 min. This run's own
-log was not kept, so treat the figure as reported, not independently
-re-verified. That run was made before the Kaiju OS to Kaiju Spine rename
-(2026-10-26); a clean-VM re-run on the renamed `kaiju-spine` paths has not been
-done yet. About 8 minutes of that was Ollama and the two models
+log was not kept. It was made before the Kaiju OS to Kaiju Spine rename
+(2026-10-26). A clean-VM re-run on the renamed `kaiju-spine` paths on
+2026-10-31, with the log kept, took 395 s for `install.sh` (Tier 3, both
+models pulled, FASHSD enabled) on a faster connection, with no errors.
+Your time will depend mostly on your download speed. In the
+11 min 33 s run, about 8 minutes was Ollama and the two models
 (35 GB); on a slower connection the model download dominates -- at
 100 Mbps, 35 GB alone takes about 47 minutes.
 
 ## What is verified
 
 - Minimal path (no model pull, no FASHSD) ran clean on Ubuntu 24.04,
-  Debian 13, Ubuntu 22.04, Arch Linux (cloud image) and Fedora 44
-  Cloud Base (SELinux enforcing, no denials seen).
+  Debian 13, Arch Linux (cloud image) and Fedora 44 Cloud Base (SELinux
+  enforcing, no denials seen). Re-run on the renamed tree (Kaiju Spine)
+  on 2026-10-31: all four passed.
+- Ubuntu 22.04: the installer completes, but mcpo is skipped with a
+  warning, because mcpo needs Python 3.11+ and 22.04 ships 3.10. The
+  installer does not add a Python version for you. Install Python 3.11+
+  yourself (for example from the deadsnakes PPA), then run
+  `pipx install --python python3.11 mcpo`.
+- Full path on Ubuntu 24.04 (Docker, Tier 3 model pull, FASHSD with a test
+  service), re-run on the renamed tree on 2026-10-31 with the log kept:
+  completed with no errors in 395 s on a fast network, both models pulled,
+  the watchdog timer active and the test service check passing. Pull
+  time depends on your connection.
 - Real model pull (after the startup-race fix below): verified on
-  Fedora 44 Cloud Base only. Not verified on Arch, Debian 13 or
-  Ubuntu in the fixed form.
+  Fedora 44 Cloud Base and Ubuntu 24.04 (2026-10-31). Not verified on
+  Arch, Debian 13 or Ubuntu 22.04.
 - Startup race in the model-pull step: the installer ran `ollama pull`
   before the daemon was listening. Reproduced on Ubuntu 24.04, Arch and
   Fedora 44 (on Ubuntu one of the two models was silently missing).
