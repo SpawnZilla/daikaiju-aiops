@@ -28,6 +28,9 @@ keeps that same standard for anyone reading from the outside.
   operation on 2026-10-10 after three supervised qualifying rounds,
   and its live state was last verified on 2026-11-04.
 
+- This documentation site (Dossier) — published on GitHub Pages and
+  rebuilt from this repository on every change to `docs-site/`.
+
 ## Designed but not yet built
 
 - Nothing at the moment.
@@ -35,9 +38,6 @@ keeps that same standard for anyone reading from the outside.
 ## Deliberately not yet started
 
 - Packaging the agent adapters (planning, reasoning, execution) as part of Kaiju Spine.
-- This documentation site (Dossier) is a locally buildable reference;
-  its GitHub Pages deployment goes live with the next push of the
-  repository.
 
 ## A word on reliability claims
 
