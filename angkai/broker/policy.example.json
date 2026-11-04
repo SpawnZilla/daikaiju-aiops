@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "_comment": "Example broker policy. Each target names a staging root, a production root, allowed file patterns, a sandbox health check and a production health check. apply_enabled=true lets the broker apply and, if the production check fails, roll back. min_checkpoint_state is the autonomy level a request needs before it is applied; below it the request is escalated to the operator.",
+  "targets": {
+    "a2a-gateway": {
+      "_comment": "B4 (2026-09-26): apply enabled, but min_checkpoint_state stays fully_autonomous -- until  climbs, every gateway request escalates to the operator (P_CHECKPOINT_STATE) and nothing is applied.",
+      "staging_root": "/srv/angkai/mcp-a2a-gateway-sandbox",
+      "production_root": "/opt/kaiju-gateway",
+      "apply_enabled": true,
+      "allowed_relpaths": [
+        "mcp_a2a_gateway/*.py"
+      ],
+      "sandbox_check": {
+        "unit": "mcp-a2a-gateway-sandbox.service",
+        "url": "http://127.0.0.1:10099/mcp",
+        "timeout_seconds": 60,
+        "settle_seconds": 8
+      },
+      "prod_check": {
+        "unit": "mcp-a2a-gateway.service",
+        "url": "http://127.0.0.1:10000/mcp",
+        "timeout_seconds": 60,
+        "settle_seconds": 8
+      },
+      "classes": {
+        "code_file_replace": {
+          "min_checkpoint_state": "fully_autonomous"
+        },
+        "edit_brief": {
+          "min_checkpoint_state": "fully_autonomous",
+          "brief_dir": "/srv/angkai/staging/edit_briefs"
+        }
+      }
+    },
+    "broker-dummy": {
+      "_comment": "Throwaway B3 test target. The prod check requires the body to contain 'HEALTH_OK' so a deliberately bad change passes the sandbox but fails production, exercising the automatic rollback. (First live run used the marker 'OK', which 'BROKEN' contains -- lesson: health markers must be distinctive.)",
+      "staging_root": "/srv/angkai/broker-dummy-staging",
+      "production_root": "/opt/kaiju-broker-dummy",
+      "apply_enabled": true,
+      "allowed_relpaths": [
+        "app/*.html"
+      ],
+      "sandbox_check": {
+        "unit": "kaiju-broker-dummy-sandbox.service",
+        "url": "http://127.0.0.1:18099/app/health.html",
+        "timeout_seconds": 30,
+        "settle_seconds": 2
+      },
+      "prod_check": {
+        "unit": "kaiju-broker-dummy.service",
+        "url": "http://127.0.0.1:18000/app/health.html",
+        "expect_body_contains": "HEALTH_OK",
+        "timeout_seconds": 15,
+        "settle_seconds": 2
+      },
+      "classes": {
+        "code_file_replace": {
+          "min_checkpoint_state": "stage_0"
+        }
+      },
+      "git": {
+        "_comment": "G2 (2026-10-09): apply/rollback enabled for the throwaway dummy ONLY, same B3 pattern applied to schema_version \"2\". Distinct units/ports from the v1 dummy above so the two never collide. production_root must already be a baseline-committed git repo (the operator does this by hand, once, outside the broker) before this is ever relied on.",
+        "broker_checkout": "/var/lib/kaiju-broker/dummy-git-checkout",
+        "production_root": "/opt/kaiju-broker-dummy-git",
+        "apply_enabled": true,
+        "ignore_patterns": [
+          "__pycache__",
+          "*.pyc",
+          "*.pyo",
+          "*.log"
+        ],
+        "sandbox_check": {
+          "unit": "kaiju-broker-dummy-git-sandbox.service",
+          "url": "http://127.0.0.1:19099/app/health.html",
+          "timeout_seconds": 30,
+          "settle_seconds": 2
+        },
+        "prod_check": {
+          "unit": "kaiju-broker-dummy-git.service",
+          "url": "http://127.0.0.1:19000/app/health.html",
+          "expect_body_contains": "HEALTH_OK",
+          "timeout_seconds": 15,
+          "settle_seconds": 2
+        },
+        "classes": {
+          "code_file_replace": {
+            "min_checkpoint_state": "stage_0",
+            "allowed_relpaths": [
+              "app/*.html"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

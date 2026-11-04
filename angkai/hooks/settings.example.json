@@ -1,0 +1,87 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /srv/angkai/.claude/hooks/secret_gate_userpromptsubmit.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read|Write|Edit|Bash|mcp__vault__.*|EnterPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/srv/angkai/.claude/hooks/pretooluse_chain.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/srv/angkai/.claude/hooks/audit_log_posttooluse.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/srv/angkai/.claude/hooks/sandbox_snapshot_posttooluse.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/srv/angkai/.claude/hooks/kai086_auto_rollback_posttooluse.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /srv/angkai/hooks/stop_hook_validator.py"
+          },
+          {
+            "type": "command",
+            "command": "python3 /srv/angkai/.claude/hooks/output_shape_stophook.py"
+          },
+          {
+            "type": "command",
+            "command": "python3 /srv/angkai/.claude/hooks/false_block_detector.py"
+          },
+          {
+            "type": "command",
+            "command": "python3 /srv/angkai/.claude/hooks/ledger_stophook.py"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /srv/angkai/.claude/hooks/kai084_sessionend_idle.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

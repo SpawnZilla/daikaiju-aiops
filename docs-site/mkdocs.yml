@@ -1,4 +1,6 @@
-site_name: Kaidosho
+site_name: Dossier
+site_url: https://spawnzilla.github.io/daikaiju-aiops/
+repo_url: https://github.com/SpawnZilla/daikaiju-aiops
 site_description: Autonomous, self-healing agentic infrastructure operations
 theme:
   name: readthedocs

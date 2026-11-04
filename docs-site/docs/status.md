@@ -14,26 +14,30 @@ keeps that same standard for anyone reading from the outside.
 - The installer for the packaged bundle (Kaiju Spine) — built, tested
   across multiple clean-environment rounds, closed.
 - Distro portability to Arch Linux and Fedora 44 Cloud Base, alongside Debian/Ubuntu: minimal path tested on both; real model pull verified on Fedora only. RHEL/CentOS, Fedora Workstation/Server and non-systemd distros remain untested/out of scope.
-- One reported clean-VM run of the full installer path on Ubuntu 24.04: 11 min 33 s
-  end to end. The run's own log was not kept, so the figure is reported, not
-  independently re-verified, and it predates the Kaiju Spine rename.
+- Clean-VM re-run of the installer on the renamed Kaiju Spine tree,
+  2026-10-31: five of six rounds passed (Ubuntu 24.04 full and minimal,
+  Debian 13, Arch and Fedora 44 Cloud Base, minimal). The full path on
+  Ubuntu 24.04 took 395 s with the log kept, on a fast connection.
+  Ubuntu 22.04 installs but skips mcpo, which needs Python 3.11+ (see the
+  README). The earlier 11 min 33 s run predates the rename and its log
+  was not kept.
 - The orchestration/guardrail automation layer — built, and has
   reached fully autonomous operation at least once in testing. Its
   trust state resets to a more supervised mode automatically any time
   a mistake is detected, by design. It returned to fully autonomous
   operation on 2026-10-10 after three supervised qualifying rounds,
-  and its live state was last verified on 2026-10-29.
+  and its live state was last verified on 2026-11-04.
 
 ## Designed but not yet built
 
-- A clean-VM install test of the renamed (`kaiju-spine`) tree, and a
-  re-measured install time on it.
+- Nothing at the moment.
 
 ## Deliberately not yet started
 
 - Packaging the agent adapters (planning, reasoning, execution) as part of Kaiju Spine.
-- This documentation site's own public deployment — it exists today as
-  a locally buildable, previewable reference, not a published site.
+- This documentation site (Dossier) is a locally buildable reference;
+  its GitHub Pages deployment goes live with the next push of the
+  repository.
 
 ## A word on reliability claims
 

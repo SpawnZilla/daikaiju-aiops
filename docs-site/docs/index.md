@@ -1,5 +1,7 @@
 # Kaidosho
 
+*Dossier is the documentation for the Kaidosho project.*
+
 Autonomous, self-healing agentic infrastructure operations — built
 from the ground up as a real, running system, not a demo.
 

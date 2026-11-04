@@ -1,0 +1,12 @@
+[Unit]
+Description=Kaiju Relay MCP server (draft_edit_brief, read-only) on port 8301
+After=network-online.target ollama.service
+
+[Service]
+User=USER
+ExecStart=/usr/bin/python3 /srv/mcpo/kaiju_relay_mcp_server.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+# Kaiju Relay MCP tool (replaces the "relay Pipe" plan; no Pipe for Daikaiju, the operator 11-01 22:13)
+What: one read-only tool, draft_edit_brief(task, target_path), on dokaisho port 8301, served by mcpo at http://192.0.2.45:8200/kaiju-relay. It runs the existing relay edit pipeline (gate met 10-30: 43/45 on gemma4-bakaidah:31b) and returns the brief + EDITS_JSON. It never applies anything: apply_edit_brief.py / the  edit_brief broker class stay the only way a brief becomes a change (follow-up 3 = a human or Mokaima hands the brief to the broker; no auto-submit).
+Two users, one tool: (1) Bakaidah in Open WebUI (Tool connection) and (2) Mokaima/A2A (plain HTTP to the mcpo URL, e.g. POST /kaiju-relay/draft_edit_brief).
+Tests: 10 offline (python3 -I test_kaiju_relay_mcp.py; needs mcp<2 like the graphify server).
+Install (dokaisho, USER): bash install_relay_mcp.sh check, then apply. Rollback: same script, rollback.
+Open WebUI step (after apply): Settings > Tools > add connection http://192.0.2.45:8200/kaiju-relay, then enable it on Bakaidah Online ONLY. A tool on Bakaidah Daikaiju is a change under Bakaidah_Release_Gate.md, so run the gate on Online first.
+Smoke test with no Open WebUI (dokaisho, drafts only, loads the model, 1-3 min):
+curl -s -m 400 -X POST http://127.0.0.1:8200/kaiju-relay/draft_edit_brief -H 'Content-Type: application/json' -d '{"task":"On the feed line for r/homelab, replace the URL with https://www.reddit.com/r/homelab/top/.rss?t=day and change nothing else in the file.","target_path":"/srv/kaiju-vault/Content_Curation/content_feeds.txt"}'
+Known limits: one run at a time (BUSY otherwise); vault files only (the relay reads through mcpo's vault server); model call uses num_ctx 24576 so Ollama does not reload.
+
+LIVE 2026-11-01 22:29: installed by the operator on dokaisho. First apply left mcpo with ConnectTimeout: ufw allowed 172.21.0.0/16 to 8300 only. Fixed with: sudo ufw allow from 172.21.0.0/16 to any port 8301 proto tcp (comment 'kaiju-relay-mcp from mcpo Docker'), then docker restart mcpo; /kaiju-relay/openapi.json now lists /draft_edit_brief. install_relay_mcp.sh now adds (apply) and removes (rollback) that ufw rule.
