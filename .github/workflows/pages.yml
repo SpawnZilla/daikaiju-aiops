@@ -20,10 +20,13 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install mkdocs
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - run: mkdocs build --strict --config-file docs-site/mkdocs.yml --site-dir _site
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: docs-site/_site
   deploy:
     needs: build
     runs-on: ubuntu-latest
