@@ -12,7 +12,7 @@ This repository holds the part that can be installed by someone else today:
 - **Kaiju Spine**, the installable package: `install.sh` is the Kaiju Spine bootstrap
   installer. It puts the memory vault in `~/.kaiju-spine`, the watchdog config in
   `/etc/kaiju-spine/` and the watchdog scripts in `/opt/kaiju-spine/watchdog/`.
-- **docs-site/**, a local MkDocs reference site (not deployed anywhere yet).
+- **docs-site/**, the MkDocs source of the Dossier reference site, published at https://spawnzilla.github.io/daikaiju-aiops/.
 
 The agent orchestration layer itself (the planning, reasoning and execution agents)
 is not packaged here. See `docs-site/docs/status.md` for what is built and verified
