@@ -1,0 +1,13 @@
+[Unit]
+Description=Kaiju docker events trigger for the acting watchdog
+After=docker.service
+Wants=docker.service
+
+[Service]
+ExecStart=/bin/bash /opt/kaiju-spine/watchdog/docker_events_trigger.sh
+Restart=always
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target

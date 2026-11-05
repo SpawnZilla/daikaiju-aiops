@@ -1,0 +1,643 @@
+diff --git a/mcp_a2a_gateway/agent_manager.py b/mcp_a2a_gateway/agent_manager.py
+index 8813dfb..abd59e4 100644
+--- a/mcp_a2a_gateway/agent_manager.py
++++ b/mcp_a2a_gateway/agent_manager.py
+@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple
+ import httpx
+ from a2a.client import A2ACardResolver
+ from a2a.types import AgentCard
++from google.protobuf.json_format import MessageToDict, ParseDict
+ from pydantic import BaseModel, Field
+ 
+ logger = logging.getLogger(__name__)
+@@ -33,6 +34,52 @@ class AgentManager:
+                 resolver = A2ACardResolver(httpx_client=http_client, base_url=url)
+                 agent_card = await resolver.get_agent_card()
+ 
++            # FIX 2026-09-07 ("no compatible transports found" --
++            # follow-up, found while testing SkillCritic A2A viability):
++            # a2a-sdk 1.0+'s ClientFactory.create() requires
++            # card.supported_interfaces to be non-empty to select a transport
++            # at all -- confirmed via direct read of
++            # a2a/client/client_factory.py's create(): it raises exactly
++            # ValueError('no compatible transports found.') if the loop over
++            # card.supported_interfaces never matches a registered transport
++            # protocol. A2ACardResolver's own card_resolver.py DOES
++            # auto-synthesize a supported_interfaces entry from a legacy flat
++            # "url" field in the raw agent-card JSON response
++            # (_handle_connection_fields_compatibility) -- but only if the
++            # server's own card response actually contains that "url" field.
++            # Confirmed via direct read of the real persisted card
++            # (a2a_gateway_data/registered_agents.json) that Bakaidah's own
++            # agent-server's card has NONE of url/preferredTransport/
++            # protocolVersion/supportedInterfaces -- so that auto-synthesis
++            # never fires, and the resulting card can never select a
++            # transport regardless of legacy/modern version detection.
++            # Root-caused via direct source read of client_factory.py,
++            # card_resolver.py, and the real persisted JSON -- not assumed
++            # or guessed. FIX: if the fetched card still has zero
++            # supported_interfaces after A2ACardResolver's own compat
++            # handling, synthesize one directly here using the REGISTRATION
++            # url (the same url this function was called with -- known-
++            # correct, since it's exactly what get_agent_card() was just
++            # fetched from) with a legacy JSONRPC/0.3.0 binding, matching
++            # Bakaidah's own real, confirmed-still-legacy server --
++            # this is exactly what routes through CompatJsonRpcTransport
++            # (is_legacy_version("0.3.0") == True, confirmed via direct read
++            # of a2a/compat/v0_3/versions.py). Only acts when
++            # supported_interfaces is empty, so this never touches a
++            # correctly-self-describing agent registered in the future.
++            if not agent_card.supported_interfaces:
++                agent_card.supported_interfaces.add(
++                    url=url,
++                    protocol_binding="JSONRPC",
++                    protocol_version="0.3.0",
++                )
++                logger.warning(
++                    f"Agent card for {url} had no supported_interfaces; "
++                    f"synthesized one (JSONRPC/0.3.0) so a transport can be "
++                    f"selected. See register_agent() comment dated "
++                    f"2026-09-07 for full root cause."
++                )
++
+             # url 필드 없이 AgentInfo 객체 생성
+             agent_info = AgentInfo(card=agent_card)
+             self.registered_agents[url] = agent_info
+@@ -61,7 +108,7 @@ class AgentManager:
+     def get_agents_data_for_saving(self) -> Dict[str, dict]:
+         """저장을 위해 직렬화된 에이전트 데이터를 반환합니다."""
+         return {
+-            url: agent.model_dump(mode="json")
++            url: {"card": MessageToDict(agent.card)}
+             for url, agent in self.registered_agents.items()
+         }
+ 
+@@ -70,7 +117,8 @@ class AgentManager:
+         for url, agent_data in data.items():
+             try:
+                 # dict에서 AgentInfo 객체를 생성합니다 (이제 url 필드가 없습니다).
+-                self.registered_agents[url] = AgentInfo.model_validate(agent_data)
++                card = ParseDict(agent_data.get("card", {}), AgentCard(), ignore_unknown_fields=True)
++                self.registered_agents[url] = AgentInfo(card=card)
+             except Exception as e:
+                 logger.error(f"Failed to load agent data for {url}: {e}")
+         logger.info(f"Loaded {len(self.registered_agents)} agents.")
+diff --git a/mcp_a2a_gateway/server.py b/mcp_a2a_gateway/server.py
+index 6b7d5bc..f951c56 100644
+--- a/mcp_a2a_gateway/server.py
++++ b/mcp_a2a_gateway/server.py
+@@ -4,6 +4,7 @@ import atexit
+ from typing import Any, Dict, List, Literal, Optional
+ 
+ from fastmcp import Context, FastMCP
++from google.protobuf.json_format import MessageToDict
+ 
+ from mcp_a2a_gateway import config
+ from mcp_a2a_gateway.agent_manager import AgentManager
+@@ -81,7 +82,7 @@ async def register_agent(url: str, ctx: Context) -> Dict[str, Any]:
+         )
+         response_agent = {
+             "url": registered_url,
+-            "card": agent_info.card.model_dump(mode="json"),
++            "card": MessageToDict(agent_info.card),
+         }
+         return {"status": "success", "agent": response_agent}
+     except Exception as e:
+@@ -108,7 +109,7 @@ async def list_agents(dummy: str = "") -> List[Dict[str, Any]]:
+     # (이 도구는 변경되지 않았습니다.)
+     agent_list = []
+     for url, agent_info in agent_manager.list_agents_with_url():
+-        agent_list.append({"url": url, "card": agent_info.card.model_dump(mode="json")})
++        agent_list.append({"url": url, "card": MessageToDict(agent_info.card)})
+     if not agent_list:
+         agent_list.append({"url": "", "card": {}})
+     return agent_list
+diff --git a/mcp_a2a_gateway/task_manager.py b/mcp_a2a_gateway/task_manager.py
+index 85f7f96..09be58f 100644
+--- a/mcp_a2a_gateway/task_manager.py
++++ b/mcp_a2a_gateway/task_manager.py
+@@ -6,17 +6,18 @@ from datetime import datetime, timezone
+ from typing import Any, Dict, List, Literal, Optional
+ 
+ import httpx
+-from a2a.client import A2AClient
++from a2a.client import ClientConfig, ClientFactory
++from a2a.client.errors import A2AClientError
+ from a2a.types import (
+-    JSONRPCErrorResponse,
++    Artifact,
+     Message,
+-    MessageSendParams,
+     Part,
++    Role,
++    SendMessageConfiguration,
+     SendMessageRequest,
+-    SendMessageResponse,
+-    SendMessageSuccessResponse,
++    StreamResponse,
+     Task,
+-    TextPart,
++    TaskState,
+ )
+ from dotenv import load_dotenv
+ from pydantic import BaseModel, Field
+@@ -32,6 +33,25 @@ load_dotenv()
+ MCP_REQUEST_TIMEOUT = int(os.getenv("MCP_REQUEST_TIMEOUT", "30"))
+ MCP_REQUEST_IMMEDIATE_TIMEOUT = int(os.getenv("MCP_REQUEST_IMMEDIATE_TIMEOUT", "2"))
+ 
++# a2a-sdk 1.0+'s TaskState is an int-backed enum (a2a.types.a2a_pb2). Mapped
++# to this gateway's own pre-existing string status vocabulary (StoredTask.status,
++# get_task_list's Literal) so callers (kaiju_mokaima_a2a_adapter.py etc.) see no
++# schema change on this side of the gateway.
++_TASK_STATE_MAP = {
++    TaskState.TASK_STATE_UNSPECIFIED: "unknown",
++    TaskState.TASK_STATE_SUBMITTED: "running",
++    TaskState.TASK_STATE_WORKING: "running",
++    TaskState.TASK_STATE_COMPLETED: "completed",
++    TaskState.TASK_STATE_FAILED: "error",
++    TaskState.TASK_STATE_CANCELED: "cancelled",
++    # No direct equivalent in the existing status vocabulary for these two --
++    # mapped conservatively rather than silently dropped. Flagged in the
++    # handoff doc as a scope decision, not discovered from real traffic yet.
++    TaskState.TASK_STATE_INPUT_REQUIRED: "running",
++    TaskState.TASK_STATE_REJECTED: "error",
++    TaskState.TASK_STATE_AUTH_REQUIRED: "error",
++}
++
+ 
+ class StoredTask(BaseModel):
+     """서버에 저장되는 작업의 상세 정보를 담는 모델"""
+@@ -67,6 +87,18 @@ class StoredTask(BaseModel):
+         arbitrary_types_allowed = True
+ 
+ 
++def _extract_text(obj) -> str:
++    """Extracts text content from a pb2 Message or Artifact (both have a
++    flat `parts` list of `Part`, and `Part` now has a flat `.text` field --
++    replaces the old duck-typed extract_text_content(), which relied on
++    hasattr() checks that don't mean anything against protobuf messages
++    (declared fields are always present, never truly absent)."""
++    if not getattr(obj, "parts", None):
++        return ""
++    texts = [p.text for p in obj.parts if p.text]
++    return " ".join(texts)
++
++
+ class TaskManager:
+     def __init__(self, agent_manager: AgentManager):
+         self.tasks: Dict[str, StoredTask] = {}
+@@ -86,17 +118,17 @@ class TaskManager:
+         logger.info(f"Removed {len(tasks_to_remove)} tasks for agent {url}.")
+         return len(tasks_to_remove)
+ 
+-    # ⭐️ [핵심 수정] _process_agent_response 함수 수정
+     async def _process_agent_response(
+         self,
+-        response: SendMessageResponse,
+-        gateway_task_id: str,  # 이름을 명확하게 변경
++        stream_response: StreamResponse,
++        gateway_task_id: str,
+         agent_url: str,
+         agent_info: AgentInfo,
+         message_text: str,
+     ) -> StoredTask:
+-        """에이전트 응답을 처리하고 항상 gateway_task_id를 기준으로 태스크를
+-        업데이트합니다."""
++        """Processes one StreamResponse event (task | message | status_update |
++        artifact_update -- a2a-sdk 1.0+'s oneof shape) and always updates the
++        task keyed by gateway_task_id, same contract as before the migration."""
+         stored_task = self.get_task(gateway_task_id)
+         if not stored_task:
+             # This can happen if the background task runs after a long delay
+@@ -113,244 +145,120 @@ class TaskManager:
+                 status="unknown",  # Initial status
+             )
+ 
+-        def extract_text_content(obj) -> str:
+-            """
+-            Safely extracts text content from various A2A response objects.
+-            Handles Message objects with parts, Task objects, or any other structure.
+-            """
+-            # Case 1: Object has 'parts' attribute (Message-like)
+-            if hasattr(obj, "parts") and obj.parts:
+-                try:
+-                    text_parts = []
+-                    for part in obj.parts:
+-                        if hasattr(part, "root") and hasattr(part.root, "text"):
+-                            text_parts.append(part.root.text)
+-                        elif hasattr(part, "text"):
+-                            text_parts.append(part.text)
+-                        elif isinstance(part, str):
+-                            text_parts.append(part)
+-
+-                    if text_parts:
+-                        return " ".join(text_parts)
+-                except Exception as e:
+-                    logger.debug(f"Error extracting from parts: {e}")
+-
+-            # Case 2: Object has direct 'text' attribute
+-            if hasattr(obj, "text"):
+-                return str(obj.text)
+-
+-            # Case 3: Object has 'content' attribute
+-            if hasattr(obj, "content"):
+-                if isinstance(obj.content, str):
+-                    return obj.content
+-                elif hasattr(obj.content, "text"):
+-                    return str(obj.content.text)
+-
+-            # Case 4: Object has 'message' attribute
+-            if hasattr(obj, "message"):
+-                if isinstance(obj.message, str):
+-                    return obj.message
+-                else:
+-                    return extract_text_content(obj.message)
+-
+-            # Case 5: Object is a Task - extract relevant info and check for
+-            # artifacts
+-            if isinstance(obj, Task):
+-                task_info = []
+-
+-                # First, try to extract from artifacts (this is where the
+-                # real content is)
+-                if hasattr(obj, "artifacts") and obj.artifacts:
+-                    try:
+-                        artifact_content = []
+-                        for artifact in obj.artifacts:
+-                            # Check if artifact has parts
+-                            if hasattr(artifact, "parts") and artifact.parts:
+-                                for part in artifact.parts:
+-                                    if hasattr(part, "root") and hasattr(
+-                                        part.root, "text"
+-                                    ):
+-                                        artifact_content.append(part.root.text)
+-                                    elif hasattr(part, "text"):
+-                                        artifact_content.append(part.text)
+-                            # Check if artifact has direct content
+-                            elif hasattr(artifact, "content"):
+-                                if isinstance(artifact.content, str):
+-                                    artifact_content.append(artifact.content)
+-                                else:
+-                                    artifact_content.append(
+-                                        extract_text_content(artifact.content)
+-                                    )
+-                            # Check if artifact has text
+-                            elif hasattr(artifact, "text"):
+-                                artifact_content.append(str(artifact.text))
+-
+-                        if artifact_content:
+-                            return " ".join(artifact_content)
+-                    except Exception as e:
+-                        logger.debug(f"Error extracting from task artifacts: {e}")
+-
+-                # If no artifacts or artifact extraction failed, get basic
+-                # task info
+-                if hasattr(obj, "id") and obj.id:
+-                    task_info.append(f"Task ID: {obj.id}")
+-                if hasattr(obj, "status") and obj.status:
+-                    task_info.append(f"Status: {obj.status}")
+-                if hasattr(obj, "description") and obj.description:
+-                    task_info.append(f"Description: {obj.description}")
+-
+-                # Also check for state or result fields that might contain
+-                # content
+-                if hasattr(obj, "state") and obj.state:
+-                    state_content = extract_text_content(obj.state)
+-                    if state_content and "no readable content" not in state_content:
+-                        task_info.append(f"State: {state_content}")
+-
+-                if hasattr(obj, "result") and obj.result:
+-                    result_content = extract_text_content(obj.result)
+-                    if result_content and "no readable content" not in result_content:
+-                        task_info.append(f"Result: {result_content}")
+-
+-                return (
+-                    " | ".join(task_info)
+-                    if task_info
+-                    else "Task object (no readable content)"
++        try:
++            logger.debug(
++                f"Received StreamResponse, set field: "
++                f"{stream_response.WhichOneof('payload')}"
++            )
++
++            if stream_response.HasField("task"):
++                task_obj: Task = stream_response.task
++                status = _TASK_STATE_MAP.get(task_obj.status.state, "unknown")
++                logger.info(
++                    f"Agent {agent_url} returned a task object "
++                    f"(state={TaskState.Name(task_obj.status.state)})."
+                 )
+ 
+-            # Case 6: Try to convert to string if it's a simple type
+-            if isinstance(obj, (str, int, float, bool)):
+-                return str(obj)
+-
+-            # Case 7: Try to extract from dict-like objects
+-            if hasattr(obj, "__dict__"):
+-                obj_dict = obj.__dict__
+-                for key in ["text", "content", "message", "description", "result"]:
+-                    if key in obj_dict and obj_dict[key]:
+-                        if isinstance(obj_dict[key], str):
+-                            return obj_dict[key]
+-                        else:
+-                            return extract_text_content(obj_dict[key])
+-
+-            # Fallback: return object type info
+-            return f"Response received (type: {type(obj).__name__})"
+-
+-        def extract_task_id(obj) -> Optional[str]:
+-            """Safely extracts task ID from A2A response objects."""
+-            if hasattr(obj, "id") and obj.id:
+-                return str(obj.id)
+-            if hasattr(obj, "task_id") and obj.task_id:
+-                return str(obj.task_id)
+-            if hasattr(obj, "taskId") and obj.taskId:
+-                return str(obj.taskId)
+-            return None
++                if task_obj.id:
++                    stored_task.agent_task_id = task_obj.id
++
++                # Real content lives in artifacts first, task-level parts second.
++                message_content = ""
++                if task_obj.artifacts:
++                    artifact_texts = [
++                        _extract_text(artifact)
++                        for artifact in task_obj.artifacts
++                        if artifact.parts
++                    ]
++                    message_content = " ".join(t for t in artifact_texts if t)
++                if not message_content and task_obj.status.HasField("message"):
++                    message_content = _extract_text(task_obj.status.message)
++
++                if not message_content:
++                    message_content = (
++                        "Task is running in background."
++                        if status == "running"
++                        else "Task completed successfully (no text response)."
++                    )
+ 
+-        try:
+-            # Log the response structure for debugging
+-            logger.debug(f"Received response type: {type(response.root).__name__}")
+-            if hasattr(response.root, "__dict__"):
+-                logger.debug(
+-                    f"Response attributes: {list(response.root.__dict__.keys())}"
+-                )
++                result = {
++                    "request_status": status,
++                    "message": message_content,
++                    "result_type": "Task",
++                }
+ 
+-            # Handle different response types
+-            if isinstance(response.root, SendMessageSuccessResponse):
++            elif stream_response.HasField("message"):
++                message_obj: Message = stream_response.message
+                 status = "completed"
+                 logger.info(f"Agent {agent_url} completed the task successfully.")
+-                result_data = response.root.result
+-
+-                # Log result data structure for debugging
+-                logger.debug(f"Result data type: {type(result_data).__name__}")
+-                if hasattr(result_data, "__dict__"):
+-                    logger.debug(
+-                        f"Result data attributes: {list(result_data.__dict__.keys())}"
+-                    )
+ 
+-                # Extract message content using our robust extractor
+-                message_content = extract_text_content(result_data)
+-                logger.debug(f"Extracted message content: {message_content[:200]}...")
+-
+-                # If we couldn't extract meaningful content, provide a fallback
+-                if not message_content or message_content.strip() == "":
++                message_content = _extract_text(message_obj)
++                if not message_content:
+                     message_content = "Task completed successfully (no text response)."
+ 
+-                # Store task ID if the result is a Task object
+-                task_id = extract_task_id(result_data)
+-                if task_id:
+-                    stored_task.agent_task_id = task_id
++                if message_obj.task_id:
++                    stored_task.agent_task_id = message_obj.task_id
+ 
+                 result = {
+                     "request_status": status,
+                     "message": message_content,
+-                    "result_type": type(result_data).__name__,
++                    "result_type": "Message",
+                 }
+ 
+-            elif isinstance(response.root, Task):
+-                # Agent returned a Task object directly
+-                status = "running"
++            elif stream_response.HasField("status_update"):
++                update = stream_response.status_update
++                status = _TASK_STATE_MAP.get(update.status.state, "running")
+                 logger.info(
+-                    f"Agent {agent_url} returned a task object. "
+-                    f"Now running in background."
++                    f"Agent {agent_url} sent a status update "
++                    f"(state={TaskState.Name(update.status.state)})."
+                 )
+ 
+-                # Log task object structure for debugging
+-                task_obj = response.root
+-                logger.debug(
+-                    f"Task object attributes: "
+-                    f"{list(task_obj.__dict__.keys()) if hasattr(task_obj, '__dict__') else 'No __dict__'}"
+-                )
+-                if hasattr(task_obj, "artifacts"):
+-                    logger.debug(
+-                        f"Task has "
+-                        f"{len(task_obj.artifacts) if task_obj.artifacts else 0} "
+-                        f"artifacts"
+-                    )
+-
+-                # Store the task ID if available
+-                task_id = extract_task_id(task_obj)
+-                if task_id:
+-                    stored_task.agent_task_id = task_id
++                if update.task_id:
++                    stored_task.agent_task_id = update.task_id
+ 
+-                # Extract any available content from the task
+-                message_content = extract_text_content(task_obj)
+-                logger.debug(f"Extracted task content: {message_content}")
+-
+-                if not message_content or "no readable content" in message_content:
+-                    message_content = "Task is running in background."
++                message_content = ""
++                if update.status.HasField("message"):
++                    message_content = _extract_text(update.status.message)
++                if not message_content:
++                    message_content = (
++                        f"Task status update: {TaskState.Name(update.status.state)}"
++                    )
+ 
+                 result = {
+                     "request_status": status,
+                     "message": message_content,
+-                    "result_type": "Task",
++                    "result_type": "TaskStatusUpdateEvent",
+                 }
+ 
+-            elif isinstance(response.root, JSONRPCErrorResponse):
+-                logger.error(
+-                    f"Agent {agent_url} returned an error: {response.root.error.message}"
+-                )
+-                status = "error"
+-                error = response.root.error
++            elif stream_response.HasField("artifact_update"):
++                update = stream_response.artifact_update
++                status = "running"
++                logger.info(f"Agent {agent_url} sent an artifact update.")
++
++                if update.task_id:
++                    stored_task.agent_task_id = update.task_id
++
++                artifact: Artifact = update.artifact
++                message_content = _extract_text(artifact) if artifact.parts else ""
++                if not message_content:
++                    message_content = "Artifact update received."
++
+                 result = {
+-                    "request_status": "error",
+-                    "message": f"Agent Error: {error.message} (Code: {error.code})",
+-                    "error_code": error.code,
++                    "request_status": status,
++                    "message": message_content,
++                    "result_type": "TaskArtifactUpdateEvent",
+                 }
+ 
+             else:
+-                # Handle any other response types
+-                status = (
+-                    "completed"  # Assume completion for unknown successful responses
+-                )
++                # Empty/unrecognized StreamResponse -- no oneof field set.
++                status = "completed"
+                 logger.info(
+-                    f"Agent {agent_url} returned unexpected response type: {type(response.root)}"
++                    f"Agent {agent_url} returned an empty StreamResponse."
+                 )
+-
+-                # Try to extract content from the unknown response type
+-                message_content = extract_text_content(response.root)
+-
+                 result = {
+                     "request_status": status,
+-                    "message": message_content,
+-                    "result_type": type(response.root).__name__,
++                    "message": "Response received (no payload set).",
++                    "result_type": "StreamResponse",
+                 }
+ 
+             stored_task.update_status(status, result)
+@@ -366,11 +274,7 @@ class TaskManager:
+                 {
+                     "request_status": "error",
+                     "message": f"Error processing response: {str(e)}",
+-                    "original_response_type": (
+-                        type(response.root).__name__
+-                        if response and response.root
+-                        else "unknown"
+-                    ),
++                    "original_response_type": type(stream_response).__name__,
+                 },
+             )
+             return stored_task
+@@ -412,30 +316,73 @@ class TaskManager:
+                 # 이 함수는 항상 self.tasks에 있는 StoredTask를 업데이트합니다.
+                 timeout_config = httpx.Timeout(MCP_REQUEST_TIMEOUT, connect=5.0)
+                 async with httpx.AsyncClient(timeout=timeout_config) as http_client:
+-                    client = A2AClient(
+-                        httpx_client=http_client, agent_card=agent_info.card
++                    # a2a-sdk 1.0+: Client is an ABC, obtained via ClientFactory
++                    # rather than instantiated directly. streaming=False keeps
++                    # the non-streaming/single-response semantics this gateway
++                    # always relied on -- BaseClient's non-streaming branch
++                    # yields exactly one StreamResponse and stops (confirmed
++                    # via direct read of base_client.py's send_message()).
++                    # ClientFactory transparently routes to CompatJsonRpcTransport
++                    # for agents still advertising a legacy v0.3 card (flat
++                    # `url` field, auto-detected by card_resolver.py) -- this is
++                    # what keeps this unchanged against Bakaidah's own
++                    # agent-server, which is still pinned a2a-sdk<1.0, with no
++                    # changes needed on that side. Confirmed via direct read of
++                    # card_resolver.py and compat/v0_3/jsonrpc_transport.py, not
++                    # assumed from the migration guide.
++                    client_config = ClientConfig(
++                        httpx_client=http_client, streaming=False
++                    )
++                    factory = ClientFactory(client_config)
++
++                    message = Message(
++                        message_id=str(uuid.uuid4()),
++                        role=Role.ROLE_USER,
++                        parts=[Part(text=message_text)],
++                        # a2a-sdk 1.0+ removed sessionId; context_id is the
++                        # closest protocol analog. Not yet live-verified against
++                        # real multi-turn context threading -- flagged in the
++                        # handoff doc as a scope decision, not a confirmed
++                        # behavior match with the pre-migration sessionId param.
++                        context_id=session_id or "",
+                     )
+                     request = SendMessageRequest(
+-                        id=gateway_task_id,
+-                        params=MessageSendParams(
+-                            message=Message(
+-                                role="user",
+-                                parts=[Part(root=TextPart(text=message_text))],
+-                                messageId=str(uuid.uuid4()),
+-                            ),
+-                            sessionId=session_id,
++                        message=message,
++                        configuration=SendMessageConfiguration(
++                            accepted_output_modes=["text/plain"],
+                         ),
+                     )
+-                    response = await client.send_message(request)
+-                    # 상태 업데이트 후 최종 StoredTask 객체를 self.tasks에 저장
+-                    updated_task = await self._process_agent_response(
+-                        response,
+-                        gateway_task_id,
+-                        agent_url,
+-                        agent_info,
+-                        message_text,
++
++                    async with factory.create(agent_info.card) as client:
++                        async for stream_response in client.send_message(request):
++                            updated_task = await self._process_agent_response(
++                                stream_response,
++                                gateway_task_id,
++                                agent_url,
++                                agent_info,
++                                message_text,
++                            )
++                            self.tasks[gateway_task_id] = updated_task
++                            # Non-streaming path always yields exactly one
++                            # StreamResponse and then the generator ends; break
++                            # explicitly rather than relying on that alone, in
++                            # case a future streaming=True call reaches this
++                            # same code path.
++                            break
++            except A2AClientError as e:
++                logger.error(
++                    f"Background task {gateway_task_id} got an agent/transport "
++                    f"error: {e}",
++                    exc_info=True,
++                )
++                if task := self.tasks.get(gateway_task_id):
++                    task.update_status(
++                        "error",
++                        {
++                            "request_status": "error",
++                            "message": f"Agent Error: {e}",
++                        },
+                     )
+-                    self.tasks[gateway_task_id] = updated_task
+             except Exception as e:
+                 logger.error(
+                     f"Background task {gateway_task_id} failed: {e}", exc_info=True

@@ -1,0 +1,9 @@
+[Unit]
+Description=Kaiju incident intake (edge-node watchdog hand-off, read-only: queue and brief only)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=svcuser
+EnvironmentFile=/etc/kaiju-os/incident-intake.env
+ExecStart=/usr/bin/python3 -I /opt/kaiju-spine/incident-intake/kaiju_incident_intake.py

@@ -1,0 +1,9 @@
+[Unit]
+Description=Kaiju incident orchestrator, every 5 minutes
+
+[Timer]
+OnBootSec=4min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

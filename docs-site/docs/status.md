@@ -28,6 +28,19 @@ keeps that same standard for anyone reading from the outside.
   operation on 2026-10-10 after three supervised qualifying rounds,
   and its live state was last verified on 2026-11-04.
 
+- The incident loop (`incident-loop/`) — built and deployed: the watchdog
+  opens a verified incident, hands it off as a signed message, a reasoning
+  agent diagnoses it read-only, a review step approves it, and a signed
+  ticket runs exactly one allowlisted fix script on the watchdog node. The
+  missing-image repair (fm12) has passed a forced live test twice (2026-10-28
+  and 2026-11-05) and mocked tests. The 4-attempt cap per incident is
+  unit-tested; a live capture of the cap firing is still pending.
+- The agent wiring (`agent-wiring/`) — the adapter between the planning
+  agent and the A2A gateway, the reasoning agent's A2A server, the
+  autonomy scope gate and the mcpo tool bridge. Published as reference
+  code with a test suite (9 tests passing); it is not yet wired into
+  `install.sh`.
+
 - This documentation site (Dossier) — published on GitHub Pages and
   rebuilt from this repository on every change to `docs-site/`.
 
@@ -37,7 +50,7 @@ keeps that same standard for anyone reading from the outside.
 
 ## Deliberately not yet started
 
-- Packaging the agent adapters (planning, reasoning, execution) as part of Kaiju Spine.
+- Integrating the agent wiring and incident loop into the `install.sh` installer (today they are published as reference code you install by hand).
 
 ## A word on reliability claims
 

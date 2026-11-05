@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the Kaiju incident orchestrator after resume from suspend
+After=suspend.target kaiju-incident-intake-resume.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 45
+ExecStart=/bin/systemctl start kaiju-incident-orchestrator.service
+
+[Install]
+WantedBy=suspend.target

@@ -30,6 +30,8 @@ anything that genuinely needs judgment.
   packaged part of Daikaiju AIOps. The installer is released; the agent
   adapters are packaged in `agent-wiring/`.
 
+The architecture diagram is available as an [interactive page](mangokai.html).
+
 ## Why this is different from "just automate it with a cron job"
 
 Automated scripts fix what they were written to fix. The interesting

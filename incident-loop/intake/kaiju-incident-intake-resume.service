@@ -1,0 +1,13 @@
+[Unit]
+Description=Run the Kaiju incident intake right after intake-host resumes from suspend (Wake-on-LAN hand-off)
+After=suspend.target
+
+[Service]
+Type=oneshot
+User=svcuser
+EnvironmentFile=/etc/kaiju-os/incident-intake.env
+ExecStartPre=/bin/sleep 20
+ExecStart=/usr/bin/python3 -I /opt/kaiju-spine/incident-intake/kaiju_incident_intake.py
+
+[Install]
+WantedBy=suspend.target

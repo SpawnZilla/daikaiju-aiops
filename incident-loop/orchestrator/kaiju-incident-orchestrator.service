@@ -1,0 +1,10 @@
+[Unit]
+Description=Kaiju incident orchestrator (Bakaidah diagnosis, Step 5 review, signed run ticket; never runs a fix itself)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=svcuser
+StateDirectory=kaiju-orchestrator
+ExecStart=/srv/adapters/mokaima-a2a-adapter/venv/bin/python3 -I /opt/kaiju-spine/incident-orchestrator/kaiju_incident_orchestrator.py
+TimeoutStartSec=3600

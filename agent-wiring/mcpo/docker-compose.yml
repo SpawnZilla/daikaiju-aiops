@@ -1,0 +1,11 @@
+services:
+  mcpo:
+    image: ghcr.io/open-webui/mcpo:main
+    container_name: mcpo
+    restart: unless-stopped
+    ports:
+      - "<port>:8000"
+    volumes:
+      - ./config.json:/app/config/config.json:ro
+      - /srv/vault:/srv/vault:ro
+    command: ["--port", "8000", "--config", "/app/config/config.json"]

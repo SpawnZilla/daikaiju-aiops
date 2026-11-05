@@ -1,0 +1,2730 @@
+{
+ "meta": {
+  "version": "1.1",
+  "generated": "2026-11-04",
+  "source_inventory": "Mangokai_Inventory.md v1.7",
+  "product": "Daikaiju AIOps",
+  "substrate": "Kaiju GAIS",
+  "note": "Data object embedded in Mangokai.html. Refreshed 2026-11-04 from Mangokai_Inventory.md v1.7 (AIOPS_INDEX.md v1.1 for KAI rows, vault/Troubleshooting_Journal.md roster for incidents). Edit the inventory and regenerate, not this object, at each refresh.",
+  "naming": "Kaiju Spine is now Kaiju Spine (renamed 2026-10-25/26). Kaiju GAIS = substrate. Public-safe names (Kaidosho, Mokaima, Bakaidah, Angkai) apply to the public repo only.",
+  "public_edition": true
+ },
+ "nodes": [
+  {
+   "id": "step1_fashsd_watchdog",
+   "label": "Step 1: FASHSD Watchdog",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "pi-node",
+   "desc": "Detection loop on the pi-node. The acting watchdog (kaiju-watchdog.timer) now runs every 5 minutes (was hourly) and a Docker-events trigger starts it about 45 s after a monitored container dies, is removed, runs out of memory or goes unhealthy. The older pi-node-watchdog (every 30 min) stays alongside it."
+  },
+  {
+   "id": "step2_known_fix_triage",
+   "label": "Step 2: Known-Fix Triage",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "pi-node"
+  },
+  {
+   "id": "step3_escalate_brief",
+   "label": "Step 3: Escalate & Brief",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "dokaisho",
+   "desc": "Watchdog-verified incidents are pre-accepted here (no human-written brief). The Kaiju Incident Orchestrator (dokaisho, 5-min timer) reads the incident feed, asks Bakaidah, runs the Step 5 review and signs tickets; no_match incidents queue an Angkai drafting brief. Manually raised problems still get a Mokaima-written brief (MABS Rule 20 classification)."
+  },
+  {
+   "id": "step4_bakaidah_reasoning",
+   "label": "Step 4: Bakaidah Reasoning",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "pi-node -> dokaisho",
+   "desc": "Bakaidah Daikaiju (gemma4-bakaidah:31b on dokaisho Ollama, hosted by Open WebUI on the pi-node, 10 Filters). The autonomous path goes through the A2A gateway to the Bakaidah A2A Agent-Server; drift and triage tasks skip Open WebUI and call Ollama directly."
+  },
+  {
+   "id": "step5_mokaima_review",
+   "label": "Step 5: Mokaima Review",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "dokaisho"
+  },
+  {
+   "id": "step5b_mokaima_writes_script",
+   "label": "Step 5b: Mokaima Writes Execution Script",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "dokaisho",
+   "parent": "step5_mokaima_review",
+   "desc": "The specific sub-step where Mokaima converts an approved fix into a real, MABS-compliant execution script for Angkai -- embedding every path, command, and pause point explicitly rather than leaving anything for Angkai to infer."
+  },
+  {
+   "id": "step6_angkai_execution",
+   "label": "Step 6: Angkai Execution",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "dokaisho"
+  },
+  {
+   "id": "step6a_angkai_self_chain",
+   "label": "Step 6a: Angkai Self-Chain",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "dokaisho",
+   "parent": "step6_angkai_execution",
+   "desc": "Angkai's own two-pass self-review of its execution output before the Stop hook validator checks it -- Pass 1 produces output, Pass 2 critiques and refines it."
+  },
+  {
+   "id": "step7_resolution_check",
+   "label": "Step 7: Resolution Check / Retry",
+   "kind": "process_step",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "dokaisho"
+  },
+  {
+   "id": "bakaidah_citation_grounding_pipe",
+   "label": "Citation Grounding Filter (was Pipe)",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama)",
+   "file_ref": "bakaidah_citation_grounding_pipe.py",
+   "desc": "Ported Pipe -> Filter under ; all 3 ports deployed on Bakaidah Daikaiju. Citation grounding still needs a web-search test."
+  },
+  {
+   "id": "bakaidah_diagnostic_history_filter",
+   "label": "Diagnostic History Filter",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama)",
+   "file_ref": "bakaidah_diagnostic_history_filter.py"
+  },
+  {
+   "id": "bakaidah_enforcement_gate_filter",
+   "label": "Enforcement Gate Filter",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama)",
+   "file_ref": "bakaidah_enforcement_gate_filter.py"
+  },
+  {
+   "id": "bakaidah_incident_fabrication_filter",
+   "label": "Incident Fabrication Filter",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama)",
+   "file_ref": "bakaidah_incident_fabrication_filter.py"
+  },
+  {
+   "id": "bakaidah_mabs_fewshot_filter",
+   "label": "MABS Few-Shot Filter",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama)",
+   "file_ref": "bakaidah_mabs_fewshot_filter.py"
+  },
+  {
+   "id": "bakaidah_mabs_topic_match_filter",
+   "label": "MABS Topic Match Filter",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama)",
+   "file_ref": "bakaidah_mabs_topic_match_filter.py"
+  },
+  {
+   "id": "bakaidah_reference_existence_filter",
+   "label": "Reference Existence Filter",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama + mcpo/vault)",
+   "file_ref": "bakaidah_reference_existence_filter.py",
+   "desc": "v0.5, . Only Filter with two distinct outbound dokaisho dependencies."
+  },
+  {
+   "id": "bakaidah_structured_brief_drafter_pipe",
+   "label": "Structured Brief Drafter Filter (was Pipe)",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama)",
+   "file_ref": "bakaidah_structured_brief_drafter_pipe.py",
+   "desc": "Filter v0.3 live; positive case PROVEN 2026-10-31. Reads mcpo (/vault/directory_tree). Open question: what to do with the 3 now-unattached Pipes."
+  },
+  {
+   "id": "skill_citation_grounding",
+   "label": "Skill: citation-grounding",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "attached_not_verified",
+   "machine": "dokaisho (content) -> pi-node (loaded at chat time)",
+   "file_ref": "skills/citation-grounding.md"
+  },
+  {
+   "id": "skill_existence_verification_escalation",
+   "label": "Skill: existence-verification-escalation",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "partial",
+   "machine": "dokaisho (content) -> pi-node (loaded at chat time)",
+   "file_ref": "skills/existence-verification-escalation.md",
+   "desc": "v2, partial effect confirmed"
+  },
+  {
+   "id": "skill_references_verification",
+   "label": "Skill: references-verification",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "attached_not_verified",
+   "machine": "dokaisho (content) -> pi-node (loaded at chat time)",
+   "file_ref": "skills/references-verification.md"
+  },
+  {
+   "id": "bakaidah_rules_mirror",
+   "label": "Bakaidah Rules Mirror (auto-load)",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node-native",
+   "file_ref": "Bakaidah_Rules_Mirror_Deployment_Guide.md",
+   "desc": ". Git clone + post-receive hook live on pi-node disk."
+  },
+  {
+   "id": "bakaidah_system_prompt",
+   "label": "Bakaidah System Prompt",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho (authored) -> pi-node (live copy in Open WebUI)",
+   "file_ref": "bakaidah_system_prompt.txt",
+   "desc": "v3.10 live on Bakaidah Daikaiju (hard-rules loader retired 2026-10-26); v3.11 staged on Bakaidah Online only (2026-11-01)."
+  },
+  {
+   "id": "bakaidah_4pass_review",
+   "label": "Bakaidah 4-Pass Self-Review",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho (authored) -> pi-node (needs push)",
+   "file_ref": "Bakaidah_4Pass_Review.md",
+   "desc": "Part of the live system prompt since v3.8 (4-Pass Self-Review)."
+  },
+  {
+   "id": "angkai_stop_hook_validator",
+   "label": "Stop Hook Validator",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho-native",
+   "file_ref": "hooks/stop_hook_validator.py",
+   "desc": "5 live-fire cycles verified"
+  },
+  {
+   "id": "angkai_self_chain",
+   "label": "Angkai Self-Chain",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho-native",
+   "file_ref": "staging//chain_two_pass.sh",
+   "desc": "Angkai's two-pass self-chain: it produces an initial output, then runs a second pass to critique and refine that output before the Stop hook validator checks it -- live-tested end-to-end."
+  },
+  {
+   "id": "angkai_4pass_review",
+   "label": "Angkai 4-Pass Self-Review",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho-native",
+   "file_ref": "Angkai_4Pass_Review.md",
+   "desc": "A self-review checklist Angkai runs against its own output, enforced automatically via CLAUDE.md v4.5 rather than needing to be manually invoked each time."
+  },
+  {
+   "id": "kaiju_relay_design",
+   "label": "Kaiju Relay Design Doc",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "current",
+   "machine": "dokaisho",
+   "file_ref": "Kaiju_Relay_Design.md"
+  },
+  {
+   "id": "kaiju_relay_model_relay",
+   "label": "Model Relay (Stage A/B/C)",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho",
+   "file_ref": "model_relay.py",
+   "desc": "v0.6"
+  },
+  {
+   "id": "kaiju_relay_checkpoint_gate",
+   "label": "Checkpoint Gate",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho",
+   "file_ref": "checkpoint_gate.py",
+   "desc": "Wired into Stage C"
+  },
+  {
+   "id": "kaiju_relay_brief_id_check",
+   "label": "Brief ID Collision Check",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho",
+   "file_ref": "brief_id_check.py"
+  },
+  {
+   "id": "kaiju_relay_update_preservation_check",
+   "label": "Update Preservation Check",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "built_not_wired",
+   "machine": "dokaisho",
+   "file_ref": "update_preservation_check.py",
+   "desc": " confirmed still unwired (read-through 2026-10-01)."
+  },
+  {
+   "id": "kaiju_relay_retry_helper",
+   "label": "Retry Helper",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "partial",
+   "machine": "dokaisho",
+   "file_ref": "retry_helper.sh",
+   "desc": "Only integrated into app_curl_check.sh so far"
+  },
+  {
+   "id": "kaiju_relay_model_ab_test",
+   "label": "Model A/B Test",
+   "kind": "catalog",
+   "axis": "tooling",
+   "status": "tooling",
+   "machine": "dokaisho",
+   "file_ref": "model_ab_test.py"
+  },
+  {
+   "id": "kaiju_relay_doc_bleed_test",
+   "label": "Doc-Bleed Test",
+   "kind": "catalog",
+   "axis": "tooling",
+   "status": "tooling",
+   "machine": "dokaisho",
+   "file_ref": "kaiju_doc_bleed_test.py"
+  },
+  {
+   "id": "kaiju_relay_bakaidah_self_chain",
+   "label": "Bakaidah Self-Chain (chain_passes.py)",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho",
+   "file_ref": "chain_passes.py"
+  },
+  {
+   "id": "pre_write_verification_skill",
+   "label": "Pre-Write Verification Skill",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho (skill) -> binds Mokaima+Angkai+Bakaidah",
+   "file_ref": "pre-write-verification skill",
+   "desc": "Cross-agent, built 2026-08-04. Found missing from earlier inventory passes."
+  },
+  {
+   "id": "gais_layer1a_fashsd",
+   "label": "Kaiju GAIS Layer 1a: FASHSD",
+   "kind": "gais_layer",
+   "axis": "containment",
+   "status": "partial",
+   "machine": "pi-node-native",
+   "file_ref": "kaiju-spine-package/fashsd/",
+   "desc": "Self-healing layer. FM-03 now live-verified (, force-recreate fallback); FM-12 plain-up fix proven on real losses 2026-10-31 (rmi+pull branch still unproven);  container-name fix live. FM-04/06/07 status was not re-checked in this refresh."
+  },
+  {
+   "id": "gais_layer1b_local_ai_hosting",
+   "label": "Kaiju GAIS Layer 1b: Local AI Hosting",
+   "kind": "gais_layer",
+   "axis": "containment",
+   "status": "live",
+   "machine": "Split: Open WebUI on pi-node, Ollama on dokaisho",
+   "desc": "This layer's identity IS the machine split"
+  },
+  {
+   "id": "gais_layer2_memory_vault",
+   "label": "Kaiju GAIS Layer 2: Memory/Archive (vault)",
+   "kind": "gais_layer",
+   "axis": "containment",
+   "status": "live",
+   "machine": "dokaisho (primary) + pi-node (git mirror)"
+  },
+  {
+   "id": "gais_layer3_onboarding",
+   "label": "Kaiju GAIS Layer 3: Onboarding/Transfer",
+   "kind": "gais_layer",
+   "axis": "containment",
+   "status": "live",
+   "machine": "dokaisho (staged in /srv/daikaiju-aiops) + public repo",
+   "desc": "install.sh built and tested ( closed 2026-09-17; clean Ubuntu 24.04 deploy about 12 min, n=1). Public repo SpawnZilla/daikaiju-aiops pushed 2026-10-18, updated through 10-26. Distro portability: Arch and Fedora rounds done 2026-10-19. The package formerly called Kaiju Spine is now Kaiju Spine."
+  },
+  {
+   "id": "gais_layer4_naming",
+   "label": "Kaiju GAIS Layer 4: Naming/Identity",
+   "kind": "gais_layer",
+   "axis": "containment",
+   "status": "live",
+   "machine": "N/A - convention, not infrastructure"
+  },
+  {
+   "id": "orchestration_layer",
+   "label": "Orchestration Layer",
+   "kind": "product_layer",
+   "axis": "containment",
+   "status": "live",
+   "machine": "dokaisho (Mokaima+Angkai) + pi-node (Bakaidah hosting half)"
+  },
+  {
+   "id": "guardrail_layer",
+   "label": "Guardrail Layer",
+   "kind": "product_layer",
+   "axis": "containment",
+   "status": "live",
+   "machine": "dokaisho-native",
+   "file_ref": "angkai/MABS.md"
+  },
+  {
+   "id": "a2a_gateway",
+   "label": "MCP A2A Gateway",
+   "kind": "catalog",
+   "axis": "orchestration",
+   "status": "live",
+   "machine": "dokaisho 192.0.2.45:<port>",
+   "desc": "Inter-agent comms layer. Checkpoint state fully_autonomous (verified 2026-10-18). Binds 192.0.2.45 only since 2026-10-28. Angkai is not registered on it; Angkai tasks release through the Mokaima adapter."
+  },
+  {
+   "id": "bakaidah_a2a_server",
+   "label": "Bakaidah A2A Agent-Server",
+   "kind": "catalog",
+   "axis": "orchestration",
+   "status": "live",
+   "machine": "dokaisho 192.0.2.45:<port> -> Open WebUI (pi-node) / Ollama",
+   "desc": "Executor-computed counts and verdicts (gates 5h-5w), Stage B automatic self-check retry, executor timeout 300 s, gateway timeout 360 s. A2A path uses the Open WebUI model Bakaidah A2A Compact (no filters, max tokens 3000)."
+  },
+  {
+   "id": "bakaidah_ledger_gate",
+   "label": "Facts-Ledger Gate",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "partial",
+   "machine": "dokaisho",
+   "desc": "Bakaidah half live in bakaidah-a2a since 2026-10-25 (9 of 10 first-try, 0 fabricated delivered). Angkai Stop hook deployed, flag off by default; flag-on validated 2026-10-27 (10/10 throwaway tasks valid). It checks sources, not truth.",
+   "file_ref": "bakaidah_ledger_gate.py"
+  },
+  {
+   "id": "incident_orchestrator",
+   "label": "Kaiju Incident Orchestrator",
+   "kind": "catalog",
+   "axis": "orchestration",
+   "status": "partial",
+   "machine": "dokaisho (user USER, 5-min timer)",
+   "desc": "Reads Health/Incident_Candidates.jsonl, asks Bakaidah, runs Step 5 review, signs tickets and dispatches them to the pi-node runner; queues Angkai drafting briefs for no_match incidents. Built and deployed 2026-10-16; not yet seen on real hardware: Bakaidah run_script + ticket, 24 h flap path, resume after a real suspend, a real no_match.",
+   "file_ref": "/opt/kaiju-spine/incident-orchestrator/"
+  },
+  {
+   "id": "pi-node_ticket_runner",
+   "label": "pi-node Ticket Runner / FM-12 executor",
+   "kind": "catalog",
+   "axis": "orchestration",
+   "status": "partial",
+   "machine": "pi-node (runner@192.0.2.21:<port>)",
+   "desc": "SSH forced command that verifies a signed ticket and runs one allowlisted fix script. FM-12 plain-up fix PROVEN on real losses (a media container, 2026-10-31); rmi+pull branch unproven. 4 attempts per incident, then an ntfy report.",
+   "file_ref": "kaiju_ticket_runner.py"
+  },
+  {
+   "id": "kaiju_watchdog_acting",
+   "label": "Acting Watchdog + Docker-events Trigger",
+   "kind": "catalog",
+   "axis": "runtime",
+   "status": "live",
+   "machine": "pi-node",
+   "desc": "kaiju-watchdog.timer every 5 min plus kaiju-docker-events.service (enabled 2026-10-31); the old pi-node-watchdog (30 min) is kept on purpose. 'Resolved' events added to the incident feed.",
+   "file_ref": "/opt/kaiju-spine/watchdog/docker_events_trigger.sh"
+  },
+  {
+   "id": "mcpo_bridge",
+   "label": "mcpo (MCP-to-HTTP bridge)",
+   "kind": "catalog",
+   "axis": "containment",
+   "status": "live",
+   "machine": "dokaisho 192.0.2.45:<port> (Docker)",
+   "desc": "Serves vault (read-only) and graphify to Bakaidah's file tools and to the structured brief drafter filter.",
+   "file_ref": "/srv/mcpo/docker-compose.yml"
+  },
+  {
+   "id": "litellm_proxy",
+   "label": "LiteLLM Proxy (/066)",
+   "kind": "catalog",
+   "axis": "containment",
+   "status": "live",
+   "machine": "dokaisho 192.0.2.45:<port> (LAN only)",
+   "desc": "OpenAI-compatible gateway in front of Ollama with flat-file call logging. Infrastructure only: neither agent calls through it yet (as of 2026-11-01)."
+  },
+  {
+   "id": "sandbox_runner",
+   "label": "Bakaidah Sandbox Runner + Log Bridge (/070)",
+   "kind": "catalog",
+   "axis": "orchestration",
+   "status": "live",
+   "machine": "pi-node 192.0.2.1:<port> (runner), dokaisho :<port> (bridge)",
+   "desc": "Disposable-container execution tool for Bakaidah; runner bound to the openwebui_default bridge only. Log bridge token rotated 2026-10-29."
+  },
+  {
+   "id": "promotion_broker",
+   "label": "Promotion Broker v3 ( /  Layer C)",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "dokaisho",
+   "desc": "Promotes staged Angkai output into production targets. First real edit_brief promotion 2026-10-29."
+  },
+  {
+   "id": "angkai_launch_runner",
+   "label": "Angkai Launch Runner + Phase L box (/081)",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "partial",
+   "machine": "dokaisho",
+   "desc": "Launch runner built and live; blocked in part by an upstream Claude Code bug (GitHub #25857). Phase L box on and settings.json locked 2026-10-29; Code work now runs from the dokaisho CLI. Layer A (OS-level sandboxing) still deferred."
+  },
+  {
+   "id": "kaiju_relay_mcp",
+   "label": "Kaiju Relay MCP Server (draft_edit_brief)",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "partial",
+   "machine": "dokaisho :<port> via mcpo /kaiju-relay",
+   "desc": "Live 2026-11-01 (read-only tool), enabled on Bakaidah Online only; release gate pending before Bakaidah Daikaiju.",
+   "file_ref": "/srv/mcpo/kaiju_relay_mcp_server.py"
+  },
+  {
+   "id": "bakaidah_grounded_drafting_filter",
+   "label": "Grounded Drafting Filter",
+   "kind": "catalog",
+   "axis": "reliability",
+   "status": "live",
+   "machine": "pi-node (executes) -> dokaisho (Ollama + mcpo)",
+   "desc": "One of Bakaidah Daikaiju's Filters.",
+   "file_ref": "bakaidah_grounded_drafting_filter.py"
+  },
+  {
+   "id": "bakaidah_harness_migration",
+   "label": "Bakaidah Harness Migration",
+   "kind": "catalog",
+   "axis": "orchestration",
+   "status": "not_built",
+   "machine": "dokaisho (planned)",
+   "desc": "Move Bakaidah from Open WebUI filtered chat completion to a DeepSeek Harness agentic runtime in shadow mode; old and new Bakaidah run back to back, not concurrently, plus a two-model consensus trial. Filed 2026-11-03; hold lifted 2026-11-02; brief to be prepared for the next local network."
+  }
+ ],
+ "overlay_incidents": [],
+ "overlay_kai_items": [],
+ "overlay_mabs_rules": [
+  {
+   "id": "MABS-Rule-1",
+   "summary": "Length ceiling (~200 lines)",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-2",
+   "summary": "Embed everything, never make Angkai discover",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-3",
+   "summary": "One output per phase",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-4",
+   "summary": "MCP paths use vault/ prefix",
+   "node_id": "orchestration_layer",
+   "flow_node_id": "r_step6",
+   "tree_node_id": "step6"
+  },
+  {
+   "id": "MABS-Rule-5",
+   "summary": "Minimize MCP reads during execution",
+   "node_id": "orchestration_layer",
+   "flow_node_id": "r_step6",
+   "tree_node_id": "step6"
+  },
+  {
+   "id": "MABS-Rule-6",
+   "summary": "Hard prohibitions block",
+   "node_id": "guardrail_layer",
+   "flow_node_id": "r_step6",
+   "tree_node_id": "step6"
+  },
+  {
+   "id": "MABS-Rule-7",
+   "summary": "Pause points between every phase",
+   "node_id": "step6_angkai_execution",
+   "flow_node_id": "r_a_pause",
+   "tree_node_id": "p3_a_pause"
+  },
+  {
+   "id": "MABS-Rule-8",
+   "summary": "One script per brief",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-9",
+   "summary": "Tell Angkai how to end",
+   "node_id": "step6_angkai_execution",
+   "flow_node_id": "r_step6",
+   "tree_node_id": "step6"
+  },
+  {
+   "id": "MABS-Rule-10",
+   "summary": "Reference scripts go inline",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-11",
+   "summary": "Sequence steps explicitly",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-12",
+   "summary": "Specify exact command per section",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-13",
+   "summary": "State permissions negatively",
+   "node_id": "guardrail_layer",
+   "flow_node_id": "r_step6",
+   "tree_node_id": "step6"
+  },
+  {
+   "id": "MABS-Rule-14",
+   "summary": "Verify filesystem pre-reqs + shared-resource deps",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-15",
+   "summary": "Never cross-reference two tables",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-16",
+   "summary": "Paste full current file when extending",
+   "node_id": "step5b_mokaima_writes_script",
+   "flow_node_id": "r_step5b",
+   "tree_node_id": "p3_brief"
+  },
+  {
+   "id": "MABS-Rule-17",
+   "summary": "Name every expected file, forbid others",
+   "node_id": "angkai_stop_hook_validator",
+   "flow_node_id": "r_a_hook",
+   "tree_node_id": "p3_a_hook"
+  },
+  {
+   "id": "MABS-Rule-18",
+   "summary": "Strengthen pause points, phase-per-message",
+   "node_id": "step6a_angkai_self_chain",
+   "flow_node_id": "r_a_pause",
+   "tree_node_id": "p3_a_pause"
+  },
+  {
+   "id": "MABS-Rule-19",
+   "summary": "REFERENCES manifest block",
+   "node_id": "angkai_stop_hook_validator",
+   "flow_node_id": "r_a_hook",
+   "tree_node_id": "p3_a_hook"
+  },
+  {
+   "id": "MABS-Rule-20",
+   "summary": "Classify brief type before writing",
+   "node_id": "step3_escalate_brief",
+   "flow_node_id": "r_step3",
+   "tree_node_id": "step3"
+  },
+  {
+   "id": "MABS-Rule-21",
+   "summary": "Pre-write verification",
+   "node_id": "pre_write_verification_skill",
+   "flow_node_id": "r_step3",
+   "tree_node_id": "step3"
+  }
+ ],
+ "containment": {
+  "outer": "Daikaiju AIOps",
+  "outer_owns": [
+   "orchestration_layer",
+   "guardrail_layer"
+  ],
+  "inner": "Kaiju GAIS",
+  "inner_owns": [
+   "gais_layer1a_fashsd",
+   "gais_layer1b_local_ai_hosting",
+   "gais_layer2_memory_vault",
+   "gais_layer3_onboarding",
+   "gais_layer4_naming"
+  ],
+  "note": "Kaiju GAIS is not a separately-adoptable product: it is the substrate inside Daikaiju AIOps. Kaiju Spine (formerly Kaiju Spine) is the separately-packaged install.sh deliverable and is part of Daikaiju AIOps, not the head of the stack.",
+  "spine_note": "Renamed Kaiju Spine -> Kaiju Spine 2026-10-25/26; install paths renamed in /srv/daikaiju-aiops; the live pi-node still uses /opt/kaiju-spine."
+ },
+ "presets": [
+  {
+   "name": "Full Picture",
+   "toggles": "all"
+  },
+  {
+   "name": "Daikaiju AIOps Only",
+   "toggles": [
+    "orchestration_layer",
+    "guardrail_layer",
+    "catalog"
+   ]
+  },
+  {
+   "name": "Kaiju GAIS Only",
+   "toggles": [
+    "gais_layer1a_fashsd",
+    "gais_layer1b_local_ai_hosting",
+    "gais_layer2_memory_vault",
+    "gais_layer3_onboarding",
+    "gais_layer4_naming"
+   ]
+  },
+  {
+   "name": "Process View",
+   "toggles": [
+    "process_step"
+   ]
+  },
+  {
+   "name": "What's Blocked",
+   "toggles": {
+    "status_in": [
+     "written_not_live",
+     "built_not_wired",
+     "partial",
+     "attached_not_verified"
+    ]
+   }
+  },
+  {
+   "name": "Where This Runs",
+   "toggles": "machine_overlay"
+  },
+  {
+   "name": "Roadmap View",
+   "toggles": "overlay_kai_items"
+  }
+ ],
+ "tree": {
+  "nodes": [
+   {
+    "id": "root",
+    "label": "Daikaiju AIOps",
+    "parents": [],
+    "peel": 0,
+    "fshape": "oval",
+    "color": "brand",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "The product. An autonomous agent-intelligence layer that detects, reasons about, and resolves infrastructure issues end to end, hosted on top of Kaiju GAIS.",
+    "status": "live"
+   },
+   {
+    "id": "orchestration",
+    "label": "Orchestration Layer",
+    "parents": [
+     "root"
+    ],
+    "peel": 1,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": "orchestration_layer",
+    "file_ref": null,
+    "desc": "The live Mokaima -> Bakaidah -> Angkai pipeline. Coordinates which agent does what and when. Exists today at manual-trigger maturity (Mokaima relays every handoff) -- autonomous maturity (agents messaging each other directly) is the gap.",
+    "status": "live"
+   },
+   {
+    "id": "guardrail",
+    "label": "Guardrail Layer",
+    "parents": [
+     "root"
+    ],
+    "peel": 1,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": "guardrail_layer",
+    "file_ref": null,
+    "desc": "The rules that keep the pipeline safe: MABS brief standard, hard install-path prohibitions, and the Stop hook that mechanically checks Angkai's work.",
+    "status": "live"
+   },
+   {
+    "id": "kaiju_gais",
+    "label": "Kaiju GAIS (substrate)",
+    "parents": [
+     "root"
+    ],
+    "peel": 1,
+    "fshape": "hexagon",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "The self-healing, self-documenting substrate Daikaiju AIOps runs on -- not a separate product. Four layers: self-healing, memory, onboarding, naming.",
+    "status": "live"
+   },
+   {
+    "id": "step1",
+    "label": "STEP 1: FASHSD Watchdog",
+    "parents": [
+     "orchestration"
+    ],
+    "peel": 2,
+    "fshape": "oval",
+    "color": "step1",
+    "catalog_ref": "step1_fashsd_watchdog",
+    "file_ref": null,
+    "desc": "Detection on the pi-node: the acting watchdog runs every 5 minutes and a Docker-events trigger starts it about 45 s after a monitored container dies, is removed, runs out of memory or goes unhealthy.",
+    "status": "live"
+   },
+   {
+    "id": "step2",
+    "label": "STEP 2: Known-Fix Triage",
+    "parents": [
+     "orchestration"
+    ],
+    "peel": 2,
+    "fshape": "rect",
+    "color": "step2",
+    "catalog_ref": "step2_known_fix_triage",
+    "file_ref": null,
+    "desc": "Checks whether a detected issue matches a known FM-01...FM-07 pattern. Same underlying FASHSD logic as Step 1 -- peels into the same detail.",
+    "status": "live"
+   },
+   {
+    "id": "step3",
+    "label": "STEP 3: Escalate & Brief",
+    "parents": [
+     "orchestration"
+    ],
+    "peel": 2,
+    "fshape": "document",
+    "color": "step3",
+    "catalog_ref": "step3_escalate_brief",
+    "file_ref": null,
+    "desc": "Mokaima pulls vault context and writes a brief for Bakaidah, following the MABS standard. The entry point whenever FASHSD can't auto-resolve something.",
+    "status": "live"
+   },
+   {
+    "id": "step4",
+    "label": "STEP 4: Bakaidah Reasoning",
+    "parents": [
+     "orchestration"
+    ],
+    "peel": 2,
+    "fshape": "hexagon",
+    "color": "step4",
+    "catalog_ref": "step4_bakaidah_reasoning",
+    "file_ref": null,
+    "desc": "Bakaidah Daikaiju (gemma4-bakaidah:31b via Open WebUI, A2A server on :<port>) drafts a proposed fix. Runs its own self-chain, reliability filters, and a parallel Kaiju Relay verification pipeline.",
+    "status": "live"
+   },
+   {
+    "id": "step5",
+    "label": "STEP 5: Mokaima Review",
+    "parents": [
+     "orchestration"
+    ],
+    "peel": 2,
+    "fshape": "diamond",
+    "color": "step5",
+    "catalog_ref": "step5_mokaima_review",
+    "file_ref": null,
+    "desc": "Mokaima checks Bakaidah's proposed fix before anything gets executed. Approve -> Angkai executes it. Reject -> flagged for manual review, pipeline stops here.",
+    "status": "live"
+   },
+   {
+    "id": "step6",
+    "label": "STEP 6: Angkai Execution",
+    "parents": [
+     "orchestration"
+    ],
+    "peel": 2,
+    "fshape": "hexagon",
+    "color": "step6",
+    "catalog_ref": "step6_angkai_execution",
+    "file_ref": null,
+    "desc": "Angkai (Claude Code on dokaisho, via Qwen/Ollama) actually runs the approved fix. Self-chains its own output and is checked by the Stop hook validator.",
+    "status": "live"
+   },
+   {
+    "id": "step7",
+    "label": "STEP 7: Resolution Check",
+    "parents": [
+     "orchestration"
+    ],
+    "peel": 2,
+    "fshape": "diamond",
+    "color": "step7",
+    "catalog_ref": "step7_resolution_check",
+    "file_ref": null,
+    "desc": "A mechanical check suite verifies the execution actually worked. Passes -> resolved. Fails -> retry loop back to Angkai, or escalate back to Mokaima/Bakaidah for a different approach.",
+    "status": "live"
+   },
+   {
+    "id": "gais1a",
+    "label": "Layer 1a: FASHSD",
+    "parents": [
+     "kaiju_gais"
+    ],
+    "peel": 2,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": "gais_layer1a_fashsd",
+    "file_ref": null,
+    "desc": "The self-healing scripts -- watchdog + FM-0x fix scripts. Same real system as orchestration's Step 1/2 -- peels into identical detail either way you get here.",
+    "status": "live"
+   },
+   {
+    "id": "gais1b",
+    "label": "Layer 1b: Local AI Hosting",
+    "parents": [
+     "kaiju_gais"
+    ],
+    "peel": 2,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": "gais_layer1b_local_ai_hosting",
+    "file_ref": null,
+    "desc": "The hosting substrate for the AI itself: Open WebUI on pi-node, Ollama serving on dokaisho. Distinct from Bakaidah's own reasoning -- this is the machine underneath it.",
+    "status": "live"
+   },
+   {
+    "id": "gais2",
+    "label": "Layer 2: Memory/Archive (vault)",
+    "parents": [
+     "kaiju_gais"
+    ],
+    "peel": 2,
+    "fshape": "cylinder",
+    "color": "gais",
+    "catalog_ref": "gais_layer2_memory_vault",
+    "file_ref": null,
+    "desc": "Vault -- the single source of truth for the whole homelab. Git-versioned, primary copy on dokaisho, mirrored to pi-node.",
+    "status": "live"
+   },
+   {
+    "id": "gais3",
+    "label": "Layer 3: Onboarding/Transfer",
+    "parents": [
+     "kaiju_gais"
+    ],
+    "peel": 2,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": "gais_layer3_onboarding",
+    "file_ref": null,
+    "desc": "Everything needed for someone else to stand up Kaiju GAIS from scratch -- docs, packaging, install scripts. The bootstrap installer itself isn't written yet.",
+    "status": "live"
+   },
+   {
+    "id": "gais4",
+    "label": "Layer 4: Naming/Identity",
+    "parents": [
+     "kaiju_gais"
+    ],
+    "peel": 2,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": "gais_layer4_naming",
+    "file_ref": null,
+    "desc": "The kaiju naming convention itself -- Daikaiju, Bakaidah, Angkai, Mokaima, Kaiju GAIS. A documentation/identity layer, not infrastructure.",
+    "status": "live"
+   },
+   {
+    "id": "guard_mabs",
+    "label": "MABS Rules",
+    "parents": [
+     "guardrail"
+    ],
+    "peel": 2,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "21 rules governing how Mokaima writes execution briefs for Angkai -- length limits, embedding requirements, pause points, permission phrasing, and more.",
+    "status": "live"
+   },
+   {
+    "id": "guard_hook",
+    "label": "Stop Hook Validator",
+    "parents": [
+     "guardrail"
+    ],
+    "peel": 2,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": "angkai_stop_hook_validator",
+    "file_ref": null,
+    "desc": "The one MABS rule with real mechanical teeth -- a hook that checks Angkai named every expected file and that REFERENCES paths actually exist, live, at execution time.",
+    "status": "live"
+   },
+   {
+    "id": "f_watchdog",
+    "label": "kaiju-watchdog fires (every 5 min, or on a Docker event)",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "oval",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_loop",
+    "label": "Loop: check each configured service",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "hexagon",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_checktype",
+    "label": "Which check type?",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "diamond",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_curl",
+    "label": "App-level curl check",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_container",
+    "label": "Container status check",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_daemon",
+    "label": "Daemon status check",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_network",
+    "label": "Network-group check (gluetun)",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_drive",
+    "label": "Drive-mount check",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_matched",
+    "label": "Failure matched? Which FM?",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "diamond",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_fm01",
+    "label": "FM-01: restart container",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_fm02",
+    "label": "FM-02: restart daemon + stacks",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_fm03",
+    "label": "FM-03: restart gluetun (force-recreate fallback, )",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Drafted and staged by the execution agent; 2 real bugs found and fixed, never run through the test suite.",
+    "status": "live"
+   },
+   {
+    "id": "f_fm05",
+    "label": "FM-05: remount drive",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_fmgap",
+    "label": "FM-04/06/07: NOT YET BUILT",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "FM-04/06/07 status was not re-checked in the 2026-11-04 refresh; last confirmed as having no draft (2026-08-06).",
+    "status": "not_built"
+   },
+   {
+    "id": "f_retry",
+    "label": "kaiju_retry_check() (shared lib)",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": "kaiju_relay_retry_helper",
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_verified",
+    "label": "Fix verified?",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "diamond",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_log",
+    "label": "Log incident + ntfy: auto-resolved",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "parallelogram",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "f_escalate",
+    "label": "Escalate to Orchestration (Step 3)",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "pentagon",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_brief",
+    "label": "Mokaima pulls vault context, writes brief (MABS)",
+    "parents": [
+     "step3"
+    ],
+    "peel": 3,
+    "fshape": "document",
+    "color": "step3",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_selfchain1",
+    "label": "Self-Chain Pass 1",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_bakaidah_self_chain",
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_gate",
+    "label": "checkpoint_gate.py",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "diamond",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_checkpoint_gate",
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_selfchain2",
+    "label": "Self-Chain Pass 2 -- critique/refine",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_draft",
+    "label": "Draft answer",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "parallelogram",
+    "color": "step4",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_rel_layer",
+    "label": "Reliability Layer (10 Filters / Skills)",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Bakaidah's own inlet Filters and response Pipes -- citation grounding, fabrication checks, reference verification. See P4 for the 11 individual components.",
+    "status": "live"
+   },
+   {
+    "id": "p3_kaiju_relay",
+    "label": "Kaiju Relay (Stage A -> B -> C)",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "An isolated-context 3-stage verification pipeline, architecturally separate from the Filters/Pipes above -- runs in parallel, not instead of.",
+    "status": "live"
+   },
+   {
+    "id": "p3_review",
+    "label": "Mokaima reviews Bakaidah's proposed fix",
+    "parents": [
+     "step5"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step5",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_a_pass1",
+    "label": "Self-Chain Pass 1 output",
+    "parents": [
+     "step6"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": "angkai_self_chain",
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_a_pause",
+    "label": "MANDATORY PAUSE -- requires 'GO'",
+    "parents": [
+     "step6"
+    ],
+    "peel": 3,
+    "fshape": "trapezoid",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_a_pass2",
+    "label": "Self-Chain Pass 2 -- refine/critique",
+    "parents": [
+     "step6"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_a_hook",
+    "label": "Stop Hook Validator runs",
+    "parents": [
+     "step6"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": "angkai_stop_hook_validator",
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_checksuite",
+    "label": "Mechanical Check Suite",
+    "parents": [
+     "step7"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step7",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "4 mechanical checks run together: checkpoint_gate, update_preservation_check, brief_id_check, retry_helper. See P4 for each.",
+    "status": "live"
+   },
+   {
+    "id": "p3_retryloop",
+    "label": "Retry / Escalation Loop",
+    "parents": [
+     "step7"
+    ],
+    "peel": 3,
+    "fshape": "diamond",
+    "color": "step7",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Pass -> resolved. Fail with retries left -> back to Step 6. Retries exhausted -> log + ask if a different approach exists -> back to Step 3, or fail out to manual intervention. Exit-condition cap not yet defined (open question in the source workflow doc).",
+    "status": "live"
+   },
+   {
+    "id": "p3_openwebui",
+    "label": "Open WebUI hosting (pi-node)",
+    "parents": [
+     "gais1b"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_ollama",
+    "label": "Ollama serving (dokaisho)",
+    "parents": [
+     "gais1b"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_vault_primary",
+    "label": "dokaisho (primary working copy)",
+    "parents": [
+     "gais2"
+    ],
+    "peel": 3,
+    "fshape": "cylinder",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_vault_mirror",
+    "label": "pi-node (git bare remote + git mirror)",
+    "parents": [
+     "gais2"
+    ],
+    "peel": 3,
+    "fshape": "cylinder",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_onboard_detail",
+    "label": "Bootstrap/install: install.sh ( closed)",
+    "parents": [
+     "gais3"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "install.sh built and tested; public repo pushed 2026-10-18.",
+    "status": "live"
+   },
+   {
+    "id": "p3_naming_detail",
+    "label": "Kaiju naming convention docs",
+    "parents": [
+     "gais4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p3_mabs_list",
+    "label": "21 individual MABS rules",
+    "parents": [
+     "guard_mabs"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "See P4 for every rule individually.",
+    "status": "live"
+   },
+   {
+    "id": "p3_hook_checks",
+    "label": "EXPECTED FILES + REFERENCES checks",
+    "parents": [
+     "guard_hook"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": null,
+    "status": "live"
+   },
+   {
+    "id": "p4_citation_grounding",
+    "label": "Citation Grounding Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_citation_grounding_pipe",
+    "file_ref": null,
+    "desc": "An Open WebUI Pipe that intercepts Bakaidah's response and forces every factual claim to carry a real citation back to a source document, rather than letting Bakaidah state things unsupported.",
+    "status": "live"
+   },
+   {
+    "id": "p4_diag_history",
+    "label": "Diagnostic History Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_diagnostic_history_filter",
+    "file_ref": null,
+    "desc": "An inlet Filter that injects relevant Troubleshooting_Journal.md history into Bakaidah's context before it answers, so it reasons with awareness of past incidents instead of starting cold each time.",
+    "status": "live"
+   },
+   {
+    "id": "p4_enforcement_gate",
+    "label": "Enforcement Gate Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_enforcement_gate_filter",
+    "file_ref": null,
+    "desc": "An inlet Filter that checks incoming requests against Bakaidah's hard rules (MABS, install-path prohibitions) before generation even starts, catching violations at the door rather than after the fact.",
+    "status": "live"
+   },
+   {
+    "id": "p4_incident_fab",
+    "label": "Incident Fabrication Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_incident_fabrication_filter",
+    "file_ref": null,
+    "desc": "A Filter built specifically to catch Bakaidah inventing incidents that never happened -- built after Bakaidah was caught fabricating incident numbers/details in a real response.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs_fewshot",
+    "label": "MABS Few-Shot Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_mabs_fewshot_filter",
+    "file_ref": null,
+    "desc": "An inlet Filter that injects real few-shot examples of correct MABS-compliant briefs into context, so Bakaidah has concrete examples to pattern-match against, not just abstract rules.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs_topic",
+    "label": "MABS Topic Match Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_mabs_topic_match_filter",
+    "file_ref": null,
+    "desc": "A Filter that detects when the current task is MABS-relevant (writing a brief for Angkai) and activates the MABS-specific guardrails only when actually needed, rather than always.",
+    "status": "live"
+   },
+   {
+    "id": "p4_ref_existence",
+    "label": "Reference Existence Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_reference_existence_filter",
+    "file_ref": null,
+    "desc": "A Filter (, v0.5) that checks every file/path Bakaidah references in a REFERENCES section against the real filesystem before letting the response through -- catches fabricated file paths.",
+    "status": "live"
+   },
+   {
+    "id": "p4_brief_drafter",
+    "label": "Structured Brief Drafter Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_structured_brief_drafter_pipe",
+    "file_ref": null,
+    "desc": "A Pipe that structures Bakaidah's output into the MABS brief format directly, rather than relying on Bakaidah to freehand the structure correctly every time.",
+    "status": "live"
+   },
+   {
+    "id": "p4_skill_citation",
+    "label": "Skill: citation-grounding",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "skill_citation_grounding",
+    "file_ref": null,
+    "desc": "An Open WebUI Skill (attached document) that teaches Bakaidah citation-grounding conventions -- loaded into context, not code that runs.",
+    "status": "live"
+   },
+   {
+    "id": "p4_skill_existence",
+    "label": "Skill: existence-verification-escalation",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "skill_existence_verification_escalation",
+    "file_ref": null,
+    "desc": "An Open WebUI Skill teaching the existence-verification-escalation pattern -- when a single failed search isn't enough to conclude something doesn't exist, and what tiers of checking to escalate through instead.",
+    "status": "live"
+   },
+   {
+    "id": "p4_skill_refs",
+    "label": "Skill: references-verification",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "skill_references_verification",
+    "file_ref": null,
+    "desc": "An Open WebUI Skill teaching Bakaidah how to properly verify and format REFERENCES sections before claiming a file exists.",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_design",
+    "label": "Kaiju Relay Design Doc",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_design",
+    "file_ref": null,
+    "desc": "The design document for Kaiju Relay -- the architectural reasoning behind why an isolated-context 3-stage pipeline exists separately from Bakaidah's own Filters/Pipes.",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_model_relay",
+    "label": "Model Relay (Stage A/B/C)",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_model_relay",
+    "file_ref": null,
+    "desc": "The actual Stage A/B/C implementation (v0.6) -- draft, cite, verify, each running in its own isolated model context so later stages can't just rubber-stamp earlier ones.",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_gate",
+    "label": "Checkpoint Gate",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_checkpoint_gate",
+    "file_ref": null,
+    "desc": "The shared halt/continue decision logic used by both Bakaidah's self-chain and Angkai's self-chain -- decides whether a second pass is actually needed or the first pass already resolved things.",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_brief_id",
+    "label": "Brief ID Collision Check",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_brief_id_check",
+    "file_ref": null,
+    "desc": "A mechanical check that catches brief-ID collisions -- two different tasks accidentally reusing the same tracking ID, which would corrupt cross-referencing.",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_update_pres",
+    "label": "Update Preservation Check",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_update_preservation_check",
+    "file_ref": null,
+    "desc": "A checker that verifies Bakaidah didn't accidentally drop or overwrite existing PENDING.md content when pulling in new updates. Built but not yet wired into any live Pipe or Stage.",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_retry",
+    "label": "Retry Helper",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_retry_helper",
+    "file_ref": null,
+    "desc": "Retry-before-fail logic, now merged into the shared FASHSD config library (2026-08-01) -- gives scripts a second attempt before declaring failure. Only actually wired into app_curl_check.sh's own calls so far.",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_abtest",
+    "label": "Model A/B Test",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_model_ab_test",
+    "file_ref": null,
+    "desc": "A tooling script for comparing two model versions' outputs side by side on the same prompt -- used during the qwen3 vs qwen3.6 model-choice investigation.",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_docbleed",
+    "label": "Doc-Bleed Test",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_doc_bleed_test",
+    "file_ref": null,
+    "desc": "A test script built to investigate whether reading vault documentation into context causes Bakaidah to treat document content as instructions (the context-bleed hypothesis).",
+    "status": "live"
+   },
+   {
+    "id": "p4_kr_selfchain",
+    "label": "Bakaidah Self-Chain (chain_passes.py)",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_bakaidah_self_chain",
+    "file_ref": null,
+    "desc": "chain_passes.py -- Bakaidah's own two-pass self-chain implementation, modeled on Angkai's chain_two_pass.sh pattern.",
+    "status": "live"
+   },
+   {
+    "id": "p4_cs_gate",
+    "label": "checkpoint_gate.py",
+    "parents": [
+     "p3_checksuite"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step7",
+    "catalog_ref": "kaiju_relay_checkpoint_gate",
+    "file_ref": null,
+    "desc": "checkpoint_gate.py running as part of Step 7's mechanical check suite -- same shared halt/continue logic, checking whether Angkai's execution needs another pass.",
+    "status": "live"
+   },
+   {
+    "id": "p4_cs_update",
+    "label": "update_preservation_check.py",
+    "parents": [
+     "p3_checksuite"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step7",
+    "catalog_ref": "kaiju_relay_update_preservation_check",
+    "file_ref": null,
+    "desc": "update_preservation_check.py verifying Angkai didn't clobber existing content while executing a brief.",
+    "status": "live"
+   },
+   {
+    "id": "p4_cs_briefid",
+    "label": "brief_id_check.py",
+    "parents": [
+     "p3_checksuite"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step7",
+    "catalog_ref": "kaiju_relay_brief_id_check",
+    "file_ref": null,
+    "desc": "brief_id_check.py catching ID collisions specifically at the execution-verification stage.",
+    "status": "live"
+   },
+   {
+    "id": "p4_cs_retry",
+    "label": "retry_helper.sh",
+    "parents": [
+     "p3_checksuite"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step7",
+    "catalog_ref": "kaiju_relay_retry_helper",
+    "file_ref": null,
+    "desc": "retry_helper.sh -- the shared retry-before-fail library function, invoked here as part of the post-execution check suite.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs1",
+    "label": "Rule 1: Length ceiling (~200 lines)",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Caps how long a single execution brief can be, forcing Mokaima to split large tasks into multiple smaller briefs rather than one sprawling brief Angkai is more likely to misread or lose context from.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs2",
+    "label": "Rule 2: Embed everything, never make Angkai discover",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Every fact, path, or value Angkai needs must be written directly into the brief -- Angkai should never have to search vault or infer something on its own, since that's where drift and misreadings happen.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs3",
+    "label": "Rule 3: One output per phase",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Each phase of a brief produces exactly one deliverable, not several bundled together, so Angkai's own pause-and-report cycle stays clean and Mokaima can verify one thing at a time.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs4",
+    "label": "Rule 4: MCP paths use vault/ prefix",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "All filesystem paths in a brief must use the vault/ prefix Angkai's MCP tools expect, not an OS-absolute path -- a real bug came from paths not matching this convention.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs5",
+    "label": "Rule 5: Minimize MCP reads during execution",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Briefs should embed what Angkai needs rather than relying on it to read multiple files live during execution, since every extra MCP call is a chance to hit a tool bug or drift from what Mokaima verified.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs6",
+    "label": "Rule 6: Hard prohibitions block",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "A fixed list of actions Angkai is never allowed to take (installing outside /srv, touching boot/EFI/swap without explicit approval) -- these override anything else in a brief, no exceptions.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs7",
+    "label": "Rule 7: Pause points between every phase",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Angkai must stop and wait for explicit confirmation after each phase rather than running a whole multi-step brief unattended end to end.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs8",
+    "label": "Rule 8: One script per brief",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "A single execution script per brief, not several -- keeps what Angkai is running traceable to one clear source rather than a chain of separate files.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs9",
+    "label": "Rule 9: Tell Angkai how to end",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Every brief must explicitly state what a successful finish looks like, so Angkai isn't left guessing whether it's actually done or should keep going.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs10",
+    "label": "Rule 10: Reference scripts go inline",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Any script Angkai needs to run gets pasted directly into the brief rather than referenced by path, removing a step where Angkai could read the wrong version or fail to find it.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs11",
+    "label": "Rule 11: Sequence steps explicitly",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Steps must be numbered and ordered explicitly in the brief, not left for Angkai to infer a reasonable order from a looser description.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs12",
+    "label": "Rule 12: Specify exact command per section",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Each section of a brief states the literal command to run, not a description of what should happen -- removes room for Angkai to improvise the wrong command.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs13",
+    "label": "Rule 13: State permissions negatively",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Permissions are written as what's NOT allowed rather than what is, since an explicit prohibition list is harder to accidentally violate than a vague 'use good judgment' positive framing.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs14",
+    "label": "Rule 14: Verify filesystem pre-reqs + shared-resource deps",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Before Angkai starts, the brief must confirm the files/directories it depends on actually exist and that no other process is using the same resource -- traces directly to real FASHSD live-test incidents.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs15",
+    "label": "Rule 15: Never cross-reference two tables",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "A brief should never make Angkai look something up in one table then cross-reference it against a second table -- that kind of indirection is exactly where real mistakes happened.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs16",
+    "label": "Rule 16: Paste full current file when extending",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "When a brief asks Angkai to extend an existing file, it must paste that file's full current content, not just a diff or summary, so Angkai works from the real current state, not a stale assumption.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs17",
+    "label": "Rule 17: Name every expected file, forbid others",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Every file the brief expects Angkai to create or modify must be named explicitly, and creating anything else is forbidden -- the rule the Stop hook validator mechanically checks.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs18",
+    "label": "Rule 18: Strengthen pause points, phase-per-message",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "A stronger version of Rule 7 -- pauses should be structural (Angkai literally cannot proceed without a new message), not just instructional text asking it to wait.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs19",
+    "label": "Rule 19: REFERENCES manifest block",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Every brief must include a REFERENCES section listing every file path it relies on, which the Stop hook validator spot-checks for real existence.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs20",
+    "label": "Rule 20: Classify brief type before writing",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Before writing a brief, Mokaima must first classify what type it is (build, fix, investigate, etc.), since different types call for different structure and level of caution.",
+    "status": "live"
+   },
+   {
+    "id": "p4_mabs21",
+    "label": "Rule 21: Pre-write verification",
+    "parents": [
+     "p3_mabs_list"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Before rewriting or substituting any existing content, first confirm the write target actually matches what the task asked for, and re-read the file fresh rather than trusting a cached earlier-session copy -- built after a real incident where a stale assumption caused an overwrite.",
+    "status": "live"
+   },
+   {
+    "id": "t_acting_watchdog",
+    "label": "Acting watchdog (5 min) + Docker-events trigger",
+    "parents": [
+     "step1"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step1",
+    "catalog_ref": "kaiju_watchdog_acting",
+    "file_ref": "/opt/kaiju-spine/watchdog/docker_events_trigger.sh",
+    "desc": "kaiju-watchdog.timer every 5 min plus kaiju-docker-events.service (enabled 2026-10-31); the old pi-node-watchdog (30 min) is kept on purpose. 'Resolved' events added to the incident feed.",
+    "status": "live"
+   },
+   {
+    "id": "t_fm12_runner",
+    "label": "FM-12 executor: signed ticket -> pi-node ticket runner",
+    "parents": [
+     "step2"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step2",
+    "catalog_ref": "pi-node_ticket_runner",
+    "file_ref": "kaiju_ticket_runner.py",
+    "desc": "SSH forced command that verifies a signed ticket and runs one allowlisted fix script. FM-12 plain-up fix PROVEN on real losses (a media container, 2026-10-31); rmi+pull branch unproven. 4 attempts per incident, then an ntfy report.",
+    "status": "partial"
+   },
+   {
+    "id": "t_orchestrator",
+    "label": "Incident Orchestrator (pre-accept, Bakaidah, review, sign)",
+    "parents": [
+     "step3"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step3",
+    "catalog_ref": "incident_orchestrator",
+    "file_ref": "/opt/kaiju-spine/incident-orchestrator/",
+    "desc": "Reads Health/Incident_Candidates.jsonl, asks Bakaidah, runs Step 5 review, signs tickets and dispatches them to the pi-node runner; queues Angkai drafting briefs for no_match incidents. Built and deployed 2026-10-16; not yet seen on real hardware: Bakaidah run_script + ticket, 24 h flap path, resume after a real suspend, a real no_match.",
+    "status": "partial"
+   },
+   {
+    "id": "t_a2a",
+    "label": "A2A gateway -> Bakaidah A2A Agent-Server",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "a2a_gateway",
+    "file_ref": null,
+    "desc": "Inter-agent comms layer. Checkpoint state fully_autonomous (verified 2026-10-18). Binds 192.0.2.45 only since 2026-10-28. Angkai is not registered on it; Angkai tasks release through the Mokaima adapter.",
+    "status": "live"
+   },
+   {
+    "id": "t_bakaidah_a2a",
+    "label": "Bakaidah A2A Agent-Server (gates 5h-5w)",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_a2a_server",
+    "file_ref": null,
+    "desc": "Executor-computed counts and verdicts (gates 5h-5w), Stage B automatic self-check retry, executor timeout 300 s, gateway timeout 360 s. A2A path uses the Open WebUI model Bakaidah A2A Compact (no filters, max tokens 3000).",
+    "status": "live"
+   },
+   {
+    "id": "t_ledger",
+    "label": "Facts-Ledger Gate",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_ledger_gate",
+    "file_ref": "bakaidah_ledger_gate.py",
+    "desc": "Bakaidah half live in bakaidah-a2a since 2026-10-25 (9 of 10 first-try, 0 fabricated delivered). Angkai Stop hook deployed, flag off by default; flag-on validated 2026-10-27 (10/10 throwaway tasks valid). It checks sources, not truth.",
+    "status": "partial"
+   },
+   {
+    "id": "t_grounded",
+    "label": "Grounded Drafting Filter",
+    "parents": [
+     "p3_rel_layer"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_grounded_drafting_filter",
+    "file_ref": "bakaidah_grounded_drafting_filter.py",
+    "desc": "One of Bakaidah Daikaiju's Filters.",
+    "status": "live"
+   },
+   {
+    "id": "t_relay_mcp",
+    "label": "Kaiju Relay MCP Server",
+    "parents": [
+     "p3_kaiju_relay"
+    ],
+    "peel": 4,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "kaiju_relay_mcp",
+    "file_ref": "/srv/mcpo/kaiju_relay_mcp_server.py",
+    "desc": "Live 2026-11-01 (read-only tool), enabled on Bakaidah Online only; release gate pending before Bakaidah Daikaiju.",
+    "status": "partial"
+   },
+   {
+    "id": "t_sandbox",
+    "label": "Sandbox Runner + Log Bridge",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "sandbox_runner",
+    "file_ref": null,
+    "desc": "Disposable-container execution tool for Bakaidah; runner bound to the openwebui_default bridge only. Log bridge token rotated 2026-10-29.",
+    "status": "live"
+   },
+   {
+    "id": "t_harness",
+    "label": "Harness migration",
+    "parents": [
+     "step4"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step4",
+    "catalog_ref": "bakaidah_harness_migration",
+    "file_ref": null,
+    "desc": "Move Bakaidah from Open WebUI filtered chat completion to a DeepSeek Harness agentic runtime in shadow mode; old and new Bakaidah run back to back, not concurrently, plus a two-model consensus trial. Filed 2026-11-03; hold lifted 2026-11-02; brief to be prepared for the next local network.",
+    "status": "not_built"
+   },
+   {
+    "id": "t_launch_runner",
+    "label": "Launch Runner + Phase L box",
+    "parents": [
+     "step6"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": "angkai_launch_runner",
+    "file_ref": null,
+    "desc": "Launch runner built and live; blocked in part by an upstream Claude Code bug (GitHub #25857). Phase L box on and settings.json locked 2026-10-29; Code work now runs from the dokaisho CLI. Layer A (OS-level sandboxing) still deferred.",
+    "status": "partial"
+   },
+   {
+    "id": "t_broker",
+    "label": "Promotion Broker v3",
+    "parents": [
+     "step6"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "step6",
+    "catalog_ref": "promotion_broker",
+    "file_ref": null,
+    "desc": "Promotes staged Angkai output into production targets. First real edit_brief promotion 2026-10-29.",
+    "status": "live"
+   },
+   {
+    "id": "t_mcpo",
+    "label": "mcpo bridge (:<port>)",
+    "parents": [
+     "gais1b"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": "mcpo_bridge",
+    "file_ref": "/srv/mcpo/docker-compose.yml",
+    "desc": "Serves vault (read-only) and graphify to Bakaidah's file tools and to the structured brief drafter filter.",
+    "status": "live"
+   },
+   {
+    "id": "t_litellm",
+    "label": "LiteLLM Proxy (:<port>)",
+    "parents": [
+     "gais1b"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": "litellm_proxy",
+    "file_ref": null,
+    "desc": "OpenAI-compatible gateway in front of Ollama with flat-file call logging. Infrastructure only: neither agent calls through it yet (as of 2026-11-01).",
+    "status": "live"
+   },
+   {
+    "id": "f_fm12",
+    "label": "FM-12: recreate a removed container (compose up)",
+    "parents": [
+     "step1",
+     "step2",
+     "gais1a"
+    ],
+    "peel": 3,
+    "fshape": "rect",
+    "color": "gais",
+    "catalog_ref": null,
+    "file_ref": null,
+    "desc": "Plain-up fix proven on real losses (a media container, 2026-10-31). The rmi+pull branch for a lost image snapshot is still unproven.",
+    "status": "partial"
+   }
+  ],
+  "edges": [
+   {
+    "from": "step1",
+    "to": "step2",
+    "kind": "normal"
+   },
+   {
+    "from": "step2",
+    "to": "step3",
+    "kind": "esc",
+    "label": "no match, or the fix failed"
+   },
+   {
+    "from": "step3",
+    "to": "step4",
+    "kind": "esc",
+    "label": "pre-accepted, asks Bakaidah"
+   },
+   {
+    "from": "step4",
+    "to": "step5",
+    "kind": "esc",
+    "label": "proposed fix"
+   },
+   {
+    "from": "step5",
+    "to": "step6",
+    "kind": "esc",
+    "label": "approved or no match"
+   },
+   {
+    "from": "step6",
+    "to": "step7",
+    "kind": "esc",
+    "label": "runs the script"
+   },
+   {
+    "from": "f_watchdog",
+    "to": "f_loop",
+    "kind": "normal"
+   },
+   {
+    "from": "f_loop",
+    "to": "f_checktype",
+    "kind": "normal"
+   },
+   {
+    "from": "f_checktype",
+    "to": "f_curl",
+    "kind": "normal"
+   },
+   {
+    "from": "f_checktype",
+    "to": "f_container",
+    "kind": "normal"
+   },
+   {
+    "from": "f_checktype",
+    "to": "f_daemon",
+    "kind": "normal"
+   },
+   {
+    "from": "f_checktype",
+    "to": "f_network",
+    "kind": "normal"
+   },
+   {
+    "from": "f_checktype",
+    "to": "f_drive",
+    "kind": "normal"
+   },
+   {
+    "from": "f_curl",
+    "to": "f_matched",
+    "kind": "normal"
+   },
+   {
+    "from": "f_container",
+    "to": "f_matched",
+    "kind": "normal"
+   },
+   {
+    "from": "f_daemon",
+    "to": "f_matched",
+    "kind": "normal"
+   },
+   {
+    "from": "f_network",
+    "to": "f_matched",
+    "kind": "normal"
+   },
+   {
+    "from": "f_drive",
+    "to": "f_matched",
+    "kind": "normal"
+   },
+   {
+    "from": "f_matched",
+    "to": "f_fm01",
+    "kind": "normal",
+    "label": "container exited"
+   },
+   {
+    "from": "f_matched",
+    "to": "f_fm02",
+    "kind": "normal",
+    "label": "daemon down"
+   },
+   {
+    "from": "f_matched",
+    "to": "f_fm03",
+    "kind": "normal",
+    "label": "gluetun unhealthy"
+   },
+   {
+    "from": "f_matched",
+    "to": "f_fm05",
+    "kind": "normal",
+    "label": "drive not mounted"
+   },
+   {
+    "from": "f_matched",
+    "to": "f_fmgap",
+    "kind": "normal",
+    "label": "clock/ghost-mount/DNS"
+   },
+   {
+    "from": "f_fm01",
+    "to": "f_retry",
+    "kind": "normal"
+   },
+   {
+    "from": "f_fm02",
+    "to": "f_retry",
+    "kind": "normal"
+   },
+   {
+    "from": "f_fm03",
+    "to": "f_retry",
+    "kind": "normal"
+   },
+   {
+    "from": "f_fm05",
+    "to": "f_retry",
+    "kind": "normal"
+   },
+   {
+    "from": "f_retry",
+    "to": "f_verified",
+    "kind": "normal"
+   },
+   {
+    "from": "f_verified",
+    "to": "f_log",
+    "kind": "normal",
+    "label": "Yes"
+   },
+   {
+    "from": "f_verified",
+    "to": "f_escalate",
+    "kind": "normal",
+    "label": "No"
+   },
+   {
+    "from": "f_fmgap",
+    "to": "f_escalate",
+    "kind": "normal",
+    "label": "No fix exists"
+   },
+   {
+    "from": "p3_selfchain1",
+    "to": "p3_gate",
+    "kind": "normal"
+   },
+   {
+    "from": "p3_gate",
+    "to": "p3_selfchain2",
+    "kind": "normal",
+    "label": "Continue"
+   },
+   {
+    "from": "p3_gate",
+    "to": "p3_draft",
+    "kind": "normal",
+    "label": "Halt"
+   },
+   {
+    "from": "p3_selfchain2",
+    "to": "p3_draft",
+    "kind": "normal"
+   },
+   {
+    "from": "p3_draft",
+    "to": "p3_rel_layer",
+    "kind": "normal"
+   },
+   {
+    "from": "p3_draft",
+    "to": "p3_kaiju_relay",
+    "kind": "normal"
+   },
+   {
+    "from": "p3_a_pass1",
+    "to": "p3_a_pause",
+    "kind": "normal"
+   },
+   {
+    "from": "p3_a_pause",
+    "to": "p3_a_pass2",
+    "kind": "normal"
+   },
+   {
+    "from": "p3_a_pass2",
+    "to": "p3_a_hook",
+    "kind": "normal"
+   },
+   {
+    "from": "p3_openwebui",
+    "to": "p3_ollama",
+    "kind": "normal",
+    "label": "every inference call"
+   },
+   {
+    "from": "p3_vault_primary",
+    "to": "p3_vault_mirror",
+    "kind": "normal",
+    "label": "git push"
+   },
+   {
+    "from": "step7",
+    "to": "step3",
+    "kind": "loop",
+    "label": "retries exhausted"
+   },
+   {
+    "from": "f_matched",
+    "to": "f_fm12",
+    "kind": "normal",
+    "label": "container removed"
+   },
+   {
+    "from": "f_fm12",
+    "to": "f_retry",
+    "kind": "normal"
+   },
+   {
+    "from": "f_escalate",
+    "to": "t_orchestrator",
+    "kind": "esc",
+    "label": "incident feed"
+   },
+   {
+    "from": "t_orchestrator",
+    "to": "t_bakaidah_a2a",
+    "kind": "esc",
+    "label": "A2A task"
+   },
+   {
+    "from": "t_bakaidah_a2a",
+    "to": "p3_review",
+    "kind": "esc",
+    "label": "proposed fix"
+   },
+   {
+    "from": "p3_review",
+    "to": "t_fm12_runner",
+    "kind": "esc",
+    "label": "signed ticket"
+   },
+   {
+    "from": "t_fm12_runner",
+    "to": "f_watchdog",
+    "kind": "loop",
+    "label": "re-check after the fix"
+   }
+  ]
+ }
+}

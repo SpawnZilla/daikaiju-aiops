@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "vault": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/srv/vault"
+      ]
+    },
+    "graphify": {
+      "type": "sse",
+      "url": "http://192.0.2.1:<port>/sse"
+    },
+    "kaiju-relay": {
+      "type": "sse",
+      "url": "http://192.0.2.1:<port>/sse"
+    }
+  }
+}

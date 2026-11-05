@@ -14,9 +14,13 @@ This repository holds the part that can be installed by someone else today:
   `/etc/kaiju-spine/` and the watchdog scripts in `/opt/kaiju-spine/watchdog/`.
 - **docs-site/**, the MkDocs source of the Dossier reference site, published at https://spawnzilla.github.io/daikaiju-aiops/.
 
-The agent orchestration layer itself (the planning, reasoning and execution agents)
-is not packaged here. See `docs-site/docs/status.md` for what is built and verified
-and what is not.
+- **incident-loop/** and **agent-wiring/**, published as reference code: the
+  incident hand-off, review and signed-ticket repair loop, and the adapters
+  that connect the planning, reasoning and execution agents. They are not yet
+  part of `install.sh`; see each folder's README.
+- **diagrams/** and **docs/**: the architecture diagram data and the long-form reports.
+
+See `docs-site/docs/status.md` for what is built and verified and what is not.
 
 ## Quick start
 
