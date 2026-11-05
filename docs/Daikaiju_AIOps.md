@@ -385,7 +385,7 @@ Leverage MCP as the agent tool-call protocol, ntfy as the event bus.
    exactly what Daikaiju AIOps provides.
 
 3. **Low replication cost** — someone else can deploy this for under $500 in
-   hardware and $0 in software. That's the value proposition: enterprise-grade
+   hardware (bought 2024–2026) and $0 in software. That's the value proposition: enterprise-grade
    agentic infrastructure for homelab budgets.
 
 4. **MABS as a standalone product** — the guardrail layer is so differentiated

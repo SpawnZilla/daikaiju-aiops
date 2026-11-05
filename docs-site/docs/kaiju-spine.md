@@ -43,5 +43,5 @@ it entirely if you don't want it.
 
 The installer, the guardrail standard (MABS), the memory vault layout
 and the watchdog are here and tested. The agent adapters that connect
-your own planning, reasoning and execution agents are not packaged yet.
+your own planning, reasoning and execution agents are packaged in [`agent-wiring/`](https://github.com/SpawnZilla/daikaiju-aiops/tree/main/agent-wiring).
 See [Status & Roadmap](status.md).

@@ -28,7 +28,7 @@ anything that genuinely needs judgment.
   guardrails that carry work between the brain and the rest of the
   system, with a check at every handoff. It is a separately
   packaged part of Daikaiju AIOps. The installer is released; the agent
-  adapters are not packaged yet.
+  adapters are packaged in `agent-wiring/`.
 
 ## Why this is different from "just automate it with a cron job"
 

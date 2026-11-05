@@ -32,7 +32,7 @@ time an agent reads or writes a record.
 ## How it does it
 
 **Layer 1 — Self-Healing.** A watchdog running on a schedule, wired to
-push-notification alerting and remote wake-on-LAN so a sleeping node
+self-hosted push-notification alerting (ntfy) and remote wake-on-LAN so a sleeping node
 can be brought back up automatically when needed. It works from a
 living catalog of known failure modes, each with its own automated
 fix — container crashed, a required daemon is down, a VPN-gated
@@ -70,6 +70,9 @@ teach to someone else.
 ## Reference implementation, for scale
 
 The real running instance this project is built from and tested
-against costs under $500 in hardware (renewed/refurbished components)
-and $0 in software — no cloud dependency, no subscription, no vendor
-lock-in for the reasoning model itself.
+against costs under $500 in hardware (renewed/refurbished components, bought
+between 2024 and 2026) and $0 in software. There is no cloud dependency
+for reasoning or orchestration, no subscription and no vendor lock-in. The
+only outbound notification path is a self-hosted push-notification server
+(ntfy) on the local network, so alerts do not pass through a third party
+unless you choose to point them at one.

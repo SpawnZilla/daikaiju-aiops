@@ -19,7 +19,7 @@ redefined. Historical records (journal, handoffs, chat history, the
 such as /opt/kaiju-os/ and kaiju-gais-package are unchanged.
 **Status:** the installer (install.sh) and the packaged FASHSD watchdog
 are published in the public repo SpawnZilla/daikaiju-aiops (the public
-tree already says Kaiju Spine); the agent adapters are not packaged yet.
+tree already says Kaiju Spine); the agent adapters are packaged in `agent-wiring/`.
 **Priority:** the full-release gaps listed below are still open.
 
 ---
@@ -174,7 +174,7 @@ can spend $500 on hardware and $0 on software.
    exactly what Kaiju Spine provides.
 
 3. **Low replication cost** — someone else can deploy this for under $500 in
-   hardware and $0 in software.
+   hardware (bought 2024–2026) and $0 in software.
 
 4. **MABS as a standalone product** — the guardrail layer is so differentiated
    it could be extracted and published independently.
