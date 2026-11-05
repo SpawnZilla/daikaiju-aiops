@@ -43,5 +43,5 @@ it entirely if you don't want it.
 
 The installer, the guardrail standard (MABS), the memory vault layout
 and the watchdog are here and tested. The agent adapters that connect
-your own planning, reasoning and execution agents are packaged in [`agent-wiring/`](https://github.com/SpawnZilla/daikaiju-aiops/tree/main/agent-wiring).
+your own planning, reasoning and execution agents are published as reference code in [`agent-wiring/`](https://github.com/SpawnZilla/daikaiju-aiops/tree/main/agent-wiring), and the incident repair loop in [`incident-loop/`](https://github.com/SpawnZilla/daikaiju-aiops/tree/main/incident-loop). Both are installed by hand; they are not yet part of `install.sh`.
 See [Status & Roadmap](status.md).

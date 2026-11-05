@@ -28,7 +28,7 @@ anything that genuinely needs judgment.
   guardrails that carry work between the brain and the rest of the
   system, with a check at every handoff. It is a separately
   packaged part of Daikaiju AIOps. The installer is released; the agent
-  adapters are packaged in `agent-wiring/`.
+  adapters are published as reference code in `agent-wiring/` (not yet part of the installer).
 
 The architecture diagram is available as an [interactive page](mangokai.html).
 

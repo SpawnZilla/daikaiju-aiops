@@ -32,7 +32,7 @@ time an agent reads or writes a record.
 ## How it does it
 
 **Layer 1 — Self-Healing.** A watchdog running on a schedule, wired to
-self-hosted push-notification alerting (ntfy) and remote wake-on-LAN so a sleeping node
+push-notification alerting (ntfy, self-hosted by default) and remote wake-on-LAN so a sleeping node
 can be brought back up automatically when needed. It works from a
 living catalog of known failure modes, each with its own automated
 fix — container crashed, a required daemon is down, a VPN-gated
@@ -54,7 +54,7 @@ zero and repeating the same mistakes.
 
 **Layer 3 — Onboarding/Transfer.** Documentation and templates that
 let someone else replicate the whole pattern without living through
-the incidents that produced it — an installer design, a portable
+the incidents that produced it — an installer, a portable
 version of the governance protocol with project-specific incident
 history stripped out, a guide for matching a reasoning model to
 available hardware, and a hardware compatibility reference. This layer
@@ -71,8 +71,4 @@ teach to someone else.
 
 The real running instance this project is built from and tested
 against costs under $500 in hardware (renewed/refurbished components, bought
-between 2024 and 2026) and $0 in software. There is no cloud dependency
-for reasoning or orchestration, no subscription and no vendor lock-in. The
-only outbound notification path is a self-hosted push-notification server
-(ntfy) on the local network, so alerts do not pass through a third party
-unless you choose to point them at one.
+between 2024 and 2026) and $0 in software. There is no cloud dependency for reasoning or orchestration, no subscription and no vendor lock-in. Alerts go through ntfy, which runs on your own network by default; the public ntfy.sh service is a fallback, and a private ntfy.sh topic can serve as the remote wake-on-LAN trigger, so those two paths do touch a third party unless you disable them.

@@ -19,8 +19,7 @@ outright:
   handoff points and pause-and-approve checkpoints at every stage.
 - **Guardrail Layer** — the rules, checks, and failure-mode catalogs
   that make autonomous execution trustworthy instead of terrifying.
-  Nearly nobody building agentic AI systems has this part formalized —
-  it's the most defensible, differentiated part of the whole project.
+  It is where most of this project's engineering effort goes.
 
 ## The three agents
 
@@ -48,7 +47,7 @@ off by default and has been exercised in testing (see
 [Status & Roadmap](status.md)). In the default mode: a human hands
 off a task, Bakaidah drafts an approach, Mokaima and a human review and
 approve it, Angkai carries it out, a human reviews the result. The
-target end state removes the human from that loop entirely for routine
+fully autonomous mode removes the human from that loop for routine
 work — approve a plan once, then get a result or an alert, not a
 play-by-play.
 
