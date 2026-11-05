@@ -88,7 +88,7 @@ class Filter:
             "pihole", "pi-hole", "unbound", "caddy", "ntfy", "searxng",
             "open webui", "openwebui", "portainer", "watchtower",
             "uptime kuma", "wireguard", "graphify", "angkai", "bakaidah",
-            "mokaima", "hola1", "hola2", "hola3", "hola4", "hola5",
+            "mokaima", "drive1", "drive2", "drive3", "drive4", "drive5",
             "dokaisho", "varan", "pi-node", "pi-user",
         ]
 

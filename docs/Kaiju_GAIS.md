@@ -1,5 +1,5 @@
 ╔══════════════════════════════════════════════════════════════╗
-║  CREATED: 2026-07-20  │  Kaidosho (DoSho Daikaiju)  │  v2.0       ║
+║  CREATED: 2026-07-20  │  Kaidosho (Daikaiju AIOps)  │  v2.0       ║
 ║  Update cycle: SESSION                                        ║
 ║  Product Document — Kaiju GAIS                                ║
 ╚══════════════════════════════════════════════════════════════╝
@@ -9,7 +9,7 @@
 
 **Version:** 2.0
 **Created:** 2026-07-20 (Kaidosho Daikaiju General), reworked 2026-09-17
-**Status:** Active development — built on DoSho Daikaiju (Kaidosho) homelab
+**Status:** Active development — built on Daikaiju AIOps (Kaidosho) homelab
 **Priority:** HIGH
 **Part of:** Daikaiju AIOps (the umbrella project and first shippable
 package). Kaiju GAIS is not a separate product -- see "RELATIONSHIP TO
@@ -94,7 +94,7 @@ outright. See "RELATIONSHIP TO DAIKAIJU AIOPS" below.)
   Infrastructure that heals itself is the headline feature of Kaiju GAIS.
 
   **Replicability status (2026-07-22):** FASHSD is currently Kaidosho-specific —
-  hardcoded to this services list, these drive names (hola1-5), this VPN
+  hardcoded to this services list, these drive names (drive1-5), this VPN
   container topology (gluetun namespace), and Debian/Ubuntu (`apt`,
   systemd). Generalizing it is NOT a CPU-architecture problem (bash/
   systemd/Docker Compose already run identically on ARM64 pi-node and x86_64
@@ -159,7 +159,7 @@ outright. See "RELATIONSHIP TO DAIKAIJU AIOPS" below.)
   - Node names: dokaisho, pi-user, varan, rodan (planned)
   - Agent names: Mokaima (planner), Angkai (executor), Bakaidah (reasoner)
   - System names: FASHSD, vault, MABS, Kaidosho
-  - Drive names: hola1-hola5, vault-drive
+  - Drive names: drive1-drive5, vault-drive
 **Why it matters:** A consistent metaphor makes a complex system legible at a
   glance. Memorable names are part of why this works — and why it's teachable.
 
@@ -202,7 +202,7 @@ running stack):
   - Graphify (knowledge graph, port 8300)
 
 **Services (self-hosted):**
-  Jellyfin, Immich, Nextcloud, Vaultwarden, Sonarr, Radarr, Lidarr,
+  a media server, Nextcloud, Vaultwarden, Sonarr, Radarr, Lidarr,
   Prowlarr, qBittorrent (via Gluetun/ProtonVPN), SearXNG, Portainer, Dozzle
 
 ---

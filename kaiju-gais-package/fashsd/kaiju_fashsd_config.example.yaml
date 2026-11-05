@@ -75,7 +75,7 @@ services:
     timeout_seconds: 10
   - name: "prowlarr"
     container: "prowlarr"
-    compose_dir: "/mnt/hola2/compose/arr"
+    compose_dir: "/mnt/drive2/compose/arr"
     health_url: "http://localhost:9696/ping"
     expected_code: "200"
     timeout_seconds: 10
@@ -94,7 +94,7 @@ network_groups:
   # independently of a healthy owner (see /FM-13 postmortem).
   - owner: "gluetun"
     dependents: ["radarr", "sonarr", "lidarr", "qbittorrent", "prowlarr"]
-    compose_dir: "/mnt/hola2/compose/arr"
+    compose_dir: "/mnt/drive2/compose/arr"
     verify_via: "qbittorrent"   # container to check outbound connectivity from, post-restart
   # Add one entry per network-namespace-sharing group. Every field is
   # required. verify_via should typically be one of the dependents.

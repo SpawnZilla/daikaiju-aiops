@@ -77,10 +77,10 @@ CATEGORY 3 — SYSTEM/SUBSYSTEM NAMES
   subsystems and protocols.
 
 CATEGORY 4 — STORAGE
-  hola1 through hola5 — the five external drives on the services host
+  drive1 through drive5 — the five external drives on the services host
   vault1              — the primary documentation vault's drive
   Pattern: a simple numbered scheme for interchangeable/fungible
-  storage (hola1-5, all playing the same role) rather than individual
+  storage (drive1-5, all playing the same role) rather than individual
   names — individual names are reserved for things with a distinct
   identity/role (nodes, agents), not for a pool of otherwise-identical
   drives.

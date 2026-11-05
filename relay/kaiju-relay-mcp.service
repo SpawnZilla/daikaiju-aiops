@@ -1,5 +1,5 @@
 [Unit]
-Description=Kaiju Relay MCP server (draft_edit_brief, read-only) on port 8301
+Description=Kaiju Relay MCP server (draft_edit_brief, read-only) on port <port>
 After=network-online.target ollama.service
 
 [Service]

@@ -1,5 +1,5 @@
 ╔══════════════════════════════════════════════════════════════╗
-║  CREATED: 2026-07-20  │  Kaidosho (DoSho Daikaiju)  │  v1.0       ║
+║  CREATED: 2026-07-20  │  Kaidosho (Daikaiju AIOps)  │  v1.0       ║
 ║  Update cycle: SESSION                                        ║
 ║  Product Document — Daikaiju AIOps                           ║
 ╚══════════════════════════════════════════════════════════════╝

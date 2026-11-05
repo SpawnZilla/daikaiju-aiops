@@ -1,5 +1,5 @@
 ╔══════════════════════════════════════════════════════════════╗
-║  CREATED: 2026-09-17  │  Kaidosho (DoSho Daikaiju)  │  v1.0       ║
+║  CREATED: 2026-09-17  │  Kaidosho (Daikaiju AIOps)  │  v1.0       ║
 ║  Update cycle: SESSION                                        ║
 ║  Product Document — Kaiju Spine                                  ║
 ╚══════════════════════════════════════════════════════════════╝
@@ -90,7 +90,7 @@ entire system is documented as code and as memory.
 ## THE TARGET USER (once released)
 
 Self-hosters who:
-- Run open source stacks (Jellyfin, Immich, Arr, Pi-hole, etc.)
+- Run open source stacks (a media server, Arr, Pi-hole, etc.)
 - Can't afford enterprise tooling
 - Want AI integration but don't know where to start
 - Would replicate a well-documented, working system
@@ -204,7 +204,7 @@ See: Kaiju_GAIS.md (the substrate)
 ## exist yet; this is a worked example of intended use, not a spec)
 
 **Persona:** a self-hoster running a handful of Docker services on
-their own hardware (e.g. Jellyfin, *arr apps, a reverse proxy) who
+their own hardware (e.g. a media server, *arr apps, a reverse proxy) who
 wants the same self-healing, orchestrated, guardrailed agent pattern
 Kaidosho runs, without adopting Kaidosho's specific hardware or agent naming.
 

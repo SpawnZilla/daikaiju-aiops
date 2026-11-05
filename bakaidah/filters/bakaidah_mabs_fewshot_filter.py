@@ -71,7 +71,7 @@ TASK
 Generalize Kaidosho's FM-05 drive-not-mounted fix script (remounts a named
 drive by fstab mountpoint) to validate the drive name against
 services.yaml's drives[] list via fashsd_config_lib.sh, instead of
-Kaidosho's hardcoded regex (hola1-hola5). Follow the exact pattern already
+Kaidosho's hardcoded regex (drive1-drive5). Follow the exact pattern already
 proven in fm01_container_exited.sh's compose_dir validation loop.
 
 ────────────────────────────────────────

@@ -1,5 +1,5 @@
 ╔══════════════════════════════════════════════════════════════╗
-║  CREATED: 2026-07-22  │  Kaidosho (DoSho Daikaiju)  │  v1.0       ║
+║  CREATED: 2026-07-22  │  Kaidosho (Daikaiju AIOps)  │  v1.0       ║
 ║  Update cycle: SESSION                                        ║
 ║  Product Document — Kaiju Spine Bootstrap Installer Spec        ║
 ╚══════════════════════════════════════════════════════════════╝

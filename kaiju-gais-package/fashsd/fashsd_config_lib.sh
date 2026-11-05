@@ -90,7 +90,7 @@ kaiju_known_compose_dirs() {
 #   network_groups:
 #     - owner: "gluetun"
 #       dependents: ["radarr", "sonarr", ...]
-#       compose_dir: "/mnt/hola2/compose/arr"
+#       compose_dir: "/mnt/drive2/compose/arr"
 #       verify_via: "qbittorrent"
 
 kaiju_network_group_count() {

@@ -74,7 +74,7 @@ stack simultaneously.
   Recommended: Raspberry Pi 5, 8GB RAM (Kaidosho's actual spec)
   Storage: at least one USB3 external drive for Docker volumes — the
     Pi5's own SD/NVMe boot storage is not sized for container data at
-    any real scale. Kaidosho uses 5 separate external drives (hola1-5); a
+    any real scale. Kaidosho uses 5 separate external drives (drive1-5); a
     single well-sized drive is sufficient for a smaller install.
   Alternative watcher hardware: any always-on x86_64 or ARM64 Linux
     box with 4GB+ RAM and Docker support works in principle — Pi5 is

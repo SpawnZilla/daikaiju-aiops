@@ -49,7 +49,7 @@
 # Generalization notes:
 #   - `sudo timedatectl set-ntp false/true` + verify-synchronized logic
 #     preserved exactly — this part needed no config at all.
-#   - Hardcoded "restart Prowlarr in /mnt/hola2/compose/arr" replaced
+#   - Hardcoded "restart Prowlarr in /mnt/drive2/compose/arr" replaced
 #     with a loop over every services[] entry, restarting via each
 #     entry's own compose_dir/container (same generic loop shape as
 #     app_curl_check.sh's services[] loop).

@@ -271,7 +271,7 @@ class Filter:
             "brief. Follow these Kaidosho-specific facts exactly: (1) BRIEF ID "
             "format is always ANG-DRAFT-<short-topic>, never a different "
             "format. (2) INSTALL PATH RULE: every file this brief creates "
-            "deploys to /srv or /mnt/hola1-hola3 ONLY -- never /etc, "
+            "deploys to /srv or /mnt/drive1-drive3 ONLY -- never /etc, "
             "/usr/local/bin, /opt, or /home, including config files. "
             "(3) Kaidosho services are self-hosted on dokaisho (192.0.2.45) or "
             "the pi-node (192.0.2.21), never a public SaaS URL. (4) Angkai "

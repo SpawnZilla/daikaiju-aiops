@@ -94,7 +94,7 @@ _EDIT_VERIFY_PROMPT = (
 )
 
 _EDIT_DRAFT_PROMPT = (
-    "You draft a structured EDIT brief for the DoSho Daikaiju homelab. "
+    "You draft a structured EDIT brief for the Daikaiju AIOps homelab. "
     "Your only source of truth is the VERIFIED EXCERPTS JSON (verbatim "
     "lines from the target file). Fill the schema:\n"
     "1. brief_id: ANG-DRAFT-<short-topic>.\n"

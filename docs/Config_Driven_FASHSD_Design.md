@@ -51,7 +51,7 @@ WHAT NEEDS TO BECOME CONFIG (the three hardcoded categories)
    app_curl_check.sh, and similarly hardcoded container names in the
    FM-01 through FM-07 fix scripts.
 
-2. DRIVES/STORAGE — currently Kaidosho's specific hola1-5 drive names and
+2. DRIVES/STORAGE — currently Kaidosho's specific drive1-5 drive names and
    mount points hardcoded into SMART-check and snapshot scripts.
 
 3. NODE TOPOLOGY — currently a hardcoded two-node pattern (pi-node wakes
@@ -145,7 +145,7 @@ confirms the earlier observation that the generalization work is
 narrower than a full rewrite. The same before/after pattern applies to
 the FM-01 through FM-07 fix scripts (swap hardcoded container names for
 a loop over services[].container) and the drive/SMART scripts (swap
-hola1-5 for a loop over drives[]).
+drive1-5 for a loop over drives[]).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 NODE TOPOLOGY HANDLING

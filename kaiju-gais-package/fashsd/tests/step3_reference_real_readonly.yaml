@@ -29,61 +29,61 @@ topology:
 services:
   - name: "open-webui"
     container: "open-webui"
-    compose_dir: "/mnt/hola3/compose/openwebui"   # best-guess, unverified
+    compose_dir: "/mnt/drive3/compose/openwebui"   # best-guess, unverified
     health_url: "http://192.0.2.21:3000/health"
     expected_code: "200"
     timeout_seconds: 15
   - name: "gitea"
     container: "gitea"
-    compose_dir: "/mnt/hola3/compose/gitea"        # best-guess, unverified
+    compose_dir: "/mnt/drive3/compose/gitea"        # best-guess, unverified
     health_url: "http://192.0.2.21:3002/api/healthz"
     expected_code: "200"
     timeout_seconds: 10
   - name: "immich"
     container: "immich-server"
-    compose_dir: "/mnt/hola3/compose/immich"       # best-guess, unverified
+    compose_dir: "/mnt/drive3/compose/immich"       # best-guess, unverified
     health_url: "http://192.0.2.21:2283/api/server/ping"
     expected_code: "200"
     timeout_seconds: 15
   - name: "vaultwarden"
     container: "vaultwarden"
-    compose_dir: "/mnt/hola3/compose/vaultwarden"  # best-guess, unverified
+    compose_dir: "/mnt/drive3/compose/vaultwarden"  # best-guess, unverified
     health_url: "http://192.0.2.21:8090/api/config"
     expected_code: "200"
     timeout_seconds: 10
   - name: "searxng"
     container: "searxng"
-    compose_dir: "/mnt/hola3/compose/searxng"      # best-guess, unverified
+    compose_dir: "/mnt/drive3/compose/searxng"      # best-guess, unverified
     health_url: "http://192.0.2.21:8085/healthz"
     expected_code: "200"
     timeout_seconds: 10
   - name: "jellyfin"
     container: "jellyfin"
-    compose_dir: "/mnt/hola2/compose/jellyfin"     # best-guess, unverified
+    compose_dir: "/mnt/drive2/compose/jellyfin"     # best-guess, unverified
     health_url: "http://192.0.2.21:8096/health"
     expected_code: "200"
     timeout_seconds: 10
   - name: "nextcloud"
     container: "nextcloud"
-    compose_dir: "/mnt/hola3/compose/nextcloud"    # best-guess, unverified
+    compose_dir: "/mnt/drive3/compose/nextcloud"    # best-guess, unverified
     health_url: "http://192.0.2.21:9090/status.php"
     expected_code: "200"
     timeout_seconds: 15
   - name: "uptime-kuma"
     container: "uptime-kuma"
-    compose_dir: "/mnt/hola3/compose/monitoring"   # best-guess, unverified
+    compose_dir: "/mnt/drive3/compose/monitoring"   # best-guess, unverified
     health_url: "http://192.0.2.21:3001"
     expected_code: "302"
     timeout_seconds: 10
   - name: "prowlarr"
     container: "prowlarr"
-    compose_dir: "/mnt/hola2/compose/arr"          # best-guess, unverified
+    compose_dir: "/mnt/drive2/compose/arr"          # best-guess, unverified
     health_url: "http://192.0.2.21:9696"
     expected_code: "302"
     timeout_seconds: 10
   - name: "dozzle"
     container: "dozzle"
-    compose_dir: "/mnt/hola3/compose/monitoring"   # best-guess, unverified
+    compose_dir: "/mnt/drive3/compose/monitoring"   # best-guess, unverified
     health_url: "http://192.0.2.21:8888"
     expected_code: "200"
     timeout_seconds: 10

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 kaiju_relay_mcp_server.py  (v0.1, staged 2026-11-01, NOT installed)
-Native SSE MCP server on dokaisho, port 8301, served to Open WebUI / Mokaima through mcpo.
+Native SSE MCP server on dokaisho, the relay port, served to Open WebUI / Mokaima through mcpo.
 One tool, draft_edit_brief(task, target_path): runs the Kaiju Relay edit pipeline
 (relay_edit_brief.run_edit_pipeline: verify excerpts, draft, Stage C review) and returns the
 rendered edit brief plus its EDITS_JSON block. READ-ONLY: it never applies an edit and never
 writes a file; apply_edit_brief.py and the  broker stay the only way a brief becomes a change.
-Same pattern as graphify_mcp_server.py (port 8300). No Pipe.
+Same pattern as graphify_mcp_server.py (the relay port). No Pipe.
 Deploy: /srv/mcpo/kaiju_relay_mcp_server.py ; managed by kaiju-relay-mcp.service.
 """
 

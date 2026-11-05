@@ -4,7 +4,7 @@
 # ============================================================
 # fm06_ghost_mount.sh — Kaiju Spine config-driven ghost-mount recovery.
 #
-# Generalized from Kaidosho's FM-06 (hola3-only): force-unmount a
+# Generalized from Kaidosho's FM-06 (drive3-only): force-unmount a
 # drive twice (lazy unmount, matches the original's exact `umount -l`
 # x2 pattern — preserved unchanged per MABS Rule 16, architecture
 # preservation), remount via fstab, then verify by checking configured
@@ -15,7 +15,7 @@
 # Generalization notes (Mokaima, 2026-09-06):
 #   - Takes a drive name as an argument, same calling convention as
 #     the already-tested fm05_drive_not_mounted.sh.
-#   - Hardcoded /mnt/hola3 + 3 hardcoded subdirs (docker-data,
+#   - Hardcoded /mnt/drive3 + 3 hardcoded subdirs (docker-data,
 #     containerd-data, compose) -> looked up via
 #     kaiju_drive_index_by_name() + kaiju_drive_field()/
 #     kaiju_drive_expected_subdirs() (schema v1.3, see that file's
