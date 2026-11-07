@@ -1,6 +1,12 @@
 #!/bin/bash
-# Set these for your host (Docker bridge subnet/gateway: `docker network inspect <net>`).
-: "${DOCKER_SUBNET:=172.17.0.0/16}"; : "${DOCKER_GW:=172.17.0.1}"; : "${RELAY_PORT:=8301}"
+: "${RELAY_PORT:=8301}"
+# Docker network that mcpo runs on. Override with DOCKER_SUBNET=<cidr> if auto-detect fails.
+if [ -z "$DOCKER_SUBNET" ]; then
+  NET=$(docker inspect mcpo --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' 2>/dev/null | awk '{print $1}')
+  DOCKER_SUBNET=$(docker network inspect "$NET" --format '{{(index .IPAM.Config 0).Subnet}}' 2>/dev/null)
+fi
+case "$1" in apply|rollback) [ -n "$DOCKER_SUBNET" ] || { echo "STOP: could not detect the mcpo Docker subnet; set DOCKER_SUBNET=<cidr>"; exit 1; };; esac
+DOCKER_GW=$(echo "$DOCKER_SUBNET" | sed -E 's#\.[0-9]+/[0-9]+$#.1#')
 # Run on dokaisho as USER (uses sudo). Usage: bash install_relay_mcp.sh check | apply | rollback
 # check    = READ ONLY: shows whether port $RELAY_PORT is free, python libs exist, and whether mcpo already lists kaiju-relay.
 # apply    = copies the server to /srv/mcpo, installs + starts kaiju-relay-mcp.service, adds "kaiju-relay" to /srv/mcpo/config.json (backup first), restarts the mcpo container.
@@ -17,7 +23,7 @@ apply)
   [ "$(grep -c kaiju-relay "$C")" = 0 ] || { echo "STOP: already in config.json"; exit 1; }
   cp -p "$C" "$C.$TAG" || exit 1
   cp "$S/kaiju_relay_mcp_server.py" "$D/" || exit 1
-  sudo ufw allow from $DOCKER_SUBNET to any port $RELAY_PORT proto tcp comment 'kaiju-relay-mcp from mcpo Docker' || exit 1
+  sudo ufw allow from "$DOCKER_SUBNET" to any port $RELAY_PORT proto tcp comment 'kaiju-relay-mcp from mcpo Docker' || exit 1
   sudo install -m 644 "$S/kaiju-relay-mcp.service" /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now kaiju-relay-mcp || exit 1
   python3 -I - "$C" "$DOCKER_GW" "$RELAY_PORT" <<'PY' || { echo "CONFIG PATCH FAILED"; cp -p "$C.$TAG" "$C"; exit 1; }
 import json, sys
@@ -27,6 +33,6 @@ json.dump(d, open(p, "w"), indent=2); open(p, "a").write("\n")
 PY
   docker restart mcpo >/dev/null && sleep 5 && curl -s -m 5 http://127.0.0.1:8200/kaiju-relay/openapi.json | head -c 200; echo; echo "applied; backup $C.$TAG";;
 rollback)
-  sudo ufw delete allow from $DOCKER_SUBNET to any port $RELAY_PORT proto tcp; sudo systemctl disable --now kaiju-relay-mcp; cp -p "$C.$TAG" "$C" && docker restart mcpo >/dev/null && echo restored;;
+  sudo ufw delete allow from "$DOCKER_SUBNET" to any port $RELAY_PORT proto tcp; sudo systemctl disable --now kaiju-relay-mcp; cp -p "$C.$TAG" "$C" && docker restart mcpo >/dev/null && echo restored;;
 *) echo "usage: bash $0 check|apply|rollback"; exit 2;;
 esac
