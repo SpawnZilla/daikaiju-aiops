@@ -1,0 +1,61 @@
+/* Dossier, dark theme aligned to the Mangokai catalog/flow page.
+   Same palette, fonts, 6px radius and 1px lines as Mangokai; nothing here loads from another host. */
+:root{
+  --bg-0:#0c0f16; --bg-panel:#151b28; --bg-card:#1a2130; --bg-card-hover:#212a3d;
+  --line:#2a3448; --line-soft:#1e2636;
+  --text-0:#e8ecf4; --text-1:#9aa7c0; --text-2:#5f6c85;
+  --step1-b:#4a6fa5; --gais-b:#2d8a5f; --brand-b:#e35a2a; --warn-b:#e08e2b; --fail-b:#d00000;
+  --flow:#7f8db0; --esc-b:#a78bfa;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:6px;
+}
+html,body{background:var(--bg-0);color:var(--text-0);font-family:var(--sans);}
+body,.wy-body-for-nav{background:var(--bg-0);}
+.wy-nav-content-wrap,.wy-nav-content{background:var(--bg-0);}
+.wy-nav-content{max-width:880px;}
+.rst-content,.rst-content p,.rst-content li,.rst-content td,.rst-content th{color:var(--text-0);font-family:var(--sans);}
+.rst-content h1,.rst-content h2,.rst-content h3,.rst-content h4{font-family:var(--sans);color:var(--text-0);font-weight:600;}
+.rst-content h1{border-bottom:1px solid var(--line);padding-bottom:10px;}
+.rst-content h2{border-bottom:1px solid var(--line-soft);padding-bottom:6px;}
+.rst-content a,.rst-content a:visited{color:var(--step1-b);}
+.rst-content a:hover{color:var(--flow);}
+.rst-content em{color:var(--text-1);}
+.rst-content hr{border-top:1px solid var(--line);}
+.rst-content blockquote{border-left:3px solid var(--line);color:var(--text-1);background:var(--bg-panel);}
+/* sidebar */
+.wy-nav-side{background:var(--bg-panel);border-right:1px solid var(--line);}
+.wy-side-nav-search{background:var(--bg-panel);border-bottom:1px solid var(--line);}
+.wy-side-nav-search>a,.wy-side-nav-search .wy-dropdown>a{color:var(--text-0);font-family:var(--sans);font-weight:600;}
+.wy-side-nav-search input[type=text]{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);color:var(--text-0);box-shadow:none;font-family:var(--sans);}
+.wy-menu-vertical a{color:var(--text-1);}
+.wy-menu-vertical a:hover{background:var(--bg-card-hover);color:var(--text-0);}
+.wy-menu-vertical li.current{background:var(--bg-card);}
+.wy-menu-vertical li.current>a,.wy-menu-vertical li.current a{color:var(--text-1);border-color:var(--line);}
+.wy-menu-vertical li.toctree-l1.current>a{background:var(--bg-card);border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--text-0);border-right:3px solid var(--brand-b);}
+.wy-menu-vertical li.current a:hover{background:var(--bg-card-hover);}
+.wy-nav-top{background:var(--bg-panel);border-bottom:1px solid var(--line);}
+.wy-nav-top a{color:var(--text-0);}
+/* code */
+.rst-content code,.rst-content tt,code{font-family:var(--mono);background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);color:var(--text-0);padding:1px 5px;}
+.rst-content pre,.rst-content div[class^=highlight]{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);}
+.rst-content pre code{background:transparent;border:0;padding:0;}
+.highlight,.highlight pre{background:var(--bg-card)!important;color:var(--text-0);font-family:var(--mono);}
+/* tables */
+.rst-content table.docutils,.wy-table-bordered-all{border:1px solid var(--line);}
+.rst-content table.docutils td,.rst-content table.docutils th{border:1px solid var(--line);background:var(--bg-0);}
+.rst-content table.docutils thead th{background:var(--bg-card);color:var(--text-0);}
+.rst-content table.docutils tr:nth-child(2n-1) td{background:var(--bg-panel);}
+/* admonitions use Mangokai status colours */
+.rst-content .admonition{background:var(--bg-card);border:1px solid var(--line);border-left:3px solid var(--step1-b);border-radius:var(--radius);color:var(--text-0);}
+.rst-content .admonition-title{background:var(--bg-panel);color:var(--text-0);border-radius:var(--radius) var(--radius) 0 0;}
+.rst-content .admonition.note{border-left-color:var(--step1-b);}
+.rst-content .admonition.warning,.rst-content .admonition.attention,.rst-content .admonition.caution{border-left-color:var(--warn-b);}
+.rst-content .admonition.danger,.rst-content .admonition.error{border-left-color:var(--fail-b);}
+.rst-content .admonition.tip,.rst-content .admonition.hint,.rst-content .admonition.success{border-left-color:var(--gais-b);}
+/* footer, previous/next, scrollbars */
+footer,.rst-footer-buttons{color:var(--text-2);}
+.rst-content footer hr{border-color:var(--line);}
+.btn,.rst-footer-buttons .btn{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);color:var(--text-0);box-shadow:none;text-shadow:none;}
+.btn:hover{background:var(--bg-card-hover);}
+.wy-nav-side::-webkit-scrollbar,body::-webkit-scrollbar{background:var(--bg-0);}
