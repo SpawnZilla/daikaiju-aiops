@@ -188,18 +188,18 @@ running stack):
   - Qwen 32B (Bakaidah model)
   - Open WebUI (Bakaidah interface)
   - Claude Desktop + Claude Code (Mokaima + Angkai interface)
-  - mcpo (MCP proxy, port 8200) — wires vault + Graphify to Bakaidah
+  - mcpo (MCP proxy, default port 8200, configurable) — wires vault + Graphify to Bakaidah
 
 **Infrastructure:**
   - Docker Compose (all services)
   - Caddy (reverse proxy + HTTPS)
-  - WireGuard (VPN, port 4443)
+  - WireGuard (VPN)
   - Pi-hole + Unbound (DNS)
   - UFW + YubiKey FIDO2 (security)
-  - ntfy (alerting, port 8201)
+  - ntfy (alerting, default port 8201, configurable)
   - Uptime Kuma × 2 (monitoring)
   - Gitea (vault git mirror)
-  - Graphify (knowledge graph, port 8300)
+  - Graphify (knowledge graph, default port 8300, configurable)
 
 **Services (self-hosted):**
   a media server, Nextcloud, Vaultwarden, Sonarr, Radarr, Lidarr,
