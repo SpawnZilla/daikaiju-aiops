@@ -491,7 +491,7 @@
    "kind": "catalog",
    "axis": "orchestration",
    "status": "live",
-   "machine": "pi-node 192.0.2.1:<port> (runner), dokaisho :<port> (bridge)",
+   "machine": "pi-node 198.51.100.1:<port> (runner), dokaisho :<port> (bridge)",
    "desc": "Disposable-container execution tool for Bakaidah; runner bound to the openwebui_default bridge only. Log bridge token rotated 2026-10-29."
   },
   {
