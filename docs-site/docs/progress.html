@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mangokai Progress — Daikaiju AIOps</title>
+<style>
+  :root{
+    --bg-0:#0c0f16; --bg-panel:#151b28; --bg-card:#1a2130; --bg-card-hover:#212a3d;
+    --line:#2a3448; --line-soft:#1e2636;
+    --text-0:#e8ecf4; --text-1:#9aa7c0; --text-2:#5f6c85;
+    --step1-b:#4a6fa5; --step2-b:#1aa3a3; --step3-b:#7a6fc4; --step4-b:#2d8a5f;
+    --step6:#b34700; --step6-b:#d9691f;
+    --ok:#2d6a4f; --ok-b:#40916c; --warn:#8a5a12; --warn-b:#e08e2b;
+    --neutral:#3a4256; --neutral-b:#5f6c85;
+    --gold:#f4a261; --cyan:#4cc9f0; --magenta:#f72585; --esc-b:#a78bfa;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --radius:6px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg-0);color:var(--text-0);font-family:var(--sans);}
+  ::selection{background:var(--step6);color:#fff;}
+  .shell{display:grid;grid-template-columns:280px 1fr;grid-template-rows:auto 1fr;min-height:100vh;}
+  @media (max-width:860px){ .shell{grid-template-columns:1fr;} .rail{order:3;max-height:none;} }
+  header.hud{grid-column:1/-1;background:linear-gradient(180deg,#131826,#0e1220);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:baseline;gap:10px;flex-shrink:0;}
+  .brand .mark{font-family:var(--mono);font-weight:700;font-size:20px;letter-spacing:.5px;background:linear-gradient(120deg,var(--step6-b),var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .brand .sub{font-size:12px;color:var(--text-2);letter-spacing:.2px;}
+  .readout{flex:1;min-width:260px;font-size:12px;color:var(--cyan);background:#0a0d14;border:1px solid var(--line-soft);border-radius:var(--radius);padding:9px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .readout .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;box-shadow:0 0 6px var(--cyan);animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  .readout .rlabel{color:var(--text-2);} .readout .rval{color:var(--text-0);font-weight:600;}
+  .readout .sep{display:inline-block;width:1px;height:14px;background:var(--line);}
+  .counts{display:flex;gap:14px;font-size:11px;color:var(--text-1);flex-shrink:0;}
+  .counts b{color:var(--text-0);}
+  .rail{background:var(--bg-panel);border-right:1px solid var(--line);padding:18px 16px 40px;overflow-y:auto;max-height:calc(100vh - 64px);}
+  .rail h3{font-size:12px;font-weight:600;color:var(--text-1);margin:22px 0 10px;}
+  .rail h3:first-child{margin-top:0;}
+  .preset-btn{display:block;width:100%;text-align:left;background:var(--bg-card);color:var(--text-1);border:1px solid var(--line-soft);border-radius:var(--radius);padding:8px 10px;margin-bottom:6px;font-family:var(--sans);font-size:12.5px;cursor:pointer;}
+  .preset-btn:hover{background:var(--bg-card-hover);color:var(--text-0);border-color:var(--line);}
+  .preset-btn.active{background:var(--step6);color:#fff;border-color:var(--step6-b);}
+  .toggle-row{display:flex;align-items:center;gap:9px;padding:5px 2px;cursor:pointer;user-select:none;}
+  .toggle-row input{accent-color:var(--step6-b);width:14px;height:14px;cursor:pointer;}
+  .toggle-row span{font-size:12.5px;color:var(--text-1);}
+  .toggle-row:hover span{color:var(--text-0);}
+  .swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;flex-shrink:0;}
+  .hint{font-size:10.5px;color:var(--text-2);line-height:1.5;margin-top:6px;}
+  main{padding:22px 26px 60px;overflow-y:auto;}
+  .intro{font-size:13.5px;line-height:1.6;color:var(--text-1);max-width:78ch;margin:0 0 24px;}
+  .group{margin-bottom:30px;}
+  .group-title{font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:4px;display:flex;align-items:center;gap:10px;}
+  .group-title .line{flex:1;height:1px;background:var(--line-soft);}
+  .group-sub{font-size:12px;color:var(--text-2);margin-bottom:12px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;}
+  .card{text-align:left;font-family:var(--sans);color:inherit;background:var(--bg-card);border:1px solid var(--line-soft);border-left:3px solid var(--neutral-b);border-radius:var(--radius);padding:12px 13px;cursor:pointer;position:relative;transition:transform .12s;}
+  .card:hover{background:var(--bg-card-hover);border-color:var(--line);transform:translateY(-1px);}
+  .card:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+  .card.dimmed{opacity:.22;filter:grayscale(.6);} .card.dimmed:hover{opacity:.55;}
+  .card .label{font-size:13px;font-weight:600;color:var(--text-0);margin-bottom:5px;line-height:1.3;}
+  .card .one{font-size:12px;color:var(--text-1);line-height:1.45;margin-bottom:8px;}
+  .status-chip{font-size:10.5px;font-weight:600;padding:1.5px 7px;border-radius:3px;display:inline-block;}
+  .st-live{border-left-color:var(--ok-b);} .st-live .status-chip{background:var(--ok);color:#d8f3dc;}
+  .st-building{border-left-color:var(--step2-b);} .st-building .status-chip{background:#0d6e6e;color:#d4f4f4;}
+  .st-waiting{border-left-color:var(--warn-b);} .st-waiting .status-chip{background:var(--warn);color:#ffe8c2;}
+  .st-backlog{border-left-color:var(--neutral-b);} .st-backlog .status-chip{background:var(--neutral);color:#d9deea;}
+  .overlay-bg{position:fixed;inset:0;background:rgba(6,8,13,.72);z-index:50;display:none;align-items:flex-start;justify-content:flex-end;}
+  .overlay-bg.open{display:flex;}
+  .panel{width:min(440px,92vw);height:100vh;background:var(--bg-panel);border-left:1px solid var(--line);padding:26px 24px 40px;overflow-y:auto;}
+  .panel .close{float:right;background:none;border:1px solid var(--line-soft);color:var(--text-1);border-radius:5px;width:28px;height:28px;cursor:pointer;font-size:14px;}
+  .panel .close:hover{color:var(--text-0);border-color:var(--line);}
+  .panel h2{font-size:18px;margin:0 36px 6px 0;line-height:1.3;}
+  .panel .pid{font-size:12px;color:var(--text-2);margin-bottom:18px;}
+  .panel .field{margin-bottom:16px;}
+  .panel .field-label{font-size:11.5px;font-weight:600;color:var(--text-2);margin-bottom:4px;}
+  .panel .field-val{font-size:14px;color:var(--text-0);line-height:1.65;}
+  footer{grid-column:1/-1;text-align:center;padding:16px;font-family:var(--mono);font-size:10.5px;color:var(--text-2);border-top:1px solid var(--line-soft);}
+  @media (prefers-reduced-motion:reduce){ .card:hover{transform:none;} .readout .dot{animation:none;} }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="hud">
+    <div class="brand"><a href="mangokai.html" style="text-decoration:none"><span class="mark">MANGOKAI</span></a><span class="sub">Daikaiju AIOps · Progress</span></div>
+    <div class="readout" id="readout">
+      <span class="dot"></span>
+      <span class="rlabel">Viewing</span> <span class="rval" id="ro-view">All projects</span>
+      <span class="sep"></span>
+      <span class="rlabel">Status</span> <span class="rval" id="ro-status">all</span>
+    </div>
+    <div class="counts" id="counts">— shown</div>
+  </header>
+
+  <nav class="rail" aria-label="Filters">
+    <h3>Project</h3>
+    <div id="presets"></div>
+    <h3>Status</h3>
+    <div id="statusToggles"></div>
+    <p class="hint">Click a card for where it started, where it stands, and what comes next. Esc closes the panel.</p>
+  </nav>
+
+  <main>
+    <p class="intro">Where each part of Daikaiju AIOps and Kaiju GIAS stands today. Cards show what is live, what is being built, what waits on a date or a real-world event, and what is parked until it is needed.</p>
+    <div id="groups"></div>
+  </main>
+
+  <footer id="foot"></footer>
+</div>
+
+<div class="overlay-bg" id="overlay" role="dialog" aria-modal="true" aria-labelledby="p-title">
+  <div class="panel">
+    <button class="close" id="p-close" aria-label="Close">×</button>
+    <h2 id="p-title"></h2>
+    <div class="pid" id="p-meta"></div>
+    <div class="field"><div class="field-label">Where it started</div><div class="field-val" id="p-origin"></div></div>
+    <div class="field"><div class="field-label">Where it stands</div><div class="field-val" id="p-now"></div></div>
+    <div class="field"><div class="field-label">What comes next</div><div class="field-val" id="p-next"></div></div>
+  </div>
+</div>
+
+<script>
+  const UPDATED = "2026-11-19";
+  const STATUS = {
+    live:     { label: "Live",        color: "var(--ok-b)" },
+    building: { label: "In progress", color: "var(--step2-b)" },
+    waiting:  { label: "Waiting",     color: "var(--warn-b)" },
+    backlog:  { label: "Backlog",     color: "var(--neutral-b)" }
+  };
+  const PROJECTS = [
+    { id: "bakaidah", name: "Bakaidah", sub: "The conversation and diagnosis agent" },
+    { id: "angkai",   name: "Angkai",   sub: "The execution agent" },
+    { id: "gias",     name: "Kaiju GIAS", sub: "The open framework and public release" },
+    { id: "aiops",    name: "Daikaiju AIOps", sub: "The autonomous layer that watches, fixes and remembers" }
+  ];
+  const ITEMS = [
+    { p:"bakaidah", t:"Prompt and rules", s:"live",
+      one:"Rules version 3.12 is live on both models and checked against the source file.",
+      origin:"July 2026: live tests of the first rule set showed three of five failures: invented file paths, a skipped diagnostic-history check, and swapping in a different task.",
+      now:"Version 3.12 is live on both Bakaidah models. A drift check compares each model's prompt with the source file and reads identical. The newest rule makes Bakaidah say it cannot check live status instead of guessing from a stale snapshot.",
+      next:"Add two more journal prompts to the release gate when the planned prompt shrink is staged." },
+    { p:"bakaidah", t:"Fix Memory lookup", s:"live",
+      one:"Looks up known fixes and failed attempts before anything is tried.",
+      origin:"November 15, 2026: one searchable place for every fix and every failed attempt, so a new problem is checked against both first.",
+      now:"A local search over about 200 records is live and enabled on both models. It passed the release gate on the third attempt, after two rule fixes. A comparison with a cloud memory service scored 9 of 10 locally against 10 of 10 on a ten-times-smaller set, so the local store stays the only one.",
+      next:"The cloud service stays an optional second source in the backlog." },
+    { p:"bakaidah", t:"Citation checking", s:"waiting",
+      one:"Quotes are checked against their sources before an answer goes out.",
+      origin:"A filter that checks quoted lines against the fetched page, built after unsupported quotes slipped into answers.",
+      now:"The check is live. The warning shown for an unverified quote has only been tested offline.",
+      next:"Waiting on the first real unverified quote to confirm the warning path." },
+    { p:"bakaidah", t:"Edit-brief drafting tool", s:"live",
+      one:"Drafts exact edit briefs; a person or the execution agent applies them.",
+      origin:"A relay that turns a described change into a checked edit brief, so a model never edits a file directly.",
+      now:"Live on both models and read-only. It passed the release gate. Applying a brief stays a human or execution-agent step.",
+      next:"No change planned." },
+
+    { p:"angkai", t:"Hardened sandbox", s:"live",
+      one:"The execution agent runs in a confined box with hardened services around it.",
+      origin:"July 2026: rules 15 to 20 closed the backlog of drift incidents with structural fixes rather than instructions.",
+      now:"Launches run inside a sandbox, and the runner and four helper services carry systemd hardening. Production targets are listed hand-only. A sha check runs before any privileged script.",
+      next:"Waiting on the first real launch through the hardened runner. If it fails, the change rolls back." },
+    { p:"angkai", t:"Typed alerts and fix requests", s:"live",
+      one:"Alerts and fix requests cross the box as typed messages, not free text.",
+      origin:"Alerts from inside the box needed a way out without giving the box a credential.",
+      now:"A write-only alert spool and a typed fix-request intake are installed and tested: a valid alert sends, an invalid request is rejected.",
+      next:"Waiting on a real alert from inside the box to confirm the full path." },
+    { p:"angkai", t:"Facts block for report tasks", s:"waiting",
+      one:"Report-type tasks must show the facts they relied on.",
+      origin:"A passed check proved a source was named but not that a fact was true.",
+      now:"Scope decided: required for report-type tasks only, not edit or build tasks.",
+      next:"Design after launch, as one conditional rule in the execution agent's instructions." },
+
+    { p:"gias", t:"Public repository and docs", s:"live",
+      one:"The framework is public with a documentation site.",
+      origin:"July 2026: the framework was spec'd: an installer, a model-selection guide and standalone rules.",
+      now:"The public repository and docs site are live, and a sanitize-and-scan step runs before every push. The weekly check shows no open issues or pull requests.",
+      next:"Keep the weekly issue and pull-request check; every new one becomes a same-day ticket." },
+    { p:"gias", t:"Clean-install tests", s:"live",
+      one:"Five of six test distributions install cleanly.",
+      origin:"The installer had never been run on a clean machine after the rename.",
+      now:"Five of six clean machines pass. The sixth fails on an older Python, and the public README says so.",
+      next:"No change planned." },
+    { p:"gias", t:"Public announcement", s:"waiting",
+      one:"The announcement waits for the community's project-age rule.",
+      origin:"A draft announcement was written the week the repository went public.",
+      now:"The target community wants a project at least three months old, a dedicated thread and an AI-involvement line.",
+      next:"Post on or after February 5, 2027, after re-reading the rules." },
+
+    { p:"aiops", t:"Self-healing watchdog", s:"live",
+      one:"Watches 19 services and recovers the ones that fail.",
+      origin:"July 2026: the first design waited on a reliability backlog before any autonomous action was safe.",
+      now:"The watchdog covers 19 services. A start-up grace patch was confirmed on real update runs, so a container being updated is no longer recreated by mistake.",
+      next:"No change planned." },
+    { p:"aiops", t:"Known-fix executor", s:"waiting",
+      one:"Applies a proven fix on its own, with a four-attempt cap.",
+      origin:"A drill showed a missing container image could leave a service down for hours while retries repeated the same failed fix.",
+      now:"Forced tests passed: it removes the image, pulls it, recreates the container and reports once. The cap and the flap guard held on real alerts on November 14.",
+      next:"Waiting on the first natural loss to prove it on a real, unsteered failure." },
+    { p:"aiops", t:"Alerts and monitoring", s:"live",
+      one:"Detailed alerts, a swap-thrashing alert and a port dashboard.",
+      origin:"Early alerts said only that something failed.",
+      now:"Alerts now carry the service, the per-attempt history and the failure reason, confirmed on real alerts. A swap-thrashing alert is proven end to end, and a port dashboard runs on both hosts.",
+      next:"No change planned." },
+    { p:"aiops", t:"Sandboxed code execution", s:"backlog",
+      one:"Autonomous code execution stays human-gated.",
+      origin:"A ladder was designed for letting the agents run code on their own.",
+      now:"Nothing needs it today: code changes go through a human-gated broker.",
+      next:"Design starts when a task first asks to run code autonomously." },
+    { p:"aiops", t:"Research backlog", s:"backlog",
+      one:"Tools and patterns to evaluate when a trigger exists.",
+      origin:"Ideas collected during the build.",
+      now:"Parked, none needed to run: structured-output and prompt-optimization libraries, a vector store, document parsers, a router, a formal goals pattern and token efficiency.",
+      next:"Nothing is built until a concrete trigger exists." }
+  ];
+
+  const state = { project: "all", status: { live:true, building:true, waiting:true, backlog:true } };
+  const $ = id => document.getElementById(id);
+
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function buildRail() {
+    const pre = $("presets");
+    [{ id:"all", name:"All projects" }].concat(PROJECTS).forEach(p => {
+      const b = el("button", "preset-btn", p.name);
+      b.type = "button"; b.dataset.id = p.id;
+      b.addEventListener("click", () => { state.project = p.id; render(); });
+      pre.appendChild(b);
+    });
+    const st = $("statusToggles");
+    Object.keys(STATUS).forEach(k => {
+      const lab = el("label", "toggle-row");
+      const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = true;
+      cb.addEventListener("change", () => { state.status[k] = cb.checked; render(); });
+      const sw = el("span", "swatch"); sw.style.background = STATUS[k].color;
+      const tx = el("span", null, STATUS[k].label);
+      const wrap = el("span"); wrap.style.display = "flex"; wrap.style.alignItems = "center"; wrap.appendChild(sw); wrap.appendChild(tx);
+      lab.appendChild(cb); lab.appendChild(wrap); st.appendChild(lab);
+    });
+  }
+
+  function render() {
+    document.querySelectorAll(".preset-btn").forEach(b => b.classList.toggle("active", b.dataset.id === state.project));
+    const root = $("groups"); root.textContent = "";
+    let shown = 0, total = 0;
+    PROJECTS.forEach(p => {
+      if (state.project !== "all" && state.project !== p.id) return;
+      const g = el("section", "group");
+      const title = el("div", "group-title"); title.appendChild(el("span", null, p.name)); title.appendChild(el("span", "line"));
+      g.appendChild(title); g.appendChild(el("div", "group-sub", p.sub));
+      const grid = el("div", "grid");
+      ITEMS.filter(i => i.p === p.id).forEach(i => {
+        total++;
+        const on = state.status[i.s];
+        if (on) shown++;
+        const c = el("button", "card st-" + i.s + (on ? "" : " dimmed"));
+        c.type = "button";
+        c.appendChild(el("div", "label", i.t));
+        c.appendChild(el("div", "one", i.one));
+        c.appendChild(el("span", "status-chip", STATUS[i.s].label));
+        c.addEventListener("click", () => openPanel(i, p));
+        grid.appendChild(c);
+      });
+      g.appendChild(grid); root.appendChild(g);
+    });
+    const active = Object.keys(STATUS).filter(k => state.status[k]);
+    $("ro-view").textContent = state.project === "all" ? "All projects" : PROJECTS.find(p => p.id === state.project).name;
+    $("ro-status").textContent = active.length === 4 ? "all" : (active.map(k => STATUS[k].label).join(", ") || "none");
+    $("counts").innerHTML = "";
+    const b = document.createElement("b"); b.textContent = shown;
+    $("counts").appendChild(b); $("counts").appendChild(document.createTextNode(" of " + total + " shown"));
+  }
+
+  let lastFocus = null;
+  function openPanel(i, p) {
+    lastFocus = document.activeElement;
+    $("p-title").textContent = i.t;
+    $("p-meta").textContent = p.name + " · " + STATUS[i.s].label;
+    $("p-origin").textContent = i.origin; $("p-now").textContent = i.now; $("p-next").textContent = i.next;
+    $("overlay").classList.add("open"); $("p-close").focus();
+  }
+  function closePanel() { $("overlay").classList.remove("open"); if (lastFocus) lastFocus.focus(); }
+  $("p-close").addEventListener("click", closePanel);
+  $("overlay").addEventListener("click", e => { if (e.target === $("overlay")) closePanel(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closePanel(); });
+
+  $("foot").textContent = "Updated " + UPDATED + " · public edition: ticket and incident history removed";
+  buildRail(); render();
+</script>
+</body>
+</html>
