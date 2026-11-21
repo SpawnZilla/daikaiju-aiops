@@ -20,6 +20,8 @@ This repository holds the part that can be installed by someone else today:
   part of `install.sh`; see each folder's README.
 - **diagrams/** and **docs/**: the architecture diagram data and the long-form reports.
 
+The human review loop, Check Alerts, is described in `docs-site/docs/check-alerts.md`. The process has been run for real; its report script is not part of this repository yet.
+
 See `docs-site/docs/status.md` for what is built and verified and what is not.
 
 ## Quick start

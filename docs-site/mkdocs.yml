@@ -14,6 +14,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Daikaiju AIOps: daikaiju-aiops.md
+  - Check Alerts: check-alerts.md
   - Kaiju GAIS: kaiju-gais.md
   - Kaiju Spine: kaiju-spine.md
   - Status & Roadmap: status.md

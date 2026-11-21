@@ -350,6 +350,22 @@ Leverage MCP as the agent tool-call protocol, ntfy as the event bus.
 
 ---
 
+## THE HUMAN REVIEW LOOP (CHECK ALERTS)
+
+Check Alerts is the review loop on top of the runtime pipeline. One command
+makes the planning agent gather every alert since the previous run, group
+them by colour and act on them. Red (not fixed): fixed autonomously, the
+original symptom re-checked, how it was fixed recorded. Yellow (needs a
+human): anything the agent cannot reach or decide, listed with the exact
+command, the host to run it on and what it does. Green (fixed): shown with
+how, so every run can be audited. White (could not be checked): each comes
+with the command that checks it, or is accepted on purpose. A second report
+shows only what is left. A failure that keeps recurring gets a root-cause
+fix: a new known-fix script, tested against mocks and mutation-checked, and
+deployed behind a root-owned allowlist. A failure the watchdog cannot see,
+such as a service that is healthy by container check and dead in function,
+gets a dedicated detector. Full description: `docs-site/docs/check-alerts.md`.
+
 ## COMPETITIVE LANDSCAPE
 
 **Enterprise AIOps** (Dynatrace, LogicMonitor, Zscaler, Palo Alto Prisma):

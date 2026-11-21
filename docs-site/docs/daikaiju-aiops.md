@@ -79,6 +79,15 @@ deterministic code that blocks the action outright on failure, the
 same way a compile error blocks a build regardless of how confident
 the programmer felt.
 
+## The human review loop
+
+The seven steps handle one incident at a time. [Check Alerts](check-alerts.md)
+is the review loop on top of them: one command makes Mokaima gather every
+alert since the previous run, fix what it can reach and prove it, and hand
+the operator a short list with exact commands for the rest. A failure that
+keeps recurring gets a root-cause fix, such as a new known-fix script, and a
+failure the watchdog cannot see gets its own detector.
+
 Persistent, versioned memory ([Kaiju GAIS](kaiju-gais.md)'s Layer 2)
 feeds every one of these steps — nothing starts from zero, and every
 decision leaves a record another agent (or a human) can check later.

@@ -41,6 +41,16 @@ keeps that same standard for anyone reading from the outside.
   code with a test suite (9 tests passing); it is not yet wired into
   `install.sh`.
 
+- Check Alerts (the human review loop, see [Check Alerts](check-alerts.md)) —
+  run for real on 2026-11-20. Its first report found a service that was
+  healthy by container check and dead in function for 13 days; it was fixed
+  by hand, then a known-fix script and a five-minute detector were added and
+  tested against an induced failure (fix completed in about 70 seconds, with
+  the mocked test suite passing and a mutation check failing it as intended).
+  Still pending: confirmation from the next scheduled health check, and a
+  notification sent by the detector's own timer (a manual test message was
+  delivered). The report script itself is not published yet.
+
 - This documentation site (Dossier) — published on GitHub Pages and
   rebuilt from this repository on every change to `docs-site/`.
 
@@ -51,6 +61,7 @@ keeps that same standard for anyone reading from the outside.
 ## Deliberately not yet started
 
 - Integrating the agent wiring and incident loop into the `install.sh` installer (today they are published as reference code you install by hand).
+- Wiring the Check Alerts failure detector into the incident loop (today it runs as a standalone timer).
 
 ## A word on reliability claims
 
