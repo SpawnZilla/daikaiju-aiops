@@ -18,6 +18,7 @@ run "relay edit brief runs scoring"   "$PY" relay/tests/test_edit_brief_runs.py
 run "mokaima candidate_to_brief"      "$PY" -m pytest -q -p no:cacheprovider agent-wiring/tests/test_candidate_to_brief.py
 run "mokaima adapter MCP in-process"  "$PY" agent-wiring/tests/test_server_integration.py
 run "mokaima adapter MCP stdio"       "$PY" agent-wiring/tests/test_stdio_subprocess.py
+run "ticket runner (real flock/subprocess)" "$PY" incident-loop/tests/test_ticket_runner.py
 run "fm12 mocked (incident-loop)"     bash incident-loop/tests/test_fm12_mocked.sh
 run "fm12 mocked (gais package)"      bash kaiju-gais-package/fashsd/tests/test_fm12_mocked.sh
 

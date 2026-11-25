@@ -8,4 +8,6 @@ Nothing touches docker, ssh, systemd or the network: those calls are mocked, and
 - `tests/test_source_validation.py`: Python and bash syntax, systemd unit parsing. Syntax only, not behavior.
 - Per-component suites live next to their code (`*/tests/`).
 
+- `incident-loop/tests/test_ticket_runner.py`: the ticket runner end to end with real flock, timeout and subprocess (takes about a minute: one case waits out the real health re-poll).
+
 Not covered yet: the Angkai hooks, the Bakaidah filters, and `install.sh`.

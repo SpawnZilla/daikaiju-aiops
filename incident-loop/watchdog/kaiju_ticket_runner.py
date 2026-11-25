@@ -17,7 +17,7 @@ exact bytes it hashed; (C) a runner-local switch file (/etc/kaiju-os/runner_auto
 ticket alone can no longer grant autonomy; (G) passed also needs the container running or healthy (docker inspect).
 Both files are root-owned on this host; missing or malformed = refuse (fail closed).
 """
-import fcntl, hashlib, hmac, json, os, re, subprocess, sys, time
+import fcntl, hashlib, hmac, json, os, re, subprocess, sys, tempfile, time
 
 class Cfg:
     def __init__(self, **kw):
@@ -69,10 +69,36 @@ def _log(cfg, msg):
         pass
 
 def _atomic(path, text):
-    tmp = path + ".tmp"
-    with open(tmp, "w") as f:
-        f.write(text)
-    os.replace(tmp, path)
+    # code review fix CR-001: a unique temp file per write (a fixed <path>.tmp let two writers clobber each other); removed on failure.
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path) or ".", prefix=os.path.basename(path) + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write(text)
+        os.chmod(tmp, 0o644)
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def _load_result(path):
+    """code review fix CR-002: a stored result, or None if it is unreadable or not a JSON object (never raises)."""
+    try:
+        with open(path) as f:
+            r = json.load(f)
+    except (OSError, ValueError):
+        return None
+    return r if isinstance(r, dict) else None
+
+def _rm(path):
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+
 
 def shape_ok(t):
     try:
@@ -218,7 +244,9 @@ def handle(cfg, key, raw, deps):
             return {"status": "refused", "reason": "bad_ticket_id"}
         p = os.path.join(cfg.state_dir, tid + ".result.json")
         if os.path.exists(p):
-            return json.load(open(p))
+            r = _load_result(p)
+            return r if r is not None else sign(key, {"schema": "kaiju-run-result/1", "ticket_id": tid, "status": "refused",
+                                                      "reason": "stored_result_unreadable"})
         return {"status": "unknown" if not os.path.exists(os.path.join(cfg.state_dir, tid + ".state")) else "running", "ticket_id": tid}
     if req.get("op") != "run" or set(req) != {"op", "ticket"}:
         return {"status": "refused", "reason": "bad_request"}
@@ -230,7 +258,9 @@ def handle(cfg, key, raw, deps):
     tid, iid, svc = t["ticket_id"], t["incident_id"], t["service"]
     resp = os.path.join(cfg.state_dir, tid + ".result.json")
     if os.path.exists(resp):
-        return json.load(open(resp))
+        r = _load_result(resp)
+        return r if r is not None else sign(key, {"schema": "kaiju-run-result/1", "ticket_id": tid, "incident_id": iid, "service": svc,
+                                                  "script": t["script"], "status": "refused", "reason": "stored_result_unreadable"})
     if os.path.exists(os.path.join(cfg.state_dir, tid + ".state")):
         return sign(key, {"schema": "kaiju-run-result/1", "ticket_id": tid, "incident_id": iid, "service": svc, "script": t["script"], "status": "running"})
     def result(status, reason="", store=True, **kw):
@@ -263,20 +293,32 @@ def handle(cfg, key, raw, deps):
     body, why = _pins(cfg, t["script"])
     if body is None:
         return result("refused", why)
+    # code review fix CR-003: a zero/negative poll interval would make the health re-poll loop forever.
+    if cfg.health_interval <= 0 or cfg.health_wait < 0:
+        return result("refused", "bad_health_config")
+    # code review fix: claim the ticket (.state) BEFORE the incident marker, so a duplicate ticket can no longer consume the incident.
+    state_path = os.path.join(cfg.state_dir, tid + ".state")
+    try:
+        os.close(os.open(state_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600))
+    except FileExistsError:
+        return sign(key, {"schema": "kaiju-run-result/1", "ticket_id": tid, "incident_id": iid, "service": svc, "script": t["script"], "status": "running"})
     inc_mark = os.path.join(cfg.state_dir, "incident-%s.ran" % iid)
     try:
         os.close(os.open(inc_mark, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600))
     except FileExistsError:
+        _rm(state_path)
         return result("refused", "incident_already_run")
-    try:
-        os.close(os.open(os.path.join(cfg.state_dir, tid + ".state"), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600))
-    except FileExistsError:
-        return sign(key, {"schema": "kaiju-run-result/1", "ticket_id": tid, "incident_id": iid, "service": svc, "script": t["script"], "status": "running"})
     # audit fix B: run a private copy of the exact bytes that matched the pin, so the script cannot change between check and run.
     rpath = os.path.join(cfg.state_dir, tid + ".run")
-    fd = os.open(rpath, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o700)
-    with os.fdopen(fd, "wb") as f:
-        f.write(body)
+    # code review fix CR-004: if the private copy cannot be written (disk full, leftover file), release the incident and the ticket claim.
+    try:
+        fd = os.open(rpath, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o700)
+        with os.fdopen(fd, "wb") as f:
+            f.write(body)
+    except OSError as ex:
+        for x in (rpath, inc_mark, state_path):
+            _rm(x)
+        return result("refused", "run_copy_failed:%s" % type(ex).__name__)
     _log(cfg, "ticket %s accepted: running %s (pinned copy of %s) %s %s" % (tid, rpath, spath, container, t["compose_dir"]))
     try:
         code, timed_out = deps["run"](cfg, [rpath, container, t["compose_dir"]])
