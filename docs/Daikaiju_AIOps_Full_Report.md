@@ -122,7 +122,7 @@ repeatedly failed in documented, specific ways: inventing wrong compose
 paths, guessing at architecture instead of reading it, losing task
 identity mid-brief and building something unrelated, and reverting to
 wrong tools even after being given exact correct paths multiple times in
-the same session (all logged under "ANGUIRUS IMPROVEMENT" in
+the same session (all logged under "ANGKAI IMPROVEMENT" in
 `PENDING.md`, 2026-07-17 through 07-19).
 
 MABS has grown through direct incident response, not speculative design:

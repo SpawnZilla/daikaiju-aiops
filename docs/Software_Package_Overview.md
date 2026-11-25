@@ -146,7 +146,7 @@ every software component labeled at the point it's involved.
 └───────────────────────────┬────────────────────────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  5. ANGUIRUS EXECUTES — Claude Code + Ollama                      │
+│  5. ANGKAI EXECUTES — Claude Code + Ollama                        │
 │     Launched with a restricted tool allowlist (never a bare       │
 │     launch). Reads the approved brief, generates the actual       │
 │     scripts/files, writes them to a staging area — never          │
