@@ -24,6 +24,8 @@ The human review loop, Check Alerts, is described in `docs-site/docs/check-alert
 
 See `docs-site/docs/status.md` for what is built and verified and what is not.
 
+Independent reviews: `docs/Threat_Model.md` (STRIDE threat model, 34 threats across 18 trust boundaries) and `docs/Whitepaper_Bounded_Autonomy.md` (when bounded autonomy is defensible, using this project as the case study; one-page version in `docs/Whitepaper_Summary.md`).
+
 ## Quick start
 
 Requirements: Ubuntu, Debian, Arch Linux or Fedora, a normal user with `sudo`,
