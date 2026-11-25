@@ -12,7 +12,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Read|Write|Edit|Bash|mcp__vault__.*|EnterPlanMode",
+        "matcher": "Read|Write|Edit|MultiEdit|NotebookEdit|Bash|Glob|Grep|WebFetch|WebSearch|Task|mcp__.*|EnterPlanMode",
         "hooks": [
           {
             "type": "command",

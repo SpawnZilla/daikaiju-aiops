@@ -3,7 +3,7 @@ title: Bakaidah Citation Grounding Filter
 author: the operator / Mokaima
 author_url: N/A
 funding_url: N/A
-version: 0.5
+version: 0.6
 description:  Phase 2 item 2, v0.5 (staged 2026-11-02, replaces v0.4; v0.4 added the tool-output search below, v0.5 fixes quote pairing: two short quoted words in one sentence were paired into a false quote and reported NOT found). v0.3 checked each
   quoted span in the answer only against the document strings in the assistant message's sources.
   For web answers Open WebUI keeps there the search_web snippets (cut off with "..." at a varying
@@ -217,7 +217,7 @@ class Filter:
         try:
             res = self.check(body)
             if self.valves.debug:
-                logger.warning("[ citation grounding v0.5] outlet() invoked checked=%s tool_docs=%d",
+                logger.warning("[ citation grounding v0.6] outlet() invoked checked=%s tool_docs=%d",
                                None if res is None else (res[0], len(res[1]), res[2]), self._tool_docs)
             if res is None:
                 return body
@@ -240,6 +240,25 @@ class Filter:
                 lines.append("Do not trust these quotes without checking the real source yourself.")
                 self._write_text(messages[idx], text + "\n\n---\n" + "\n".join(lines))
                 body["messages"] = messages
-        except Exception as exc:  # fail open
-            logger.warning("[ citation grounding v0.5] error, answer untouched: %r", exc)
+        except Exception as exc:  # audit fix D: fail VISIBLE -- the answer still goes out, but says the check did not run
+            logger.warning(
+                "[ citation grounding v0.6] error, check NOT run, notice appended: %r", exc
+            )
+            try:
+                messages = body.get("messages", [])
+                idx = next(
+                    i
+                    for i in range(len(messages) - 1, -1, -1)
+                    if messages[i].get("role") == "assistant"
+                )
+                text = self._response_text(messages[idx])
+                self._write_text(
+                    messages[idx],
+                    text
+                    + "\n\n---\nnote: the citation check did NOT run on this answer (internal filter error). "
+                    "Its quotes are UNVERIFIED -- check them against the real sources yourself.",
+                )
+                body["messages"] = messages
+            except Exception:  # noqa: BLE001 -- no assistant message to mark; nothing else to do
+                pass
         return body

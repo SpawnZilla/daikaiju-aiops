@@ -11,6 +11,11 @@ Checks for op=run, in order: size/shape, HMAC signature, stored result (replay r
 open+capped incident record for that service with a matching incident_id, one run per incident, script is an executable
 file inside the lib dir. The script then runs under the watchdog flock with the same arguments the watchdog uses
 (<container> <compose_dir>); the service health URL is re-checked; a signed result is stored and returned.
+2026-11-25 external audit fixes: (B) every file listed in the sha256 pin file (/etc/kaiju-os/known-fix-run.sha256,
+sha256sum format) must match before a run, the ticket's script must be pinned, and the runner executes a private copy of the
+exact bytes it hashed; (C) a runner-local switch file (/etc/kaiju-os/runner_autonomy) must read fully_autonomous, so a signed
+ticket alone can no longer grant autonomy; (G) passed also needs the container running or healthy (docker inspect).
+Both files are root-owned on this host; missing or malformed = refuse (fail closed).
 """
 import fcntl, hashlib, hmac, json, os, re, subprocess, sys, time
 
@@ -30,6 +35,11 @@ class Cfg:
         self.skew = int(e("SKEW", "120"))
         self.health_wait = int(e("HEALTH_WAIT", "60"))        # S7: seconds to keep re-checking health after a script that exited 0
         self.health_interval = int(e("HEALTH_INTERVAL", "5"))
+        # audit fix B: sha256 pins for the fix scripts AND the libs they source (sha256sum format: "<64 hex>  <file>").
+        self.pins = e("PINS", "/etc/kaiju-os/known-fix-run.sha256")
+        # audit fix C: runner-local autonomy switch on THIS host; the ticket's checkpoint_state alone is no longer enough.
+        self.autonomy_file = e("AUTONOMY_FILE", "/etc/kaiju-os/runner_autonomy")
+        self.container_check = e("CONTAINER_CHECK", "1") == "1"   # audit fix G: passed also needs the container running/healthy
         for k, v in kw.items():
             setattr(self, k, v)
 
@@ -98,6 +108,70 @@ def _incident(cfg, t):
     if not isinstance(c, str) or not re.match(r"\A[A-Za-z0-9][A-Za-z0-9._-]{0,63}\Z", c):
         return None, "bad_container"
     return c, None
+
+PIN_RE = re.compile(r"\A([0-9a-f]{64}) [ *]([A-Za-z0-9._-]{1,80})\Z")
+
+def _sha256_bytes(path):
+    with open(path, "rb") as f:
+        b = f.read()
+    return hashlib.sha256(b).hexdigest(), b
+
+def _pins(cfg, script):
+    """audit fix B -> (script_bytes, None) or (None, reason). Every pinned file in lib_dir must match its pin and the
+    ticket's script must be pinned. An unreadable or malformed pin file refuses (fail closed)."""
+    try:
+        with open(cfg.pins, encoding="utf-8") as f:
+            lines = [l.rstrip("\n") for l in f if l.strip() and not l.startswith("#")]
+    except OSError:
+        return None, "pins_missing"
+    pins = {}
+    for l in lines:
+        m = PIN_RE.match(l)
+        if not m or m.group(2) in pins:
+            return None, "pins_malformed"
+        pins[m.group(2)] = m.group(1)
+    if script not in pins:
+        return None, "script_not_pinned"
+    got = None
+    for name, want in sorted(pins.items()):
+        path = os.path.join(cfg.lib_dir, name)
+        if os.path.realpath(path) != os.path.join(os.path.realpath(cfg.lib_dir), name):
+            return None, "pin_target_outside_lib_dir"
+        try:
+            h, b = _sha256_bytes(path)
+        except OSError:
+            return None, "pinned_file_missing:" + name
+        if not hmac.compare_digest(h, want):
+            return None, "pin_mismatch:" + name
+        if name == script:
+            got = b
+    return got, None
+
+def _autonomy_on(cfg):
+    """audit fix C: first non-comment line of the runner-local file must be exactly fully_autonomous; missing = off."""
+    try:
+        with open(cfg.autonomy_file, encoding="utf-8") as f:
+            for l in f:
+                l = l.strip()
+                if l and not l.startswith("#"):
+                    return l == "fully_autonomous"
+    except OSError:
+        pass
+    return False
+
+def real_container(cfg, container):
+    """audit fix G -> 'running', 'healthy', 'unhealthy', 'starting', 'not_running' or 'unknown'."""
+    try:
+        r = subprocess.run(["docker", "inspect", "-f", "{{.State.Running}} {{if .State.Health}}{{.State.Health.Status}}{{end}}", container],
+                           capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return "unknown"
+    if r.returncode != 0:
+        return "unknown"
+    parts = (r.stdout.strip().split() + ["", ""])[:2]
+    if parts[0] != "true":
+        return "not_running"
+    return parts[1] or "running"
 
 def real_run(cfg, argv):
     """-> (exit_code, timed_out). argv runs under the watchdog flock (exit 200 = lock not obtained) and under `timeout` (124 = timed out)."""
@@ -175,6 +249,8 @@ def handle(cfg, key, raw, deps):
         return result("refused", "outside_validity_window", store=False)
     if t["checkpoint_state"] != "fully_autonomous":
         return result("refused", "checkpoint_state")
+    if not _autonomy_on(cfg):
+        return result("refused", "runner_autonomy_off")
     line = "%s %s %s" % (t["script"], svc, t["compose_dir"])
     if not _allowed(cfg, line):
         return result("refused", "not_allowlisted")
@@ -184,6 +260,9 @@ def handle(cfg, key, raw, deps):
     spath = os.path.join(cfg.lib_dir, t["script"])
     if not (os.path.isfile(spath) and os.access(spath, os.X_OK) and os.path.realpath(spath) == os.path.join(os.path.realpath(cfg.lib_dir), t["script"])):
         return result("refused", "script_not_executable_in_lib_dir")
+    body, why = _pins(cfg, t["script"])
+    if body is None:
+        return result("refused", why)
     inc_mark = os.path.join(cfg.state_dir, "incident-%s.ran" % iid)
     try:
         os.close(os.open(inc_mark, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600))
@@ -193,8 +272,19 @@ def handle(cfg, key, raw, deps):
         os.close(os.open(os.path.join(cfg.state_dir, tid + ".state"), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600))
     except FileExistsError:
         return sign(key, {"schema": "kaiju-run-result/1", "ticket_id": tid, "incident_id": iid, "service": svc, "script": t["script"], "status": "running"})
-    _log(cfg, "ticket %s accepted: running %s %s %s" % (tid, spath, container, t["compose_dir"]))
-    code, timed_out = deps["run"](cfg, [spath, container, t["compose_dir"]])
+    # audit fix B: run a private copy of the exact bytes that matched the pin, so the script cannot change between check and run.
+    rpath = os.path.join(cfg.state_dir, tid + ".run")
+    fd = os.open(rpath, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o700)
+    with os.fdopen(fd, "wb") as f:
+        f.write(body)
+    _log(cfg, "ticket %s accepted: running %s (pinned copy of %s) %s %s" % (tid, rpath, spath, container, t["compose_dir"]))
+    try:
+        code, timed_out = deps["run"](cfg, [rpath, container, t["compose_dir"]])
+    finally:
+        try:
+            os.remove(rpath)
+        except OSError:
+            pass
     if code == 200 and not timed_out:
         os.remove(inc_mark)
         return result("not_run", "watchdog_lock_not_obtained", exit=None)
@@ -210,7 +300,12 @@ def handle(cfg, key, raw, deps):
             waited += cfg.health_interval
             hc, exp = deps["health"](cfg, svc)
         _log(cfg, "ticket %s health re-poll: waited %ss, last code %s, expected %s" % (tid, waited, hc, exp))
-    return result("done", "", exit=code, timed_out=timed_out, health_code=hc, passed=bool(code == 0 and not timed_out and exp and hc == exp))
+    ok = bool(code == 0 and not timed_out and exp and hc == exp)
+    cstate = "not_checked"
+    if cfg.container_check:
+        cstate = deps.get("container", real_container)(cfg, container)
+        ok = ok and cstate in ("running", "healthy")
+    return result("done", "", exit=code, timed_out=timed_out, health_code=hc, container_state=cstate, passed=ok)
 
 def main():
     cfg = Cfg()

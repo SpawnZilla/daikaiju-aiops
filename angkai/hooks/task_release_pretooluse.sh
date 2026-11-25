@@ -42,15 +42,19 @@ HOOKS_DIR="/srv/angkai/.claude/hooks"
 RELEASE_FILE="$HOOKS_DIR/task_released.json"
 
 INPUT="$(cat)"
-SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // "default"')
-AUTH_FLAG="$HOOKS_DIR/session_release_authorized_${SESSION_ID}.flag"
 
-# Already validated this session -- cheap pass-through, no re-parse.
-if [[ -f "$AUTH_FLAG" ]]; then
-  exit 0
+# 2026-11-25 external audit fix: a missing or malformed
+# session_id used to fall back to "default", so every session without an
+# id shared ONE authorization flag. Refuse anything that is not a real id.
+SESSION_ID=$(printf '%s' "$INPUT" | jq -r '.session_id // empty' 2>/dev/null || echo "")
+if [[ ! "$SESSION_ID" =~ ^[A-Za-z0-9][A-Za-z0-9-]{7,127}$ || "$SESSION_ID" == "default" ]]; then
+  echo "BLOCKED: this tool call carries no valid session_id ('$SESSION_ID')." >&2
+  echo "A release can only authorize one identified session -- stop and" >&2
+  echo "report this to the operator." >&2
+  exit 2
 fi
-
-# ---- First tool call of this session: full validation ----
+AUTH_FLAG="$HOOKS_DIR/session_release_authorized_${SESSION_ID}.flag"
+FLAG_TTL="${ANG_RELEASE_FLAG_TTL:-21600}"   # seconds a session stays authorized (6 h)
 
 if [[ -z "${ANG_BRIEF_BASENAME:-}" ]]; then
   echo "BLOCKED: ANG_BRIEF_BASENAME is not set for this session." >&2
@@ -59,6 +63,27 @@ if [[ -z "${ANG_BRIEF_BASENAME:-}" ]]; then
   echo "for every Angkai session, not just this check." >&2
   exit 2
 fi
+
+# Already validated this session -- cheap path, but the flag must name
+# the same brief, carry the consumed task_id, and be younger than FLAG_TTL.
+# An empty or old-format flag is not accepted.
+if [[ -f "$AUTH_FLAG" ]]; then
+  F_BRIEF=$(jq -r '.brief // empty' "$AUTH_FLAG" 2>/dev/null || echo "")
+  F_TASK=$(jq -r '.task_id // empty' "$AUTH_FLAG" 2>/dev/null || echo "")
+  F_TS=$(jq -r '.authorized_at // empty' "$AUTH_FLAG" 2>/dev/null || echo "")
+  NOW=$(date +%s)
+  if [[ -n "$F_BRIEF" && "$F_BRIEF" == "$ANG_BRIEF_BASENAME" && -n "$F_TASK" \
+        && "$F_TS" =~ ^[0-9]+$ && "$NOW" -ge "$F_TS" && $((NOW - F_TS)) -le "$FLAG_TTL" ]]; then
+    exit 0
+  fi
+  rm -f "$AUTH_FLAG" 2>/dev/null || true
+  echo "BLOCKED: this session's authorization flag is expired, old-format," >&2
+  echo "or does not match this session's brief. A new release is needed" >&2
+  echo "-- stop and report this to the operator." >&2
+  exit 2
+fi
+
+# ---- First tool call of this session: full validation ----
 
 if [[ ! -s "$RELEASE_FILE" ]]; then
   echo "BLOCKED: no task has been released to you by Mokaima yet." >&2
@@ -94,6 +119,12 @@ if [[ "$TARGET_AGENT" != "angkai" ]]; then
   exit 2
 fi
 
+if [[ -z "$TASK_ID" ]]; then
+  echo "BLOCKED: the release marker has no task_id -- refusing to authorize" >&2
+  echo "a session that cannot be tied to one task." >&2
+  exit 2
+fi
+
 RELEASE_BASENAME=$(basename "$PAYLOAD_REF" 2>/dev/null || echo "")
 if [[ "$RELEASE_BASENAME" != "$ANG_BRIEF_BASENAME" ]]; then
   echo "BLOCKED: the released task's payload_ref ('$PAYLOAD_REF') does" >&2
@@ -110,6 +141,7 @@ fi
 TMP_FILE="$(mktemp)"
 jq '.status = "consumed"' "$RELEASE_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$RELEASE_FILE"
 chmod 664 "$RELEASE_FILE" || true
-touch "$AUTH_FLAG"
+jq -n --arg b "$ANG_BRIEF_BASENAME" --arg t "$TASK_ID" --argjson ts "$(date +%s)" \
+  '{brief:$b, task_id:$t, authorized_at:$ts}' > "$AUTH_FLAG"
 
 exit 0

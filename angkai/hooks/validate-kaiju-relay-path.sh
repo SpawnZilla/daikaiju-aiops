@@ -73,7 +73,7 @@ fi
 # ---- CHECK 2: write-path allowlist ----
 IS_WRITE_TOOL=0
 case "$TOOL_NAME" in
-  Write|Edit|mcp__vault__write_file|mcp__vault__create_directory) IS_WRITE_TOOL=1 ;;
+  Write|Edit|MultiEdit|NotebookEdit|mcp__vault__write_file|mcp__vault__create_directory) IS_WRITE_TOOL=1 ;;  # MultiEdit/NotebookEdit added (2026-11-25 audit fix)
 esac
 PLANS_DIR="/srv/angkai/.claude/plans"
 if [[ "$IS_WRITE_TOOL" -eq 1 ]] && [[ -n "$FILE_PATH" ]] && { [[ "$FILE_PATH" == "$VAULT_ROOT"* ]] || [[ "$FILE_PATH" == "$PLANS_DIR"* ]]; }; then
