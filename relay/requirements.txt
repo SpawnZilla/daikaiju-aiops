@@ -1,0 +1,5 @@
+# Kaiju Relay MCP server. The code uses the mcp 1.x API (FastMCP); mcp 2.x renamed it.
+mcp==1.28.1
+starlette
+uvicorn
+requests

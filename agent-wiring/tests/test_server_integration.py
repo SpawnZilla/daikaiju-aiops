@@ -17,8 +17,13 @@ import os
 import tempfile
 
 os.environ["KAIJU_VAULT_ROOT"] = tempfile.mkdtemp()
+# Checkpoint state lives under KAIJU_GOVERNANCE_ROOT, not the vault. Point it at a
+# temp dir too, or this test reads and WRITES the real /srv/governance state.
+os.environ["KAIJU_GOVERNANCE_ROOT"] = tempfile.mkdtemp()
 
-import kaiju_mokaima_a2a_adapter as srv
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "mokaima-adapter"))
+import kaiju_mokaima_a2a_adapter as srv  # noqa: E402
 from mcp.shared.memory import create_connected_server_and_client_session
 
 

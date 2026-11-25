@@ -2,7 +2,11 @@
 """test_edit_brief_runs.py -- offline tests for relay_edit_brief_runs.py scoring (2026-09-20)."""
 
 import json
+import os
 import sys
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path[:0] = [_HERE, os.path.dirname(_HERE)]
 
 import relay_edit_brief as E
 import relay_edit_brief_runs as R

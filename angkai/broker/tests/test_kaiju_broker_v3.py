@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for schema_version 3 / edit_brief. Runs as current user; unit restart + probes faked. python3 test_kaiju_broker_v3.py"""
 import hashlib, json, os, sys, tempfile, uuid
-HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE); sys.dont_write_bytecode = True
+HERE = os.path.dirname(os.path.abspath(__file__)); sys.path[:0] = [HERE, os.path.dirname(HERE)]; sys.dont_write_bytecode = True
 T = tempfile.mkdtemp()
 os.environ.update({"KAIBROKER_SPOOL": T+"/spool", "KAIBROKER_STATE": T+"/state", "KAIBROKER_POLICY": T+"/policy.json",
   "KAIBROKER_CHECKPOINT": T+"/cp.json", "KAIBROKER_ALLOWED_UID": str(os.getuid()), "KAIBROKER_NTFY": T+"/none.json"})

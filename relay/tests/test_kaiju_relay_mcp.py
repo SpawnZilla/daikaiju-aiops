@@ -2,7 +2,8 @@
 import os, sys, tempfile, threading, unittest
 root = tempfile.mkdtemp()
 os.environ["VAULT_ROOT"] = root
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path[:0] = [_HERE, os.path.dirname(_HERE)]
 import kaiju_relay_mcp_server as s
 
 target = os.path.join(root, "cfg.txt")

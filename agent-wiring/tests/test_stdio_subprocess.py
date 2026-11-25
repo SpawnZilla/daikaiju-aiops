@@ -22,14 +22,16 @@ from mcp.client.stdio import StdioServerParameters, stdio_client
 
 VAULT_TMP = tempfile.mkdtemp()
 PYTHON = sys.executable
-SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kaiju_mokaima_a2a_adapter.py")
+SCRIPT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "mokaima-adapter", "kaiju_mokaima_a2a_adapter.py")
 
 
 async def main():
     params = StdioServerParameters(
         command=PYTHON,
         args=[SCRIPT],
-        env={**os.environ, "KAIJU_VAULT_ROOT": VAULT_TMP},
+        env={**os.environ, "KAIJU_VAULT_ROOT": VAULT_TMP,
+             # temp governance root: never touch the real checkpoint state
+             "KAIJU_GOVERNANCE_ROOT": tempfile.mkdtemp()},
     )
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:

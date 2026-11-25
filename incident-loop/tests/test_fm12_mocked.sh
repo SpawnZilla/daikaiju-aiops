@@ -4,7 +4,16 @@
 # Needs: bash, jq. Touches nothing outside a mktemp directory; no real docker.
 # Written 2026-10-15. 10 scenarios; prints [ok]/[FAIL] per scenario and exits 1 on any FAIL.
 
-SCRIPT="${1:-$(dirname "$0")/fm12_missing_image_snapshot.sh}"
+SCRIPT="${1:-}"
+if [ -z "$SCRIPT" ]; then
+    D=$(dirname "$0")
+    for c in "$D/fm12_missing_image_snapshot.sh" "$D/../fm12_missing_image_snapshot.sh" \
+             "$D/../watchdog/fm12_missing_image_snapshot.sh" \
+             "$D/../../../incident-loop/watchdog/fm12_missing_image_snapshot.sh"; do
+        [ -f "$c" ] && { SCRIPT="$c"; break; }
+    done
+fi
+[ -f "$SCRIPT" ] || { echo "fm12_missing_image_snapshot.sh not found; pass its path as \$1" >&2; exit 2; }
 T=$(mktemp -d /tmp/fm12test.XXXXXX)
 mkdir -p "$T/bin" "$T/lib" "$T/arr" "$T/other"
 

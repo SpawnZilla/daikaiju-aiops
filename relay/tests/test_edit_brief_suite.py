@@ -16,6 +16,9 @@ import sys
 import tempfile
 import types
 
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path[:0] = [_HERE, os.path.dirname(_HERE)]
+
 import apply_edit_brief as A
 import relay_edit_brief as E
 
