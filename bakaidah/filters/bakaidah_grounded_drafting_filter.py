@@ -240,7 +240,7 @@ description:  Phase 1 -- Filter (inlet/outlet), NOT a Pipe.
   -- not a lenient substring-matching mock, per the documented lesson
   from Reference Existence Gate v0.4/v0.5's own mock-fidelity bug.
 
-  PHASE PLAN (, this file's own build history):
+  PHASE PLAN (this file's own build history):
     v0.1 (2026-08-20) -- async/event-emitter trigger detection.
       DEPLOYED, TESTED, NO VISIBLE TRACE. Superseded by v0.2.
     v0.2 (2026-08-20) -- sync rewrite, passive system-message marker.

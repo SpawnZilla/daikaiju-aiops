@@ -1,8 +1,8 @@
 """
-kai086_content_backup.py (, 2026-09-25) -- real file-content
-backup/restore, extending 's snapshot mechanism.
+content_backup.py (2026-09-25) -- real file-content
+backup/restore, extending the earlier snapshot mechanism.
 
-WHY THIS EXISTS: 's sandbox_snapshot_gate.py already computes and
+WHY THIS EXISTS: the earlier sandbox_snapshot_gate.py already computes and
 stores an mtime+sha256 hash of a target BEFORE any gated call, to DETECT
 whether something changed unexpectedly. It never kept the actual content,
 only enough to notice drift -- it cannot restore anything. the operator asked
@@ -13,7 +13,7 @@ HONESTLY -- see KNOWN LIMITS below before assuming this solves rollback
 in general.
 
 SCOPE, stated plainly: this only makes sense for FILE-CONTENT changes
-(a code edit, a config edit) -- the exact shape of change 's own
+(a code edit, a config edit) -- the exact shape of change the snapshot hook's own
 dry-run promotion tested (a sed -i on a production Python file). It does
 NOT apply to restart-shaped fixes (fm01 restarting a crashed container --
 there is no prior "good" file state to restore, the down container IS
@@ -26,7 +26,7 @@ KNOWN LIMIT: restoring a file's CONTENT does not, by itself, make a
 running service pick up the reverted content. Whatever needed a restart
 to apply the original change also needs a restart to apply the
 rollback -- this module does not know how to restart an arbitrary
-service, that's inherently domain-specific. kai086_auto_rollback_gate.py
+service, that's inherently domain-specific. auto_rollback_gate.py
 (the caller) logs this limitation explicitly in its own alert.
 """
 
@@ -34,7 +34,7 @@ import hashlib
 import os
 import shutil
 
-BACKUP_DIR = os.environ.get("KAI086_BACKUP_DIR", "/srv/angkai/content_backups")
+BACKUP_DIR = os.environ.get("ANGKAI_ROLLBACK_BACKUP_DIR", "/srv/angkai/content_backups")
 
 
 def _backup_path(task_id, target):
@@ -52,7 +52,7 @@ def save_backup(task_id, target):
     simpler case handled by the caller checking existence, not this
     function). Overwrites any prior backup for this exact (task_id,
     target) pair -- each gated call gets a FRESH backup of the state
-    immediately before IT executes, matching 's own per-call
+    immediately before IT executes, matching the snapshot gate's per-call
     snapshot granularity."""
     if not os.path.isfile(target):
         return False

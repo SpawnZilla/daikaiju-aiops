@@ -114,11 +114,11 @@ import json
 json.dump({'task_id': 'REGRESSION-TEST', 'status': 'released', 'target_agent': 'angkai', 'payload_ref': 'regression-suite'}, open('$SANDBOX/task_released.json', 'w'))
 "
 
-export KAI076_HOOKS_DIR="$SANDBOX"
-export KAI076_SNAPSHOT_DIR="$SANDBOX/snapshots"
-export KAI076_DEFAULT_CWD="$SANDBOX"
-export KAI082_HOOKS_DIR="$SANDBOX"
-export KAI086_BACKUP_DIR="$SANDBOX/backups"
+export ANGKAI_SNAPSHOT_HOOKS_DIR="$SANDBOX"
+export ANGKAI_SNAPSHOT_DIR="$SANDBOX/snapshots"
+export ANGKAI_SNAPSHOT_DEFAULT_CWD="$SANDBOX"
+export ANGKAI_AUTHCMD_HOOKS_DIR="$SANDBOX"
+export ANGKAI_ROLLBACK_BACKUP_DIR="$SANDBOX/backups"
 
 # A scratch settings.json, seeded with the same shape real Graft
 # entries take, so the "nothing else got touched" assertion means
@@ -126,7 +126,7 @@ export KAI086_BACKUP_DIR="$SANDBOX/backups"
 cat > "$SANDBOX/settings.json" << 'EOF'
 {"permissions": {"allow": ["Bash(graft:*)", "mcp__graft__graft_find_code"]}}
 EOF
-export KAI082_SETTINGS_PATH="$SANDBOX/settings.json"
+export ANGKAI_AUTHCMD_SETTINGS_PATH="$SANDBOX/settings.json"
 
 TARGET="$SANDBOX/scratch-target-dir/target.txt"
 
@@ -144,7 +144,7 @@ MATCH_EXIT=$?
 echo "external change" >> "$TARGET"
 echo "$BASELINE_JSON" | python3 "$REAL_HOOKS_DIR/sandbox_snapshot_gate.py" pre > /dev/null 2>&1
 MISMATCH_EXIT=$?
-[ "$MISMATCH_EXIT" = "2" ] && pass "externally-changed target correctly BLOCKED (exit 2)" || fail "externally-changed target was NOT blocked (exit $MISMATCH_EXIT) -- REGRESSION, 's core purpose"
+[ "$MISMATCH_EXIT" = "2" ] && pass "externally-changed target correctly BLOCKED (exit 2)" || fail "externally-changed target was NOT blocked (exit $MISMATCH_EXIT) -- REGRESSION of the hook's core purpose"
 
 echo ""
 echo "  -- : arm/disarm + health-check file handling --"
@@ -159,8 +159,8 @@ assert 'Bash(echo regression)' in d['permissions']['allow'], 'new rule missing'
 assert 'Bash(graft:*)' in d['permissions']['allow'], 'original Graft rule lost'
 assert 'mcp__graft__graft_find_code' in d['permissions']['allow'], 'original Graft rule lost'
 print('OK')
-" > /tmp/kai082_check.out 2>&1
-grep -q "^OK$" /tmp/kai082_check.out && pass "settings.json: new rule added, both original Graft entries preserved" || fail "settings.json check failed: $(cat /tmp/kai082_check.out)"
+" > /tmp/authcmd_check.out 2>&1
+grep -q "^OK$" /tmp/authcmd_check.out && pass "settings.json: new rule added, both original Graft entries preserved" || fail "settings.json check failed: $(cat /tmp/authcmd_check.out)"
 
 echo ""
 echo "  -- : rollback fires on health-check failure --"
@@ -193,16 +193,16 @@ if [ "$PRE1_EXIT" = "0" ]; then
     # The gate's ntfy URL is hardcoded (real alert channel), so this fixture used to send a REAL urgent
     # " AUTO-ROLLBACK FIRED" alert on every run. Point curl at a dead proxy (and blank no_proxy) for this one call only;
     # the gate then logs NOTIFY_FAILED in the sandbox log, which is asserted below.
-    echo "$POST_JSON" | http_proxy=http://127.0.0.1:9 https_proxy=http://127.0.0.1:9 no_proxy= NO_PROXY= python3 "$REAL_HOOKS_DIR/kai086_auto_rollback_gate.py" > /dev/null 2>&1
+    echo "$POST_JSON" | http_proxy=http://127.0.0.1:9 https_proxy=http://127.0.0.1:9 no_proxy= NO_PROXY= python3 "$REAL_HOOKS_DIR/auto_rollback_gate.py" > /dev/null 2>&1
     ROLLBACK_GATE_EXIT=$?
-    grep -q "NOTIFY_FAILED" "$SANDBOX/kai086_auto_rollback.log" 2>/dev/null && pass " fixture did NOT send a real ntfy alert (notification was blocked, NOTIFY_FAILED logged)" || fail " fixture may have sent a REAL ntfy alert (no NOTIFY_FAILED in the sandbox log)"
+    grep -q "NOTIFY_FAILED" "$SANDBOX/auto_rollback.log" 2>/dev/null && pass "fixture did NOT send a real ntfy alert (notification was blocked, NOTIFY_FAILED logged)" || fail "fixture may have sent a REAL ntfy alert (no NOTIFY_FAILED in the sandbox log)"
     [ "$ROLLBACK_GATE_EXIT" = "0" ] && pass "rollback gate ran without error (exit 0, PostToolUse never blocks)" || fail "rollback gate itself errored unexpectedly (exit $ROLLBACK_GATE_EXIT)"
 
     RESTORED_CONTENT2=$(cat "$TARGET2" 2>/dev/null)
     if echo "$RESTORED_CONTENT2" | grep -q "clean state v1"; then
         pass "file content genuinely restored to its pre-call state after a failing health check"
     else
-        fail "file content was NOT restored -- REGRESSION, 's core purpose. Got: $RESTORED_CONTENT2"
+        fail "file content was NOT restored -- REGRESSION of the hook's core purpose. Got: $RESTORED_CONTENT2"
     fi
 fi
 
@@ -217,10 +217,10 @@ d = json.load(open('$SANDBOX/settings.json'))
 assert 'Bash(echo regression)' not in d['permissions']['allow'], 'disarmed rule still present'
 assert 'Bash(graft:*)' in d['permissions']['allow'], 'Graft rule lost on disarm'
 print('OK')
-" > /tmp/kai082_disarm_check.out 2>&1
-grep -q "^OK$" /tmp/kai082_disarm_check.out && pass "settings.json: disarmed rule removed, Graft entries survived" || fail "disarm settings check failed: $(cat /tmp/kai082_disarm_check.out)"
+" > /tmp/authcmd_disarm_check.out 2>&1
+grep -q "^OK$" /tmp/authcmd_disarm_check.out && pass "settings.json: disarmed rule removed, Graft entries survived" || fail "disarm settings check failed: $(cat /tmp/authcmd_disarm_check.out)"
 
-rm -rf "$SANDBOX" /tmp/kai082_check.out /tmp/kai082_disarm_check.out
+rm -rf "$SANDBOX" /tmp/authcmd_check.out /tmp/authcmd_disarm_check.out
 echo ""
 echo "  Sandbox cleaned up."
 

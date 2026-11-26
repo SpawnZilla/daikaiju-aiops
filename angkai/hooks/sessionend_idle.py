@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-kai084_sessionend_idle.py (, 2026-09-25) -- SessionEnd hook that
+sessionend_idle.py (2026-09-25) -- SessionEnd hook that
 moves task_released.json from "consumed" to an explicit "idle" state when
 an Angkai session ends, so a consumed marker no longer sits there
 indefinitely looking like live state.
@@ -25,7 +25,7 @@ NEVER BLOCKS / NEVER RAISES: SessionEnd cannot block; every failure path
 logs and exits 0. SessionEnd may not run at all if the process is killed
 by a signal (SIGKILL/OOM) -- a known limit, see the deployment guide.
 
-Stdlib only. TEST-ONLY env override: KAI084_HOOKS_DIR.
+Stdlib only. TEST-ONLY env override: ANGKAI_IDLE_HOOKS_DIR.
 """
 
 import datetime
@@ -35,9 +35,9 @@ import sys
 
 sys.dont_write_bytecode = True
 
-HOOKS_DIR = os.environ.get("KAI084_HOOKS_DIR", "/srv/angkai/.claude/hooks")
+HOOKS_DIR = os.environ.get("ANGKAI_IDLE_HOOKS_DIR", "/srv/angkai/.claude/hooks")
 RELEASE_FILE = os.path.join(HOOKS_DIR, "task_released.json")
-LOG_FILE = os.path.join(HOOKS_DIR, "kai084_sessionend.log")
+LOG_FILE = os.path.join(HOOKS_DIR, "sessionend_idle.log")
 
 
 def _now():
@@ -87,7 +87,7 @@ def main():
     updated["idled_at"] = _now()
     updated["idled_by_session"] = session_id
 
-    tmp_path = RELEASE_FILE + ".kai084.tmp"
+    tmp_path = RELEASE_FILE + ".idle.tmp"
     try:
         with open(tmp_path, "w", encoding="utf-8") as fh:
             json.dump(updated, fh, indent=2)

@@ -480,7 +480,7 @@ that failed should be listed explicitly (same "mechanical, not vague"
 pattern as every other check this session) -- not just a generic
 "review needed."
 NOT YET DONE: no code written for Stage C at all. This is scope only.
-Natural integration with AIOPS_PENDING.md 's checkpoint gate
+Natural integration with AIOPS_PENDING.md's checkpoint gate
 design -- Stage C BLOCK is exactly the kind of mandatory-checkpoint
 trigger that design is built around (see kaiju-relay/
 checkpoint_gate_design.md).

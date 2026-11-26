@@ -105,7 +105,7 @@ people. Most of them are running similar stacks and facing the same problems.
 ## Kaiju_OS.md/now-Kaiju_GAIS.md 2026-07-20 "v1.0 gaps" list —
 ## these were always about the combined package, not the substrate)
 
-1. **Bootstrap installer** — BUILT 2026-09-17 (, `install.sh`),
+1. **Bootstrap installer** — BUILT 2026-09-17 (`install.sh`),
    TESTED across 3 real rounds, CLOSED. See
    AIOPS_PENDING.md  for the full build+test history. This gap
    is now RESOLVED — the remaining gaps below are what's left before a
@@ -215,7 +215,7 @@ cd kaiju-os
 ./install.sh
 ```
 - Missing Docker → instruct-and-exit, no silent auto-install (same
-  precedent as 's autonomy scope).
+  precedent as the autonomy scope gate).
 - Installer stands up the watchdog (FASHSD), an vault-style
   git-initialized archive directory, and the orchestration/guardrail
   scaffolding.

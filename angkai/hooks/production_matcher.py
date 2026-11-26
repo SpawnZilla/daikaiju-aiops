@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-production_matcher.py -- shared production-signature matcher (,
-2026-09-19). Stdlib only. Built to be REUSED by 's future snapshot
+production_matcher.py -- shared production-signature matcher (
+2026-09-19). Stdlib only. Built to be REUSED by the future snapshot
 hook (the operator's decision 2026-09-19: the snapshot gate stays a separate
 sibling hook, but both share this matcher and production_signatures.conf).
 
@@ -9,7 +9,7 @@ It does two jobs:
   1. NORMALIZE one PreToolUse tool call (Bash, Write/Edit, any mcp write-ish
      tool) into candidate targets: relative paths resolved against the
      call's cwd, symlinks and '..' resolved (os.path.realpath), '~' expanded.
-     This is the fix for 's relative-path blind spot.
+     This is the fix for the earlier relative-path blind spot.
   2. MATCH the targets against production_signatures.conf.
 
 CONFIG LINES ('#' comments and blank lines allowed):

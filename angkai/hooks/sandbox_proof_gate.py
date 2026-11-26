@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 sandbox_proof_gate.py -- the decision logic behind sandbox_proof_pretooluse.sh
-(, 2026-09-19). Stdlib only.
+(2026-09-19). Stdlib only.
 
 Chain contract (same as the other hooks): one JSON object on stdin
 (tool_name, tool_input, cwd, session_id ...); exit 0 = allow; exit 2 = block
@@ -36,8 +36,8 @@ owns the hooks dir, so it could edit the gate itself, and its docker-group
 membership is root-equivalent -- this raises the bar from "one stray write" to
 "deliberate tampering"; real protection is  layer A.
 
-TEST-ONLY ENV OVERRIDES: KAI064_HOOKS_DIR, KAI064_PROOF_DIR, KAI064_DEFAULT_CWD,
-KAI064_TEST_AGENT_UID (the agent cannot set the environment of its own hook).
+TEST-ONLY ENV OVERRIDES: ANGKAI_PROOF_HOOKS_DIR, ANGKAI_PROOF_DIR, ANGKAI_PROOF_DEFAULT_CWD,
+ANGKAI_PROOF_TEST_AGENT_UID (the agent cannot set the environment of its own hook).
 """
 
 import datetime
@@ -49,9 +49,9 @@ import sys
 
 sys.dont_write_bytecode = True
 
-HOOKS_DIR = os.environ.get("KAI064_HOOKS_DIR", "/srv/angkai/.claude/hooks")
-PROOF_DIR = os.environ.get("KAI064_PROOF_DIR", "/srv/angkai/sandbox_proofs")
-DEFAULT_CWD = os.environ.get("KAI064_DEFAULT_CWD", "/srv/angkai")
+HOOKS_DIR = os.environ.get("ANGKAI_PROOF_HOOKS_DIR", "/srv/angkai/.claude/hooks")
+PROOF_DIR = os.environ.get("ANGKAI_PROOF_DIR", "/srv/angkai/sandbox_proofs")
+DEFAULT_CWD = os.environ.get("ANGKAI_PROOF_DEFAULT_CWD", "/srv/angkai")
 sys.path.insert(0, HOOKS_DIR)
 
 _SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._-]{1,80}$")
@@ -59,7 +59,7 @@ _SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._-]{1,80}$")
 
 def _agent_uid():
     try:
-        return int(os.environ["KAI064_TEST_AGENT_UID"])
+        return int(os.environ["ANGKAI_PROOF_TEST_AGENT_UID"])
     except (KeyError, ValueError):
         return os.getuid()
 

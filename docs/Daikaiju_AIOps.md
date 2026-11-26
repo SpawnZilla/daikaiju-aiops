@@ -451,7 +451,7 @@ See PENDING.md for all active tasks.
 ---
 
 *End of Daikaiju_AIOps.md v1.1*
-*Last updated: 2026-08-06 (, product-structure reconciliation)
+*Last updated: 2026-08-06 (product-structure reconciliation)
 -- Orchestration and Guardrail layers added as owned, built-and-
 running components (moved from Kaiju_Spine.md's own layer list -- they
 were always agent-reasoning territory). "Current State vs Target

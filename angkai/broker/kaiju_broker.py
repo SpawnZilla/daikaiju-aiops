@@ -52,7 +52,7 @@ Check order (first failure wins):
           written (bad destination, missing prod_check, write error) ->
           "failed_not_applied" (escalate).
 
-B2 DECISION (2026-09-26): 's proof store (/srv/angkai/
+B2 DECISION (2026-09-26): the earlier proof store (/srv/angkai/
 sandbox_proofs) has no producer and its format carries no artifact hash, so
 it cannot say WHICH code passed. Per the approved Q2 ("the broker re-runs a
 fixed check itself rather than trusting Angkai's report"), the broker now

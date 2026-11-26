@@ -112,7 +112,7 @@ def main():
 
     # --apply mode: backup first, then write.
     ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M%S")
-    backup_path = f"{path}.bak-kai056-{ts}"
+    backup_path = f"{path}.bak-{ts}"
     shutil.copy2(path, backup_path)
     print(f"Backed up original to: {backup_path}")
 

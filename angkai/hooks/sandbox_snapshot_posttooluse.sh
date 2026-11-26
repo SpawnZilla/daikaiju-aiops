@@ -6,6 +6,6 @@
 # Registered independently in settings.json (alongside audit_log_posttooluse.sh),
 # NOT inside pretooluse_chain.sh -- see the  deployment guide for the
 # real settings.json hook-registration format, confirmed before wiring.
-HOOKS_DIR="${KAI076_HOOKS_DIR:-/srv/angkai/.claude/hooks}"
+HOOKS_DIR="${ANGKAI_SNAPSHOT_HOOKS_DIR:-/srv/angkai/.claude/hooks}"
 /usr/bin/python3 "$HOOKS_DIR/sandbox_snapshot_gate.py" post
 exit 0

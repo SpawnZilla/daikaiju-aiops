@@ -5,7 +5,7 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.path // 
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 KAIJU_RELAY_ROOT="/srv/kaiju-vault/kaiju-relay"
 VAULT_ROOT="/srv/kaiju-vault"
-KAI052_TOKENIZER="/srv/angkai/.claude/hooks/kai052_tokenize.py"
+TOKENIZER="/srv/angkai/.claude/hooks/command_tokenize.py"
 srv_ROOT="/srv"
 #  Layer C (2026-09-26): the broker spool is where Angkai submits
 # promotion requests -- a known root, but ONLY the incoming/ directory.
@@ -116,7 +116,7 @@ extract_bash_read_target() {
   local tok
   while IFS= read -r -d '' tok; do
     tokens+=("$tok")
-  done < <("$KAI052_TOKENIZER" "$cmd" 2>/dev/null)
+  done < <("$TOKENIZER" "$cmd" 2>/dev/null)
 
   [[ "${#tokens[@]}" -eq 0 ]] && return 1
 

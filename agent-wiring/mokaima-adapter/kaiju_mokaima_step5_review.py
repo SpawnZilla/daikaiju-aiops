@@ -70,13 +70,13 @@ resets the ladder to stage_0. It is not counted as a clean run either:
 the checkpoint is left exactly as it was. Three prior resets (2026-09-17,
 09-24, 09-26) were all correct escalations punished as failures. The
 route is unchanged (still escalate_to_operator), and the escalation still
-notifies the operator via 's "NEUTRAL:" branch, because before this change
+notifies the operator via the earlier "NEUTRAL:" branch, because before this change
 the RESET alert was the only out-of-band signal an escalation produced.
 An escalation that coincides with a real section 6 warning or a stage
 error still resets, exactly as before. Tested 9/9 on intake-host
 2026-09-26 against the real filter/gate/state machine (staging:
 angkai/staging/-neutral-escalation/). Previous version:
-kaiju_mokaima_step5_review.py.bak-kai054neutral-20260926.
+kaiju_mokaima_step5_review.py.bak-neutral-20260926.
 
 MANUAL-REVIEW-OVERRIDE UPDATE (2026-09-30, Full Auto part 15): before
 this change, the only inputs that could make a run non-clean were

@@ -8,7 +8,7 @@ it. Runs as the angkai user (same as every other Angkai hook), so it
 never needs cross-user access to anything: reads its own session's
 own transcript and its own audit logs, all angkai-owned.
 
-Fail-open by construction (matches 's priority): any error in
+Fail-open by construction (matches the earlier priority): any error in
 this script's own logic must never block or delay Angkai's turn.
 Always exits 0.
 

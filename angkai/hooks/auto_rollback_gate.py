@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-kai086_auto_rollback_gate.py (, 2026-09-25) -- optional,
+auto_rollback_gate.py (2026-09-25) -- optional,
 opt-in automatic rollback for the ONE armed command a task
 runs, if its own operator-supplied health check fails afterward.
 
-HOW IT FITS: 's `arm` optionally writes a health-check command to
-task_health_check.txt (empty by default -- see kai082_authorized_command_lib.py's
+HOW IT FITS: the earlier `arm` optionally writes a health-check command to
+task_health_check.txt (empty by default -- see authorized_command_lib.py's
  update). This hook, registered as a PostToolUse entry AFTER
-'s own re-baseline hook, does nothing at all unless that file is
+the snapshot gate's re-baseline hook, does nothing at all unless that file is
 non-empty for THIS task -- auto-rollback is opt-in per task, never a
 new default behavior.
 
@@ -25,7 +25,7 @@ task_health_check.txt names a real command:
      why. A human MUST know an automatic rollback happened -- this is
      not a silent recovery.
 
-SCOPE, restated from kai086_content_backup.py: this only meaningfully
+SCOPE, restated from content_backup.py: this only meaningfully
 covers FILE-CONTENT changes. If the armed command didn't touch any
 file  was already tracking (e.g. it was a pure restart with no
 file edit), there is nothing to restore -- the alert says so plainly
@@ -50,13 +50,13 @@ import sys
 
 sys.dont_write_bytecode = True
 
-HOOKS_DIR = os.environ.get("KAI076_HOOKS_DIR", "/srv/angkai/.claude/hooks")
-DEFAULT_CWD = os.environ.get("KAI076_DEFAULT_CWD", "/srv/angkai")
+HOOKS_DIR = os.environ.get("ANGKAI_SNAPSHOT_HOOKS_DIR", "/srv/angkai/.claude/hooks")
+DEFAULT_CWD = os.environ.get("ANGKAI_SNAPSHOT_DEFAULT_CWD", "/srv/angkai")
 HEALTH_CHECK_FILE = os.path.join(HOOKS_DIR, "task_health_check.txt")
-HEALTH_CHECK_TIMEOUT_SECONDS = int(os.environ.get("KAI086_HEALTH_CHECK_TIMEOUT", "30"))
+HEALTH_CHECK_TIMEOUT_SECONDS = int(os.environ.get("ANGKAI_ROLLBACK_HEALTH_CHECK_TIMEOUT", "30"))
 
-NTFY_URL = os.environ.get("KAI086_NTFY_URL", "http://192.0.2.45:8201/kaiju-alerts")
-NTFY_ENV_FILE = os.environ.get("KAI086_NTFY_ENV", "/etc/kaiju-os/ntfy.env")
+NTFY_URL = os.environ.get("ANGKAI_ROLLBACK_NTFY_URL", "http://192.0.2.45:8201/kaiju-alerts")
+NTFY_ENV_FILE = os.environ.get("ANGKAI_ROLLBACK_NTFY_ENV", "/etc/kaiju-os/ntfy.env")
 
 
 def _ntfy_credential():
@@ -85,7 +85,7 @@ sys.path.insert(0, HOOKS_DIR)
 def _log(line):
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     try:
-        with open(os.path.join(HOOKS_DIR, "kai086_auto_rollback.log"), "a", encoding="utf-8") as fh:
+        with open(os.path.join(HOOKS_DIR, "auto_rollback.log"), "a", encoding="utf-8") as fh:
             fh.write("%s %s\n" % (stamp, line))
     except OSError:
         pass
@@ -123,7 +123,7 @@ def _current_task_id():
 def _resolve_targets(call):
     """Same target-resolution logic as sandbox_snapshot_gate.py's _post()
     -- deliberately duplicated rather than imported, so a bug in 's
-    own module can never silently disable 's rollback path too."""
+    own module can never silently disable this rollback path too."""
     import production_matcher
     sigs, options = production_matcher.load_signatures(os.path.join(HOOKS_DIR, "production_signatures.conf"))
     match = production_matcher.match_tool_call(call, sigs, options, DEFAULT_CWD)
@@ -201,11 +201,11 @@ def main():
 
     _log("HEALTH_CHECK_FAILED task=%s exit=%s output=%s" % (task_id, check_exit, check_output[:500]))
 
-    import kai086_content_backup
+    import content_backup
     restored = []
     not_restored = []
     for target in sorted(targets):
-        if kai086_content_backup.restore_backup(task_id, target):
+        if content_backup.restore_backup(task_id, target):
             restored.append(target)
             _log("ROLLBACK_RESTORED task=%s target=%s" % (task_id, target))
         else:

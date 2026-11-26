@@ -98,7 +98,7 @@ confirm() {
 # soon as its own download/extract/service-enable finishes, but on a
 # fresh install this routinely takes 20-30s of real wall time (the
 # binary download+extraction itself, confirmed via journalctl on
-# Fedora and Arch test VMs, KAI-097) before ollama.service actually
+# Fedora and Arch test VMs) before ollama.service actually
 # starts listening -- so the very next command, 'ollama pull', loses
 # that race deterministically. Poll the real API instead of trusting
 # the upstream installer's own "available" message (observed on Arch
@@ -118,7 +118,7 @@ wait_for_ollama_api() {
     return 1
 }
 
-# --- Package manager abstraction (KAI-097 distro portability) --
+# --- Package manager abstraction (distro portability) --
 # apt (Debian/Ubuntu) behaves as before; pacman (Arch) and dnf (Fedora)
 # were added and ran the minimal path clean on Arch and Fedora 44 Cloud
 # Base. See Distro_Portability_Design.md. ---
@@ -150,7 +150,7 @@ kaiju_install_pkg() {
             sudo pacman -Sy --noconfirm "$pkg"
             ;;
         dnf)
-            # Fedora round (KAI-097): names verified against a real
+            # Fedora round: names verified against a real
             # Fedora 44 Cloud box, see RESULTS_fedora.md.
             sudo dnf install -y "$pkg"
             ;;
@@ -505,7 +505,7 @@ EOF
     echo "Vault structure written to $vault_path"
 
     if [ ! -d "$vault_path/.git" ]; then
-        # fix (KAI-097, Arch round): git was assumed present -- true on
+        # fix (Arch round): git was assumed present -- true on
         # the Debian/Ubuntu cloud images this was tested on, but Arch's
         # cloud image ships without it, and this block had no check,
         # so git init/add/commit all silently failed ("command not

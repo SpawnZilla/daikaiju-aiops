@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-kai082_authorized_command_lib.py (, Option B, 2026-09-24) -- a
+authorized_command_lib.py (Option B, 2026-09-24) -- a
 REUSABLE arm/disarm mechanism so any future promotion-class task can
 unlock exactly one mutating Bash command through Claude Code's OWN
 permission layer, without loosening it beyond that one exact command.
-Generalizes the one-off approach dryrun_kai064.sh used for 's dry
+Generalizes the one-off approach an earlier dry-run script used for 's dry
 run into something any future ticket can call. Used by
 arm_authorized_command.py and disarm_authorized_command.py in this same
 directory -- not meant to be run directly.
@@ -16,7 +16,7 @@ sufficient -- Claude Code's OWN permission layer sits in front of all five
 of our PreToolUse hooks and, under the runner's -p (headless) mode with no
 one to answer an approval prompt, denies any mutating Bash command that
 isn't covered by an allow rule, no matter what our hooks would have
-decided ('s root cause, confirmed live 2026-09-20 -- five hooks
+decided (the earlier root cause, confirmed live 2026-09-20 -- five hooks
 passed a `sed -i` and Claude Code's own layer still blocked it).
 
 THE FIX: `arm` writes the EXACT command to BOTH task_authorized_command.txt
@@ -42,7 +42,7 @@ SESSION-RESTART CAVEAT (same subprocess-staleness pattern as every other
 hook/settings.json change in this project): a settings.json change takes
 effect on the NEXT `claude` process start, not inside an already-running
 session. Arm BEFORE launching the session that needs the command, same as
-'s dry run already did -- this is not for arming mid-session.
+the earlier dry run already did -- this is not for arming mid-session.
 
 KNOWN LIMIT, NOT VERIFIED: Claude Code's Bash(...) rule syntax was checked
 against the docs' own examples, none of which contain a literal `(` or `)`
@@ -54,11 +54,11 @@ flagged, not solved, here.
  UPDATE (2026-09-25): `arm` now accepts an OPTIONAL 3rd argument,
 a health-check command, written to task_health_check.txt alongside the
 existing task_authorized_command.txt. This is what
-kai086_auto_rollback_gate.py (a separate, optional PostToolUse hook)
+auto_rollback_gate.py (a separate, optional PostToolUse hook)
 reads to decide whether the armed command's own change should be
 automatically rolled back -- if provided and it exits non-zero after the
-armed command runs, the target's pre-call content backup ('s own
-extension, kai086_content_backup.py) is restored and the operator is alerted.
+armed command runs, the target's pre-call content backup (the snapshot hook's own
+extension, content_backup.py) is restored and the operator is alerted.
 Purely additive: arming WITHOUT a health-check works exactly as before,
 no auto-rollback behavior at all -- this is opt-in per task, not a new
 default.
@@ -69,11 +69,11 @@ import os
 import sys
 import datetime
 
-HOOKS_DIR = os.environ.get("KAI082_HOOKS_DIR", "/srv/angkai/.claude/hooks")
-SETTINGS_PATH = os.environ.get("KAI082_SETTINGS_PATH", "/srv/angkai/.claude/settings.json")
+HOOKS_DIR = os.environ.get("ANGKAI_AUTHCMD_HOOKS_DIR", "/srv/angkai/.claude/hooks")
+SETTINGS_PATH = os.environ.get("ANGKAI_AUTHCMD_SETTINGS_PATH", "/srv/angkai/.claude/settings.json")
 AUTH_CMD_FILE = os.path.join(HOOKS_DIR, "task_authorized_command.txt")
 HEALTH_CHECK_FILE = os.path.join(HOOKS_DIR, "task_health_check.txt")  #
-STATE_FILE = os.path.join(HOOKS_DIR, "kai082_armed_state.json")
+STATE_FILE = os.path.join(HOOKS_DIR, "authcmd_armed_state.json")
 
 
 def _write_inplace(path, text):
@@ -94,7 +94,7 @@ def _write_inplace(path, text):
 
 def _backup(path):
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    backup_path = "%s.bak-kai082-%s" % (path, stamp)
+    backup_path = "%s.bak-authcmd-%s" % (path, stamp)
     with open(path, "r", encoding="utf-8") as src, open(backup_path, "w", encoding="utf-8") as dst:
         dst.write(src.read())
     return backup_path
@@ -177,7 +177,7 @@ def disarm():
         print("Nothing armed (no state file) -- checking for a stray authorized-command file...")
         if os.path.exists(AUTH_CMD_FILE) and open(AUTH_CMD_FILE, encoding="utf-8").read().strip():
             print("WARNING: task_authorized_command.txt is non-empty but no  state file exists.")
-            print("This was likely armed by something else (e.g. the old dryrun_kai064.sh path).")
+            print("This was likely armed by something else (e.g. the old an earlier dry-run script path).")
             print("Not touching settings.json (no rule recorded to remove). Truncating the auth file only.")
             _write_inplace(AUTH_CMD_FILE, "")
         else:

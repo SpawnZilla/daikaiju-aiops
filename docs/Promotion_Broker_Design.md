@@ -133,7 +133,7 @@ test_kaiju_broker.py 26/26 PASS in Mokaima's sandbox, policy.json,
 b1_setup_install.sh, b1_host_check.sh). Deviations from this doc: policy is
 JSON not YAML (stdlib-only); request adds a required target_relpath field;
 proof_dir is deliberately UNALIGNED (fails closed) until B2 aligns it with
-'s real proof record. Host install + D-C10 check pending (sudo).
+the earlier real proof record. Host install + D-C10 check pending (sudo).
 B1 DEPLOYED + VERIFIED 2026-09-26 (the operator, dokaisho): host unit tests 26/26;
 b1_setup_install.sh created kaibroker (uid 995, own group only), dirs and
 ACLs exactly per design; b1_host_check.sh 14/14 -- D-C10 all PASS as the real
@@ -260,7 +260,7 @@ REACHED THE BROKER through Claude Code + all hooks (ledger: rejected_fixable, th
 probe was deliberately not a full request) -- so the CLI roots hold, no roots-protocol
 override; (3) every tool call CHAIN_ALL_PASS stages=6 on the root-owned hooks (the
 lockdown's owed live check: PASSED); (4)  SessionEnd fired in -p mode
-(reason=other, marker consumed -> idle) -- 's last open item CLOSED.
+(reason=other, marker consumed -> idle) -- the last open item CLOSED.
 FOUND ON THE WAY (lockdown side effect): fs.protected_regular=2 + the now sticky,
 group-writable hooks dir made the kernel refuse O_CREAT opens of angkai-owned files
 (even for root) -> every release_task.sh run (manual AND Mokaima's auto-release) had

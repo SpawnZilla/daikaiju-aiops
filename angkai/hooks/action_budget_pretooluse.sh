@@ -66,7 +66,7 @@
 # CORRECT PATH (/srv/angkai/.claude/hooks/task_budget.txt — NOT
 # /srv/angkai/task_budget.txt, a real staging mistake found and
 # fixed 2026-08-25), AND ensure ANG_BRIEF_BASENAME is set at launch to
-# the brief's own filename (per 's existing requirement and the
+# the brief's own filename (per the existing requirement and the
 # corrected standard launch command in state-doc). Omitting
 # task_budget.txt, or leaving it empty, means no budget is enforced by
 # this script for that session — CHECK 2b and the other existing

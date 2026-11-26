@@ -45,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/srv/angkai/.claude/hooks/kai086_auto_rollback_posttooluse.sh"
+            "command": "/srv/angkai/.claude/hooks/auto_rollback_posttooluse.sh"
           }
         ]
       }
@@ -77,7 +77,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /srv/angkai/.claude/hooks/kai084_sessionend_idle.py",
+            "command": "python3 /srv/angkai/.claude/hooks/sessionend_idle.py",
             "timeout": 10
           }
         ]

@@ -257,7 +257,7 @@ actually describing the combined shippable package, not the substrate
 alone. "THE TARGET USER" and "WHAT MAKES THIS COMMERCIALLY INTERESTING"
 sections also moved to Kaiju_Spine.md for the same reason. Full rationale:
 AIOPS_PENDING.md  update, same date.*
-*Last updated: 2026-08-06 (, product-structure reconciliation)
+*Last updated: 2026-08-06 (product-structure reconciliation)
 -- Layer 1 (Orchestration) and Layer 2 (Guardrail) removed entirely;
 they belong to Daikaiju AIOps, not the substrate. Remaining four
 layers renumbered (old 3/4/5/6 -> new 1/2/3/4).*

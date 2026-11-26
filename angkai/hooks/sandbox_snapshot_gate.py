@@ -2,7 +2,7 @@
 """
 sandbox_snapshot_gate.py -- decision logic for  (2026-09-20), the
 event-adjacency snapshot gate. Stdlib only. Registered as a SEPARATE sibling
-hook to 's sandbox_proof_gate.py -- both share production_matcher.py
+hook to the earlier sandbox_proof_gate.py -- both share production_matcher.py
 and production_signatures.conf (per the operator's 2026-09-19 decision, already
 noted in production_signatures.conf's own header).
 
@@ -46,7 +46,7 @@ KNOWN LIMIT (same class as 's): the snapshot store lives under this
 same agent's write access (SNAPSHOT_DIR below), so this gate stops
 accidents and external interference, not an agent that deliberately
 tampers with its own snapshot files to unblock itself -- that requires
- layer A (guardrail self-protection), same as 's own
+ layer A (guardrail self-protection), same as the proof gate's own
 documented limit. This gate's real value is catching a stale read against
 external changes (another session, the watchdog, a human editing the file
 directly), which is the failure mode it was written for.
@@ -59,20 +59,20 @@ own mtime (e.g. an in-place edit via an open file descriptor) will not be
 caught. File-level signatures get full mtime+sha256 tracking.
 
  UPDATE (2026-09-25): _pre() now ALSO saves a real content backup
-(kai086_content_backup.save_backup) for every real file target, right at
+(content_backup.save_backup) for every real file target, right at
 the moment it's about to ALLOW (both the baseline case and the match
 case) -- this is the "state immediately before this specific call
-executes" restore point kai086_auto_rollback_gate.py (a separate,
+executes" restore point auto_rollback_gate.py (a separate,
 optional PostToolUse hook) uses if that call's own health check later
 fails. This is a pure addition: the existing hash-based drift detection
 above is completely unchanged, backup-saving failures never block a call
-(best-effort, logged only) so 's own core purpose can't regress
+(best-effort, logged only) so the snapshot gate's core purpose can't regress
 because of a  problem (e.g. the backup disk being full).
 
-TEST-ONLY ENV OVERRIDES: KAI076_HOOKS_DIR, KAI076_SNAPSHOT_DIR,
-KAI076_DEFAULT_CWD, KAI076_MAX_AGE_SECONDS (see also KAI064_* which this
+TEST-ONLY ENV OVERRIDES: ANGKAI_SNAPSHOT_HOOKS_DIR, ANGKAI_SNAPSHOT_DIR,
+ANGKAI_SNAPSHOT_DEFAULT_CWD, ANGKAI_SNAPSHOT_MAX_AGE_SECONDS (see also ANGKAI_PROOF_* which this
 file does not use directly but production_matcher.py's config path does
-follow KAI076_HOOKS_DIR here, not KAI064_HOOKS_DIR).
+follow ANGKAI_SNAPSHOT_HOOKS_DIR here, not ANGKAI_PROOF_HOOKS_DIR).
 """
 
 import datetime
@@ -84,10 +84,10 @@ import sys
 
 sys.dont_write_bytecode = True
 
-HOOKS_DIR = os.environ.get("KAI076_HOOKS_DIR", "/srv/angkai/.claude/hooks")
-SNAPSHOT_DIR = os.environ.get("KAI076_SNAPSHOT_DIR", "/srv/angkai/sandbox_snapshots")
-DEFAULT_CWD = os.environ.get("KAI076_DEFAULT_CWD", "/srv/angkai")
-MAX_AGE_SECONDS = int(os.environ.get("KAI076_MAX_AGE_SECONDS", str(6 * 3600)))  # loose backstop, default 6h
+HOOKS_DIR = os.environ.get("ANGKAI_SNAPSHOT_HOOKS_DIR", "/srv/angkai/.claude/hooks")
+SNAPSHOT_DIR = os.environ.get("ANGKAI_SNAPSHOT_DIR", "/srv/angkai/sandbox_snapshots")
+DEFAULT_CWD = os.environ.get("ANGKAI_SNAPSHOT_DEFAULT_CWD", "/srv/angkai")
+MAX_AGE_SECONDS = int(os.environ.get("ANGKAI_SNAPSHOT_MAX_AGE_SECONDS", str(6 * 3600)))  # loose backstop, default 6h
 sys.path.insert(0, HOOKS_DIR)
 
 _SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._-]{1,80}$")
@@ -107,8 +107,8 @@ def _save_backup_best_effort(task_id, target):
     a backup-save failure (e.g. disk full) must not turn into a
     outage, since backup-saving is an addition, not the gate's core job."""
     try:
-        import kai086_content_backup
-        saved = kai086_content_backup.save_backup(task_id, target)
+        import content_backup
+        saved = content_backup.save_backup(task_id, target)
         if saved:
             _log("SNAPSHOT_GATE_BACKUP_SAVED task=%s target=%s" % (task_id, target))
     except Exception as exc:  # noqa: BLE001

@@ -14,7 +14,7 @@ description: Deterministic inlet gate. (v0.2, 2026-10-25: the example's vault
   fabricated incident records that don't exist in the real journal),
   abstract structural rules (OUTPUT CONSTRAINT 8) were clearly not
   enough on their own. This Filter injects one complete, real,
-  Mokaima-approved MABS brief (, for a different, unrelated
+  Mokaima-approved MABS brief (for a different, unrelated
   service -- FM-05 drive-mount fix, NOT Vaultwarden or whatever is
   actually being requested) directly into context whenever a brief-
   drafting request is detected, so Bakaidah has a concrete shape to

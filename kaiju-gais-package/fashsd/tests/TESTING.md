@@ -228,7 +228,7 @@ so it isn't forgotten.
 
 ### Round 3 results — fm03_gluetun_unhealthy.sh (Step 9)
 
-**Tested 2026-09-08 ("Daikaiju AIOps & Kaiju GIAS Full Auto setup
+**Tested 2026-09-08 ("Daikaiju AIOps & Kaiju GAIS Full Auto setup
 part 2"), by the maintainer on Dokaisho:**
 
 ```
